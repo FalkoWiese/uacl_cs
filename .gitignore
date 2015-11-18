@@ -1,0 +1,8 @@
+serverConsole/.vs
+serverConsole/packages/
+*.pyc
+serverConsole/serverConsole/bin
+serverConsole/serverConsole/obj
+serverConsole/TestServerConsole/bin
+serverConsole/TestResult.xml
+serverConsole/TestServerConsole/obj/
