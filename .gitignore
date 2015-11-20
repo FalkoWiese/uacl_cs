@@ -8,3 +8,10 @@ serverConsole/TestResult.xml
 serverConsole/TestServerConsole/obj/
 .idea/
 serverConsole/NUnit.3.0.0/
+.vs/ServerConsole/v14/.suo
+packages/*
+ServerConsole/bin/
+ServerConsole/obj/
+TestServerConsole/bin
+TestResult.xml
+TestServerConsole/obj/
