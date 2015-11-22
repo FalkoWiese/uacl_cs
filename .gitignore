@@ -6,3 +6,11 @@ serverConsole/serverConsole/obj
 serverConsole/TestServerConsole/bin
 serverConsole/TestResult.xml
 serverConsole/TestServerConsole/obj/
+.idea/
+.vs/
+packages/
+ServerConsole/bin/
+ServerConsole/obj/
+TestResult.xml
+TestServerConsole/bin/
+TestServerConsole/obj/
