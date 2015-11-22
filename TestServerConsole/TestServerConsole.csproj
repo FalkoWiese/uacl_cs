@@ -38,9 +38,9 @@
     <Compile Include="TestBusinessLogic.cs" />
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\serverConsole\serverConsole.csproj">
+    <ProjectReference Include="..\ServerConsole\ServerConsole.csproj">
       <Project>{1cd68920-fd19-4d9f-a47d-82e2bd7f88e4}</Project>
-      <Name>serverConsole</Name>
+      <Name>ServerConsole</Name>
     </ProjectReference>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />

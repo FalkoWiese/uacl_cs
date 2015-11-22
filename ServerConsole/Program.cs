@@ -15,7 +15,7 @@ namespace serverConsole
 			ApplicationLicenseManager.AddProcessLicenses(System.Reflection.Assembly.GetExecutingAssembly(), "License.txt");
 			var application = new ApplicationInstance();
 			ServerManager srv = new ServerManager();
-			application.Start(srv, Run, srv);
+            application.Start(srv, Run, srv);
 		}
 
 		static void Run(object state)
