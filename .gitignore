@@ -9,3 +9,7 @@ TestResult.xml
 TestServerConsole/bin/
 TestServerConsole/obj/
 TestServerConsole/obj/
+TestUaclServer/bin/
+TestUaclServer/obj/
+UaclServer/bin/
+UaclServer/obj/

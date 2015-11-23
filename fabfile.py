@@ -20,10 +20,9 @@ nunit_path = r'C:\Program Files (x86)\NUnit.org\nunit-console'
 nuget_path = r'C:\Program Files (x86)\NuGet'
 
 # project path settings
-server_project = 'ServerConsole'
-server_test_project = 'Test{project}'.format(project=server_project)
-projects = [server_project, server_test_project]
-test_projects = [server_test_project, ]
+impl_projects = ['ServerConsole', 'UaclServer']
+test_projects = ['Test{p}'.format(p=p) for p in impl_projects]
+projects = impl_projects + test_projects
 solution = "ServerConsole"
 
 

@@ -5,6 +5,7 @@ using System.Text;
 using System.Threading.Tasks;
 using UnifiedAutomation.UaBase;
 using UnifiedAutomation.UaServer;
+using UaclServer;
 
 namespace serverConsole
 {
@@ -12,16 +13,23 @@ namespace serverConsole
 	{
 		static void Main(string[] args)
 		{
-			ApplicationLicenseManager.AddProcessLicenses(System.Reflection.Assembly.GetExecutingAssembly(), "License.txt");
-			var application = new ApplicationInstance();
-			ServerManager srv = new ServerManager();
-            application.Start(srv, Run, srv);
-		}
+            try
+            {
+                InternalServer server = new InternalServer("localhost", 48043);
+                server.Start();
 
-		static void Run(object state)
-		{
-			System.Console.WriteLine("Application run");
-			System.Console.ReadKey();
-		}
+                Console.WriteLine("Press <enter> to exit the program.");
+                Console.ReadLine();
+
+                // Stop the server.
+                server.Stop();
+            }
+            catch (Exception e)
+            {
+                Console.WriteLine("ERROR: {0}", e.Message);
+                Console.WriteLine("Press <enter> to exit the program.");
+                Console.ReadLine();
+            }
+        }
     }
 }
