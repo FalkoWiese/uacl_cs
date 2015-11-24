@@ -22,7 +22,7 @@ namespace UaclServer
             this.Ip = ip;
             this.Port = port;
             ServerThread = new Thread(new ThreadStart(ServerMethod));
-            Manager = new ServerManager();
+            Manager = new InternalServerManager("http://http://www.concept-laser.de/");
         }
 
         private void RunServer(object state)
@@ -32,9 +32,17 @@ namespace UaclServer
 
         private void ServerMethod()
         {
-            while (ServerThread.IsAlive)
+            Console.WriteLine("UA Convenience Layer is running ...");
+            try
             {
-                Thread.Sleep(1);
+                while (ServerThread.IsAlive)
+                {
+                    Thread.Sleep(1);
+                }
+            }
+            catch (ThreadInterruptedException e)
+            {
+                Console.WriteLine("UA Convenience Layer stopped.");
             }
         }
 
@@ -51,6 +59,7 @@ namespace UaclServer
             if (ServerThread.IsAlive)
             {
                 ServerThread.Interrupt();
+                ServerThread.Join();
                 correctlyStopped = true && correctlyStopped;
             }
 

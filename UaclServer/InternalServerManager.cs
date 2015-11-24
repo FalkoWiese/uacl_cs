@@ -1,32 +1,21 @@
 ﻿using UnifiedAutomation.UaBase;
 using UnifiedAutomation.UaServer;
 
-namespace serverConsole
+namespace UaclServer
 {
 	public class InternalServerManager : ServerManager
 	{
+        public InternalServerManager(string namespaceUri)
+        {
+            NamespaceUri = namespaceUri;
+        }
+
+        private string NamespaceUri { get; set; }
+
 		protected override void OnRootNodeManagerStarted(RootNodeManager nodeManager)
 		{
-			new InternalNodeManager(this).Startup();
-
-
-
-			/// [Add ImpersonateEventHandler]
-			//this.SessionManager.ImpersonateUser += new ImpersonateEventHandler
-			//(SessionManager_ImpersonateUser);
-			// [Add ImpersonateEventHandler]
-		}
-
-
-		public override void Start(ApplicationInstance application)
-		{
-			base.Start(application);
-		}
-
-
-		public override void Stop()
-		{
-			base.Stop();
+			var mngr = new InternalNodeManager(this, NamespaceUri);
+            mngr.Startup();
 		}
 	}
 }

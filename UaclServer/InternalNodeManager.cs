@@ -1,26 +1,34 @@
-﻿using UnifiedAutomation.UaServer;
+﻿using System;
+using UnifiedAutomation.UaServer;
 
-namespace serverConsole
+namespace UaclServer
 {
 	internal class InternalNodeManager : BaseNodeManager
 	{
-		public InternalNodeManager(ServerManager server, params string[] namespaceUris)
-			:base(server, namespaceUris)
+		public InternalNodeManager(ServerManager server, params string[] namespaceUrises)
+			:base(server, namespaceUrises)
 		{
+		    InternalNamespaceUris = namespaceUrises;
 		}
 
+        private string[] InternalNamespaceUris { get; set; }
 
 		public override void Startup()
 		{
-			System.Console.WriteLine("InternalNodeManager: Startup");
-			base.Startup();
+			Console.WriteLine("InternalNodeManager: Startup()");
+		    if (InternalNamespaceUris.Length > 0)
+		    {
+                AddNamespaceUri(InternalNamespaceUris[0]);
+            }
+
+            base.Startup();
 		}
 
 
 		public override void Shutdown()
 		{
-			System.Console.WriteLine("InternalNodeManager: Shutdown");
 			base.Shutdown();
-		}
-	}
+            Console.WriteLine("InternalNodeManager: Shutdown()");
+        }
+    }
 }
