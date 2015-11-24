@@ -15,7 +15,7 @@ namespace serverConsole
 		{
             try
             {
-                InternalServer server = new InternalServer("localhost", 48043);
+                InternalServer server = new InternalServer("localhost", 48030);
                 server.Start();
 
                 Console.WriteLine("Press <enter> to exit the program.");
