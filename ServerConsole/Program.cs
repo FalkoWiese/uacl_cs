@@ -13,22 +13,25 @@ namespace serverConsole
 	{
 		static void Main(string[] args)
 		{
-            try
-            {
-                InternalServer server = new InternalServer("localhost", 48030);
-                server.Start();
+		    InternalServer server = null;
+		    try
+		    {
+		        server = new InternalServer("localhost", 48030);
+		        server.Start();
 
-                Console.WriteLine("Press <enter> to exit the program.");
-                Console.ReadLine();
-
+		        Console.WriteLine("Press <enter> to exit the program.");
+		        Console.ReadLine();
+		    }
+		    catch (Exception e)
+		    {
+		        Console.WriteLine("ERROR: {0}", e.Message);
+		        Console.WriteLine("Press <enter> to exit the program.");
+		        Console.ReadLine();
+		    }
+		    finally
+		    {
                 // Stop the server.
-                server.Stop();
-            }
-            catch (Exception e)
-            {
-                Console.WriteLine("ERROR: {0}", e.Message);
-                Console.WriteLine("Press <enter> to exit the program.");
-                Console.ReadLine();
+                server?.Stop();
             }
         }
     }
