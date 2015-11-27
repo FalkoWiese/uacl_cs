@@ -65,7 +65,7 @@ namespace UaclServer
                     StoreType = "Directory",
                     StorePath = @"%CommonApplicationData%\unifiedautomation\UaSdkNet\pki\rejected"
                 },
-                BaseAddresses = new ListOfBaseAddresses {"opc.tcp://"+ip+":"+port.ToString()},
+                BaseAddresses = new ListOfBaseAddresses {string.Format("opc.tcp://{0}:{1}", ip, port)},
                 SecurityProfiles = new ListOfSecurityProfiles
                 {
                     new SecurityProfile() {ProfileUri = SecurityProfiles.Basic256, Enabled = true},
