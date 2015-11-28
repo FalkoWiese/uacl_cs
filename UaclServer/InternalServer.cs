@@ -15,15 +15,18 @@ namespace UaclServer
     { 
         private int Port { get; set; }
         private string Ip { get; set; }
-
+        private string ApplicationName { get; set; }
         private Thread ServerThread { get; set; }
 
-        public InternalServer(string ip, int port)
+        public const string CompanyUri = "http://http://www.concept-laser.de";
+
+        public InternalServer(string ip, int port, string applicationName)
         {
-            this.Ip = ip;
-            this.Port = port;
+            Ip = ip;
+            Port = port;
+            ApplicationName = applicationName;
             ServerThread = new Thread(new ThreadStart(ServerMethod));
-            Manager = new InternalServerManager("http://http://www.concept-laser.de/");
+            Manager = new InternalServerManager(CompanyUri, applicationName);
         }
 
         // Fill in the application settings in code
@@ -34,12 +37,10 @@ namespace UaclServer
             // settings are hardcoded
             var application = new SecuredApplication
             {
-                // ***********************************************************************
                 // standard configuration options
                 // general application identification settings
                 // configure certificate stores
                 // configure endpoints
-                // ***********************************************************************
                 ApplicationName = "UnifiedAutomation GettingStartedServer",
                 ApplicationUri = "urn:localhost:UnifiedAutomation:GettingStartedServer",
                 ApplicationType = UnifiedAutomation.UaSchema.ApplicationType.Server_0,
@@ -73,7 +74,6 @@ namespace UaclServer
                     new SecurityProfile() {ProfileUri = SecurityProfiles.None, Enabled = true}
                 }
             };
-            // ***********************************************************************
             // extended configuration options
             // trace settings
             var trace = new TraceSettings
@@ -133,12 +133,11 @@ namespace UaclServer
                 correctlyStopped = true;
             }
 
-            if (ServerThread.IsAlive)
-            {
-                ServerThread.Interrupt();
-                ServerThread.Join();
-                correctlyStopped = true && correctlyStopped;
-            }
+            if (!ServerThread.IsAlive) return correctlyStopped;
+
+            ServerThread.Interrupt();
+            ServerThread.Join();
+            correctlyStopped = true && correctlyStopped;
 
             return correctlyStopped;
         }

@@ -1,10 +1,4 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using UnifiedAutomation.UaBase;
-using UnifiedAutomation.UaServer;
 using UaclServer;
 
 namespace serverConsole
@@ -16,7 +10,7 @@ namespace serverConsole
 		    InternalServer server = null;
 		    try
 		    {
-		        server = new InternalServer("localhost", 48030);
+		        server = new InternalServer("localhost", 48030, "ServerConsole");
 		        server.Start();
 
 		        Console.WriteLine("Press <enter> to exit the program.");

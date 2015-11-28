@@ -11,7 +11,7 @@ namespace TestUaclServer
         [Test]
         public void StartAndStopTheServer()
         {
-            var server = new InternalServer("localhost", 48030);
+            var server = new InternalServer("localhost", 48030, "ServerConsole");
             Assert.IsTrue(server.Start());
             Thread.Sleep(1000);
             server.Stop();

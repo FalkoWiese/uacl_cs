@@ -5,16 +5,16 @@ namespace UaclServer
 {
 	public class InternalServerManager : ServerManager
 	{
-        public InternalServerManager(string namespaceUri)
+        public InternalServerManager(params string[] uris)
         {
-            NamespaceUri = namespaceUri;
+            InternalUris = uris;
         }
 
-        private string NamespaceUri { get; set; }
+        private string[] InternalUris { get; set; }
 
 		protected override void OnRootNodeManagerStarted(RootNodeManager nodeManager)
 		{
-			var mngr = new InternalNodeManager(this, NamespaceUri);
+			var mngr = new InternalNodeManager(this, InternalUris);
             mngr.Startup();
 		}
 	}
