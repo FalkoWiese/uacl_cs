@@ -3,16 +3,21 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
-using serverConsole;
+using UaclServer;
 
-namespace serverConsole
+namespace ServerConsole
 {
+    [UaObject]
     public class BusinessLogic
     {
-        public bool CalculateJob(String name, int id)
+        [UaMethod]
+        public bool CalculateJob(string name, int id)
         {
-            System.Console.WriteLine("Job Started ... " + name + " (" + id + ")");
+            System.Console.WriteLine($"Job Started ... {name} ({id})");
             return true;
         }
+
+        [UaVariable]
+        public string State { get; set; }
     }
 }
