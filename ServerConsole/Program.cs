@@ -11,6 +11,7 @@ namespace ServerConsole
 		    try
 		    {
 		        server = new InternalServer("localhost", 48030, "ServerConsole");
+                server.RegisterObject(new BusinessLogic());
 		        server.Start();
 
 		        Console.WriteLine("Press <enter> to exit the program.");
