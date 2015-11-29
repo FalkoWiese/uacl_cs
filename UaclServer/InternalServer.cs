@@ -144,9 +144,9 @@ namespace UaclServer
 
         private InternalServerManager Manager { get; set; }
 
-        public void RegisterObject(object modelObject)
+        public bool RegisterObject(object modelObject)
         {
-            Manager?.RegisterObject(modelObject);
+            return Manager != null && Manager.RegisterObject(modelObject);
         }
 
 
