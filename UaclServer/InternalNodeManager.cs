@@ -6,7 +6,13 @@ namespace UaclServer
 {
 	internal class InternalNodeManager : BaseNodeManager
 	{
-		public InternalNodeManager(ServerManager server, params string[] namespaceUris)
+        private class SystemAddress
+        {
+            public int Address;
+            public int Offset;
+        }
+
+        public InternalNodeManager(ServerManager server, params string[] namespaceUris)
 			:base(server, namespaceUris)
 		{
             CompanyUri = namespaceUris.Length < 1 || namespaceUris[0].Trim().Length <= 0 ?
@@ -24,44 +30,64 @@ namespace UaclServer
         private ushort InstanceNamespaceIndex { get; set; }
         private ushort TypeNamespaceIndex { get; set; }
 
+	    private InternalServerManager getManager()
+	    {
+	        return (InternalServerManager) this.Server;
+	    }
+
         public override void Startup()
 		{
 			Console.WriteLine("InternalNodeManager: Startup()");
 
-            CreateInterface();
+            CreateUaServerInterface();
 
             base.Startup();
 		}
 
-	    private void CreateInterface()
+	    private void CreateUaServerInterface()
 	    {
-            CreateObjectSettings settings = new CreateObjectSettings()
-            {
-                ParentNodeId = ObjectIds.ObjectsFolder,
-                ReferenceTypeId = ReferenceTypeIds.Organizes,
-                RequestedNodeId = new NodeId(ApplicationUri, InstanceNamespaceIndex),
-                BrowseName = new QualifiedName(ApplicationUri, InstanceNamespaceIndex),
-                TypeDefinitionId = ObjectTypeIds.FolderType
-            };
-            CreateObject(Server.DefaultRequestContext, settings);
+            // The root folder, named by the specific application, e.g. 'ServerConsole'.
+	        var applicationRoot = CreateObjectTypeNode(new CreateObjectSettings()
+	        {
+	            ParentNodeId = ObjectIds.ObjectsFolder,
+	            ReferenceTypeId = ReferenceTypeIds.Organizes,
+	            RequestedNodeId = new NodeId(ApplicationUri, InstanceNamespaceIndex),
+	            BrowseName = new QualifiedName(ApplicationUri, InstanceNamespaceIndex),
+	            TypeDefinitionId = ObjectTypeIds.FolderType
+	        });
 
-	        var className = "BusinessLogic";
-            settings = new CreateObjectSettings()
-            {
-                ParentNodeId = new NodeId(ApplicationUri, InstanceNamespaceIndex),
-                ReferenceTypeId = ReferenceTypeIds.Organizes,
-                RequestedNodeId = new NodeId(className, InstanceNamespaceIndex),
-                BrowseName = new QualifiedName(className, InstanceNamespaceIndex),
-                TypeDefinitionId = ObjectTypeIds.BaseObjectType
-            };
-            CreateObject(Server.DefaultRequestContext, settings);
+            // Here we add the registered objects. Unless, they aren't correctly annotated.
+	        foreach (var model in getManager().BusinessModel)
+	        {
+                var className = model.GetType().Name;
+                CreateObjectTypeNode(new CreateObjectSettings()
+                {
+                    ParentNodeId = applicationRoot.NodeId,
+                    ReferenceTypeId = ReferenceTypeIds.Organizes,
+                    RequestedNodeId = new NodeId(className, InstanceNamespaceIndex),
+                    BrowseName = new QualifiedName(className, InstanceNamespaceIndex),
+                    TypeDefinitionId = ObjectTypeIds.BaseObjectType
+                }, model);
+            }
         }
 
+        private ObjectNode CreateObjectTypeNode(CreateObjectSettings settings, object businessObject=null)
+        {
+            var node = CreateObject(Server.DefaultRequestContext, settings);
+            Console.WriteLine($"Created node ... {node}.");
+
+            if (businessObject != null)
+            {
+                       
+            }
+
+            return node;
+        }
 
         public override void Shutdown()
 		{
 			base.Shutdown();
-            Console.WriteLine("InternalNodeManager: Shutdown()");
+            Console.WriteLine(@"InternalNodeManager: Shutdown()");
         }
     }
 }

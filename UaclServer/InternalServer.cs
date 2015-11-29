@@ -117,7 +117,7 @@ namespace UaclServer
                     Thread.Sleep(1);
                 }
             }
-            catch (ThreadInterruptedException e)
+            catch (ThreadInterruptedException)
             {
                 Console.WriteLine("UA Convenience Layer stopped.");
             }
@@ -142,7 +142,13 @@ namespace UaclServer
             return correctlyStopped;
         }
 
-        private ServerManager Manager { get; set; }
+        private InternalServerManager Manager { get; set; }
+
+        public void RegisterObject(object modelObject)
+        {
+            Manager?.RegisterObject(modelObject);
+        }
+
 
         public bool Start()
         {

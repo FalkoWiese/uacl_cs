@@ -58,6 +58,9 @@
       <DesignTime>True</DesignTime>
       <DependentUpon>Resources.resx</DependentUpon>
     </Compile>
+    <Compile Include="UaMethod.cs" />
+    <Compile Include="UaObject.cs" />
+    <Compile Include="UaVariable.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="App.config" />
