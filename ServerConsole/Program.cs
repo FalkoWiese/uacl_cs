@@ -1,7 +1,7 @@
 ﻿using System;
 using UaclServer;
 
-namespace serverConsole
+namespace ServerConsole
 {
 	class Program
 	{

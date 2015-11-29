@@ -2,7 +2,7 @@
 using NUnit.Framework;
 
 
-namespace serverConsole
+namespace ServerConsole
 {
     [TestFixture]
     public class TestBusinessLogic

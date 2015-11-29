@@ -2,6 +2,7 @@
 using NUnit.Framework;
 using UaclServer;
 using System.Threading;
+using ServerConsole;
 
 namespace TestUaclServer
 {
