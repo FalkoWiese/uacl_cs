@@ -9,11 +9,11 @@ namespace UaclServer
     [System.AttributeUsage(System.AttributeTargets.Property)]
     public class UaVariable : System.Attribute
     {
-        private string name;
+        public string Name { get; private set; }
 
         public UaVariable(string name = null)
         {
-            this.name = name;
+            Name = name;
         }
     }
 }
