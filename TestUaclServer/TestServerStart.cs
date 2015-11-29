@@ -14,18 +14,19 @@ namespace TestUaclServer
             var server = new InternalServer("localhost", 48040, "ControlConsole");
             Assert.IsTrue(server.Start());
             Thread.Sleep(1000);
-            server.Stop();
+            Assert.IsTrue(server.Stop());
         }
 
         [Test]
         public void RegisterAnObject()
         {
             var server = new InternalServer("localhost", 48030, "ServerConsole");
-
+            Assert.IsNotNull(server);
             var bo = new BusinessLogic();
-            server.RegisterObject(bo);
-
-            Assert.IsTrue(server.Start());
+            Assert.IsNotNull(bo);
+            Assert.IsTrue(server.RegisterObject(bo));
         }
+
+
     }
 }
