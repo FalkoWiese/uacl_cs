@@ -86,55 +86,90 @@ namespace UaclServer
         private ObjectNode AddNode(CreateObjectSettings settings, object businessObject = null)
         {
             var node = CreateObject(Server.DefaultRequestContext, settings);
-            Console.WriteLine($"Created node ... {node}.");
+            Console.WriteLine($"Created node ... {node.NodeId.Identifier}.");
 
             if (businessObject == null) return node;
 
             foreach (var property in businessObject.GetType().GetProperties())
             {
-                var uaVariableAttribute = property.GetCustomAttribute<UaVariable>();
-                if (uaVariableAttribute == null) continue;
-
-                var uaVariableName = uaVariableAttribute.Name ?? property.Name;
-                var variableNode = CreateVariable(Server.DefaultRequestContext,
-                    new CreateVariableSettings()
-                    {
-                        ParentNodeId = node.NodeId,
-                        ReferenceTypeId = ReferenceTypeIds.HasComponent,
-                        RequestedNodeId = new NodeId(uaVariableName, InstanceNamespaceIndex),
-                        BrowseName = new QualifiedName(uaVariableName, InstanceNamespaceIndex),
-                        TypeDefinitionId = new NodeId(DataTypes.VariableNode, TypeNamespaceIndex),
-                        ValueType = TypeMapping.Instance.MapType(property.PropertyType),
-                        Value = new Variant(),
-                        AccessLevel = AccessLevels.CurrentRead | AccessLevels.CurrentWrite,
-                    });
-
-                variableNode.UserData = new VariableNodeData { BusinessObject = businessObject, Property = property };
+                AddVariable(businessObject, property, node);
             }
 
             foreach (var method in businessObject.GetType().GetMethods())
             {
-                var uaMethodAttribute = method.GetCustomAttribute<UaMethod>();
-                if (uaMethodAttribute == null) continue;
-
-                var uaMethodName = uaMethodAttribute.Name ?? method.Name;
-                var methodNode = CreateMethod(Server.DefaultRequestContext,
-                    new CreateMethodSettings()
-                    {
-                        ParentNodeId = node.NodeId,
-                        ReferenceTypeId = ReferenceTypeIds.HasComponent,
-                        RequestedNodeId = new NodeId(uaMethodName, InstanceNamespaceIndex),
-                        BrowseName = new QualifiedName(uaMethodName, InstanceNamespaceIndex),
-                        TypeDefinitionId = new NodeId(DataTypes.MethodNode, TypeNamespaceIndex),
-                    });
-
-                methodNode.UserData = new MethodNodeData { BusinessObject = businessObject, Method = method };
+                AddMethod(businessObject, method, node);
             }
 
             return node;
         }
 
- 
+        private void AddMethod(object businessObject, MethodInfo method, ObjectNode node)
+        {
+            var uaMethodAttribute = method.GetCustomAttribute<UaMethod>();
+            if (uaMethodAttribute == null) return;
+
+            var uaMethodName = uaMethodAttribute.Name ?? method.Name;
+            var methodNode = CreateMethod(Server.DefaultRequestContext,
+                new CreateMethodSettings()
+                {
+                    ParentNodeId = node.NodeId,
+                    ReferenceTypeId = ReferenceTypeIds.HasComponent,
+                    RequestedNodeId = new NodeId($"{node.NodeId.Identifier}.{uaMethodName}", InstanceNamespaceIndex),
+                    BrowseName = new QualifiedName(uaMethodName, InstanceNamespaceIndex),
+                    DisplayName = uaMethodName,
+                });
+
+            methodNode.UserData = new MethodNodeData {BusinessObject = businessObject, Method = method};
+            Console.WriteLine($"Created method ... {methodNode.NodeId.Identifier}.");
+        }
+
+        private void AddVariable(object businessObject, PropertyInfo property, ObjectNode node)
+        {
+            var uaVariableAttribute = property.GetCustomAttribute<UaVariable>();
+            if (uaVariableAttribute == null) return;
+
+            var uaVariableName = uaVariableAttribute.Name ?? property.Name;
+            var variableNode = CreateVariable(Server.DefaultRequestContext,
+                new CreateVariableSettings()
+                {
+                    ParentNodeId = node.NodeId,
+                    ReferenceTypeId = ReferenceTypeIds.HasComponent,
+                    RequestedNodeId = new NodeId($"{node.NodeId.Identifier}.{uaVariableName}", InstanceNamespaceIndex),
+                    BrowseName = new QualifiedName(uaVariableName, InstanceNamespaceIndex),
+                    TypeDefinitionId = VariableTypeIds.BaseDataVariableType,
+                    DataType = DataTypeIds.BaseDataType, //TypeMapping.Instance.MapType(property.PropertyType),
+                    ValueRank = ValueRanks.Scalar,
+                    Value = new Variant(25),
+                    AccessLevel = AccessLevels.CurrentReadOrWrite,
+                });
+
+            variableNode.UserData = new VariableNodeData {BusinessObject = businessObject, Property = property};
+            Console.WriteLine($"Created variable ... {variableNode.NodeId.Identifier}.");
+        }
+
+        protected override CallMethodEventHandler GetMethodDispatcher(RequestContext context, MethodHandle methodHandle)
+        {
+            if (methodHandle.MethodData is MethodNodeData)
+            {
+                return DispatchControllerMethod;
+            }
+            return null;
+        }
+
+        private StatusCode DispatchControllerMethod(
+            RequestContext context,
+            MethodHandle methodHandle,
+            IList<Variant> inputArguments,
+            List<StatusCode> inputArgumentResults,
+            List<Variant> outputArguments)
+        {
+            MethodNodeData data = methodHandle.MethodData as MethodNodeData;
+
+            object returnValue = data?.Method.Invoke(data.BusinessObject, new object[] {});
+
+            return StatusCodes.BadNotImplemented;
+        }
+
         private sealed class TypeMapping
         {
             private static readonly TypeMapping instance = new TypeMapping();
