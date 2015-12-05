@@ -13,3 +13,7 @@ TestUaclServer/bin/
 TestUaclServer/obj/
 UaclServer/bin/
 UaclServer/obj/
+TestUaclUtils/bin/
+TestUaclUtils/obj/
+UaclUtils/bin/
+UaclUtils/obj/
