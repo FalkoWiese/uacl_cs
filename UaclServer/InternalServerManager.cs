@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Reflection;
 using UnifiedAutomation.UaServer;
+using UaclUtils;
 
 namespace UaclServer
 {
@@ -36,7 +37,7 @@ namespace UaclServer
             }
 	        catch (Exception e)
 	        {
-                Console.WriteLine(e.Message);
+                ExceptionHandler.Log(e);
                 return false;
 	        }
 

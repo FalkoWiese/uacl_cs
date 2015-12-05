@@ -1,4 +1,5 @@
 ﻿using UaclServer;
+using UaclUtils;
 
 namespace ServerConsole
 {
@@ -8,7 +9,7 @@ namespace ServerConsole
         [UaMethod]
         public bool CalculateJob(string name, int id)
         {
-            System.Console.WriteLine($"Job Started ... {name} ({id})");
+            Logger.Info($"Job Started ... {name} ({id})");
             return true;
         }
 

@@ -1,11 +1,7 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using UnifiedAutomation.UaBase;
-using UnifiedAutomation.UaServer;
 using System.Threading;
+using UaclUtils;
 using UnifiedAutomation.UaSchema;
 
 namespace UaclServer
@@ -109,7 +105,7 @@ namespace UaclServer
 
         private void ServerMethod()
         {
-            Console.WriteLine("UA Convenience Layer is running ...");
+            Logger.Info("UA Convenience Layer is running ...");
             try
             {
                 while (ServerThread.IsAlive)
@@ -119,7 +115,7 @@ namespace UaclServer
             }
             catch (ThreadInterruptedException)
             {
-                Console.WriteLine("UA Convenience Layer stopped.");
+                Logger.Info("UA Convenience Layer stopped.");
             }
         }
 

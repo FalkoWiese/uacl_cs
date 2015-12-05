@@ -1,5 +1,6 @@
 ﻿using System;
 using UaclServer;
+using UaclUtils;
 
 namespace ServerConsole
 {
@@ -14,13 +15,12 @@ namespace ServerConsole
                 server.RegisterObject(new BusinessLogic());
 		        server.Start();
 
-		        Console.WriteLine("Press <enter> to exit the program.");
+		        Logger.Info("Press <enter> to exit the program.");
 		        Console.ReadLine();
 		    }
 		    catch (Exception e)
 		    {
-		        Console.WriteLine("ERROR: {0}", e.Message);
-		        Console.WriteLine("Press <enter> to exit the program.");
+                ExceptionHandler.Log(e, "Press <enter> to exit the program.");
 		        Console.ReadLine();
 		    }
 		    finally

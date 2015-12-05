@@ -1,10 +1,8 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.ComponentModel;
-using System.Data;
 using System.Reflection;
+using UaclUtils;
 using UnifiedAutomation.UaBase;
-using UnifiedAutomation.UaSchema;
 using UnifiedAutomation.UaServer;
 
 namespace UaclServer
@@ -14,32 +12,32 @@ namespace UaclServer
         public InternalNodeManager(ServerManager server, params string[] namespaceUris)
             : base(server, namespaceUris)
         {
-            CompanyUri = namespaceUris.Length < 1 || namespaceUris[0].Trim().Length <= 0 ?
-                "http://www.company.com" : namespaceUris[0];
+            CompanyUri = namespaceUris.Length < 1 || namespaceUris[0].Trim().Length <= 0
+                ? "http://www.company.com"
+                : namespaceUris[0];
 
-            ApplicationUri = namespaceUris.Length < 2 || namespaceUris[1].Trim().Length <= 0 ?
-                "application" : namespaceUris[1];
+            ApplicationUri = namespaceUris.Length < 2 || namespaceUris[1].Trim().Length <= 0
+                ? "application"
+                : namespaceUris[1];
 
             InstanceNamespaceIndex = AddNamespaceUri($"{CompanyUri}/{ApplicationUri}/instances");
             TypeNamespaceIndex = AddNamespaceUri($"{CompanyUri}/{ApplicationUri}/types");
         }
 
-        public string ApplicationUri { get; set; }
-        public string CompanyUri { get; set; }
+        private string ApplicationUri { get; set; }
+        private string CompanyUri { get; set; }
         private ushort InstanceNamespaceIndex { get; set; }
         private ushort TypeNamespaceIndex { get; set; }
 
-        private InternalServerManager getManager()
+        private InternalServerManager GetManager()
         {
-            return (InternalServerManager)this.Server;
+            return (InternalServerManager) Server;
         }
 
         public override void Startup()
         {
-            Console.WriteLine("InternalNodeManager: Startup()");
-
+            Logger.Info(@"InternalNodeManager: Startup()");
             CreateUaServerInterface();
-
             base.Startup();
         }
 
@@ -56,7 +54,7 @@ namespace UaclServer
             });
 
             // Here we add the registered objects. Unless, they aren't correctly annotated.
-            foreach (var model in getManager().BusinessModel)
+            foreach (var model in GetManager().BusinessModel)
             {
                 var uaObject = model.GetType().GetCustomAttribute<UaObject>();
                 var uaObjectName = uaObject.Name ?? model.GetType().Name;
@@ -71,22 +69,10 @@ namespace UaclServer
             }
         }
 
-        private class VariableNodeData
-        {
-            public object BusinessObject { get; set; }
-            public PropertyInfo Property { get; set; }
-        }
-
-        private class MethodNodeData
-        {
-            public object BusinessObject { get; set; }
-            public MethodInfo Method { get; set; }
-        }
-
         private ObjectNode AddNode(CreateObjectSettings settings, object businessObject = null)
         {
             var node = CreateObject(Server.DefaultRequestContext, settings);
-            Console.WriteLine($"Created node ... {node.NodeId.Identifier}.");
+            Logger.Info($"Created node ... {node.NodeId.Identifier}.");
 
             if (businessObject == null) return node;
 
@@ -120,7 +106,7 @@ namespace UaclServer
                 });
 
             methodNode.UserData = new MethodNodeData {BusinessObject = businessObject, Method = method};
-            Console.WriteLine($"Created method ... {methodNode.NodeId.Identifier}.");
+            Logger.Info($"Created method ... {methodNode.NodeId.Identifier}.");
         }
 
         private void AddVariable(object businessObject, PropertyInfo property, ObjectNode node)
@@ -144,7 +130,7 @@ namespace UaclServer
                 });
 
             variableNode.UserData = new VariableNodeData {BusinessObject = businessObject, Property = property};
-            Console.WriteLine($"Created variable ... {variableNode.NodeId.Identifier}.");
+            Logger.Info($"Created variable ... {variableNode.NodeId.Identifier}.");
         }
 
         protected override CallMethodEventHandler GetMethodDispatcher(RequestContext context, MethodHandle methodHandle)
@@ -165,54 +151,9 @@ namespace UaclServer
         {
             MethodNodeData data = methodHandle.MethodData as MethodNodeData;
 
-            object returnValue = data?.Method.Invoke(data.BusinessObject, new object[] {});
+            object returnValue = data?.Method.Invoke(data.BusinessObject, new object[] {"", 0});
 
             return StatusCodes.BadNotImplemented;
-        }
-
-        private sealed class TypeMapping
-        {
-            private static readonly TypeMapping instance = new TypeMapping();
-
-            private TypeMapping() { }
-
-            private Dictionary<Type, uint> typeMap;
-            private Dictionary<Type, uint> TypeMap
-            {
-                get
-                {
-                    if (typeMap != null) return typeMap;
-
-                    typeMap = new Dictionary<Type, uint>
-                    {
-                        [typeof(bool)] = DataTypes.Boolean,
-                        [typeof(byte)] = DataTypes.Byte,
-                        [typeof(short)] = DataTypes.Int16,
-                        [typeof(int)] = DataTypes.Int32,
-                        [typeof(long)] = DataTypes.Int64,
-                        [typeof(ushort)] = DataTypes.UInt16,
-                        [typeof(uint)] = DataTypes.UInt32,
-                        [typeof(ulong)] = DataTypes.UInt64,
-                        [typeof(float)] = DataTypes.Float,
-                        [typeof(double)] = DataTypes.Double,
-                        [typeof(string)] = DataTypes.String,
-                    };
-
-                    return typeMap;
-                }
-            }
-
-            public uint MapType(Type dataType)
-            {
-                if (!TypeMap.ContainsKey(dataType))
-                {
-                    throw new Exception($"Cannot find type {dataType.Name} in mapping table!");
-                }
-
-                return TypeMap[dataType];
-            }
-
-            public static TypeMapping Instance => instance;
         }
 
         protected override void Read(
@@ -221,28 +162,19 @@ namespace UaclServer
             IList<NodeAttributeOperationHandle> operationHandles,
             IList<ReadValueId> settings)
         {
-            foreach (NodeAttributeOperationHandle t in operationHandles)
+            foreach (var processVariableHandle in operationHandles)
             {
                 // Initialize with bad status
-                DataValue dv = new DataValue(new StatusCode(StatusCodes.BadNodeIdUnknown));
+                var dv = new DataValue(new StatusCode(StatusCodes.BadNodeIdUnknown));
                 // the data passed to CreateVariable is returned as the UserData in the handle.
-                /*
-                                SystemAddress address = operationHandles[ii].NodeHandle.UserData as SystemAddress;
-                                if (address != null)
-                                {
-                                    // read the data from the underlying system.
-                                    object value = m_system.Read(address.Address, address.Offset);
-                                    if (value != null)
-                                    {
-                                        dv = new DataValue(new Variant(value, null), DateTime.UtcNow);
-                                    }
-                                }
-                */
+                var processVariable = processVariableHandle.NodeHandle.UserData as VariableNodeData;
+                if (processVariable != null)
+                {
+                    // read the data from the underlying system.
+                    dv = new DataValue(processVariable.ReadValue(), DateTime.UtcNow);
+                }
                 // return the data to the caller.
-                ((ReadCompleteEventHandler)transaction.Callback)(
-                    t,
-                    transaction.CallbackData,
-                    dv,
+                ((ReadCompleteEventHandler) transaction.Callback)(processVariableHandle, transaction.CallbackData, dv,
                     false);
             }
         }
@@ -253,35 +185,29 @@ namespace UaclServer
             IList<NodeAttributeOperationHandle> operationHandles,
             IList<WriteValue> settings)
         {
-            foreach (NodeAttributeOperationHandle t in operationHandles)
+            for (var ii = 0; ii < operationHandles.Count; ii++)
             {
                 // initialize with bad status
                 StatusCode error = StatusCodes.BadNodeIdUnknown;
                 // the data passed to CreateVariable is returned as the UserData in the handle.
-                /*
-                                SystemAddress address = operationHandles[ii].NodeHandle.UserData as SystemAddress;
-                                if (address != null)
-                                {
-                                    error = StatusCodes.Good;
-                                    if (!m_system.Write(address.Address, address.Offset, settings[ii].Value.Value))
-                                    {
-                                        error = StatusCodes.BadUserAccessDenied;
-                                    }
-                                }
-                */
+                var processVariableHandle = operationHandles[ii];
+                var processVariable = processVariableHandle.NodeHandle.UserData as VariableNodeData;
+                if (processVariable != null)
+                {
+                    error = processVariable.WriteValue(settings[ii].Value.Value)
+                        ? StatusCodes.Good
+                        : StatusCodes.BadUserAccessDenied;
+                }
                 // return the data to the caller.
-                ((WriteCompleteEventHandler)transaction.Callback)(
-                    t,
-                    transaction.CallbackData,
-                    error,
-                    false);
+                ((WriteCompleteEventHandler) transaction.Callback)(processVariableHandle, transaction.CallbackData,
+                    error, false);
             }
         }
 
         public override void Shutdown()
         {
             base.Shutdown();
-            Console.WriteLine(@"InternalNodeManager: Shutdown()");
+            Logger.Info(@"InternalNodeManager: Shutdown()");
         }
     }
 }
