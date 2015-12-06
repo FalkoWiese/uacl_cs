@@ -44,7 +44,7 @@ namespace UaclServer
         private void CreateUaServerInterface()
         {
             // The root folder, named by the specific application, e.g. 'ServerConsole'.
-            var applicationRoot = AddNode(new CreateObjectSettings()
+            var applicationRoot = CreateObject(Server.DefaultRequestContext, new CreateObjectSettings()
             {
                 ParentNodeId = ObjectIds.ObjectsFolder,
                 ReferenceTypeId = ReferenceTypeIds.Organizes,
@@ -52,6 +52,7 @@ namespace UaclServer
                 BrowseName = new QualifiedName(ApplicationUri, InstanceNamespaceIndex),
                 TypeDefinitionId = ObjectTypeIds.FolderType
             });
+            Logger.Info($"Created root node ... {applicationRoot.NodeId.Identifier}.");
 
             // Here we add the registered objects. Unless, they aren't correctly annotated.
             foreach (var model in GetManager().BusinessModel)
@@ -71,6 +72,17 @@ namespace UaclServer
 
         private ObjectNode AddNode(CreateObjectSettings settings, object businessObject = null)
         {
+            CreateObjectTypeNode(Server.DefaultRequestContext, new CreateObjectTypeSettings()
+            {
+                ParentNodeId = ObjectTypeIds.BaseObjectType,
+                ReferenceTypeId = ReferenceTypeIds.HasSubtype,
+                RequestedNodeId = nodeId,
+                BrowseName = new QualifiedName(name, DefaultNamespaceIndex),
+                DisplayName = name,
+                Description = description
+            });
+            AddReference(Server.DefaultRequestContext, baseId, ReferenceTypeIds.Organizes, false, nodeId, true);
+
             var node = CreateObject(Server.DefaultRequestContext, settings);
             Logger.Info($"Created node ... {node.NodeId.Identifier}.");
 
@@ -109,24 +121,37 @@ namespace UaclServer
             Logger.Info($"Created method ... {methodNode.NodeId.Identifier}.");
         }
 
-        private void AddVariable(object businessObject, PropertyInfo property, ObjectNode node)
+        private void AddVariable(object businessObject, PropertyInfo property, ObjectNode parentNode)
         {
             var uaVariableAttribute = property.GetCustomAttribute<UaVariable>();
             if (uaVariableAttribute == null) return;
 
-            var uaVariableName = uaVariableAttribute.Name ?? property.Name;
+            var parentNodeId = parentNode.NodeId;
+            var variableName = uaVariableAttribute.Name ?? property.Name;
+            var nodeName = $"{parentNodeId.Identifier}.{variableName}";
+            var name = new QualifiedName(variableName, InstanceNamespaceIndex);
+            CreateVariableTypeNode(Server.DefaultRequestContext,
+                new CreateVariableTypeSettings()
+                {
+                    ParentNodeId = VariableTypeIds.BaseDataVariableType,
+                    ReferenceTypeId = ReferenceTypeIds.HasSubtype,
+                    RequestedNodeId = new NodeId(nodeName, TypeNamespaceIndex),
+                    BrowseName = name,
+                    DataType = TypeMapping.Instance.MapDataTypeId(property.PropertyType),
+                    ValueRank = ValueRanks.Scalar
+                });
+            //AddReference(Server.DefaultRequestContext, parentNodeId, ReferenceTypeIds.Organizes, false, 
+              //  new NodeId(nodeName, TypeNamespaceIndex), true);
             var variableNode = CreateVariable(Server.DefaultRequestContext,
                 new CreateVariableSettings()
                 {
-                    ParentNodeId = node.NodeId,
+                    ParentNodeId = parentNodeId,
                     ReferenceTypeId = ReferenceTypeIds.HasComponent,
-                    RequestedNodeId = new NodeId($"{node.NodeId.Identifier}.{uaVariableName}", InstanceNamespaceIndex),
-                    BrowseName = new QualifiedName(uaVariableName, InstanceNamespaceIndex),
+                    RequestedNodeId = new NodeId(nodeName, InstanceNamespaceIndex),
+                    BrowseName = name,
                     TypeDefinitionId = VariableTypeIds.BaseDataVariableType,
-                    DataType = DataTypeIds.BaseDataType, //TypeMapping.Instance.MapType(property.PropertyType),
-                    ValueRank = ValueRanks.Scalar,
-                    Value = new Variant(25),
                     AccessLevel = AccessLevels.CurrentReadOrWrite,
+                    DataType = TypeMapping.Instance.MapDataTypeId(property.PropertyType),
                 });
 
             variableNode.UserData = new VariableNodeData {BusinessObject = businessObject, Property = property};

@@ -13,7 +13,7 @@ namespace UaclServer
 
         public Variant ReadValue()
         {
-            var value = BusinessObject != null ? Property?.GetValue(BusinessObject) : null;
+            var value = BusinessObject != null ? Property?.GetMethod.Invoke(BusinessObject, null) : null;
             return value != null ? new Variant(value, null) : new Variant();
         }
 
@@ -28,7 +28,7 @@ namespace UaclServer
             {
                 lock (Property)
                 {
-                    Property.SetValue(BusinessObject, value);
+                    Property.SetMethod.Invoke(BusinessObject, new object[] {value});
                 }
                 return true;
             }

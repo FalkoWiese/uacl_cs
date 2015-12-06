@@ -7,13 +7,18 @@ namespace ServerConsole
     public class BusinessLogic
     {
         [UaMethod]
-        public bool CalculateJob(string name, int id)
+        public bool CalculateJob(string name, int state)
         {
-            Logger.Info($"Job Started ... {name} ({id})");
+            Logger.Info($"Job Started ... {name} ({state})");
+            State = $"{state}";
             return true;
         }
 
         [UaVariable]
-        public string State { get; set; }
+        public string State
+        {
+            get;
+            set;
+        }
     }
 }
