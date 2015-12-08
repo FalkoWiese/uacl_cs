@@ -16,6 +16,10 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "UaclServer", "UaclServer\Ua
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "TestUaclServer", "TestUaclServer\TestUaclServer.csproj", "{0F80AAC4-20F2-476A-A633-3BAB811D2E85}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "UaclUtils", "UaclUtils\UaclUtils.csproj", "{0749E410-6901-49A3-B74C-859A6515A92A}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "TestUaclUtils", "TestUaclUtils\TestUaclUtils.csproj", "{823E4BB8-83A1-432A-B800-EC831F4522E7}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -38,6 +42,14 @@ Global
 		{0F80AAC4-20F2-476A-A633-3BAB811D2E85}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{0F80AAC4-20F2-476A-A633-3BAB811D2E85}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{0F80AAC4-20F2-476A-A633-3BAB811D2E85}.Release|Any CPU.Build.0 = Release|Any CPU
+		{0749E410-6901-49A3-B74C-859A6515A92A}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{0749E410-6901-49A3-B74C-859A6515A92A}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{0749E410-6901-49A3-B74C-859A6515A92A}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{0749E410-6901-49A3-B74C-859A6515A92A}.Release|Any CPU.Build.0 = Release|Any CPU
+		{823E4BB8-83A1-432A-B800-EC831F4522E7}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{823E4BB8-83A1-432A-B800-EC831F4522E7}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{823E4BB8-83A1-432A-B800-EC831F4522E7}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{823E4BB8-83A1-432A-B800-EC831F4522E7}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

@@ -52,12 +52,18 @@
     <Compile Include="InternalNodeManager.cs" />
     <Compile Include="InternalServerManager.cs" />
     <Compile Include="InternalServer.cs" />
+    <Compile Include="MethodNodeData.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Properties\Resources.Designer.cs">
       <AutoGen>True</AutoGen>
       <DesignTime>True</DesignTime>
       <DependentUpon>Resources.resx</DependentUpon>
     </Compile>
+    <Compile Include="TypeMapping.cs" />
+    <Compile Include="UaMethod.cs" />
+    <Compile Include="UaObject.cs" />
+    <Compile Include="UaVariable.cs" />
+    <Compile Include="VariableNodeData.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="App.config" />
@@ -68,6 +74,12 @@
       <Generator>ResXFileCodeGenerator</Generator>
       <LastGenOutput>Resources.Designer.cs</LastGenOutput>
     </EmbeddedResource>
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\UaclUtils\UaclUtils.csproj">
+      <Project>{0749e410-6901-49a3-b74c-859a6515a92a}</Project>
+      <Name>UaclUtils</Name>
+    </ProjectReference>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 

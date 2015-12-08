@@ -3,11 +3,11 @@
   <PropertyGroup>
     <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
     <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
-    <ProjectGuid>{0F80AAC4-20F2-476A-A633-3BAB811D2E85}</ProjectGuid>
+    <ProjectGuid>{823E4BB8-83A1-432A-B800-EC831F4522E7}</ProjectGuid>
     <OutputType>Library</OutputType>
     <AppDesignerFolder>Properties</AppDesignerFolder>
-    <RootNamespace>TestUaclServer</RootNamespace>
-    <AssemblyName>TestUaclServer</AssemblyName>
+    <RootNamespace>TestUaclUtils</RootNamespace>
+    <AssemblyName>TestUaclUtils</AssemblyName>
     <TargetFrameworkVersion>v4.5.2</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
     <ProjectTypeGuids>{3AC096D0-A1C2-E12C-1390-A8335801FDAB};{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}</ProjectTypeGuids>
@@ -30,25 +30,24 @@
     <WarningLevel>4</WarningLevel>
   </PropertyGroup>
   <ItemGroup>
-    <Reference Include="nunit.framework, Version=3.0.5797.27534, Culture=neutral, PublicKeyToken=2638cd05610744eb, processorArchitecture=MSIL" />
+    <Reference Include="nunit.framework, Version=3.0.5813.39031, Culture=neutral, PublicKeyToken=2638cd05610744eb, processorArchitecture=MSIL">
+      <HintPath>..\packages\NUnit.3.0.1\lib\net45\nunit.framework.dll</HintPath>
+      <Private>True</Private>
+    </Reference>
     <Reference Include="System" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="TestServerStart.cs" />
+    <Compile Include="TestExceptionHandling.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\ServerConsole\ServerConsole.csproj">
-      <Project>{1cd68920-fd19-4d9f-a47d-82e2bd7f88e4}</Project>
-      <Name>ServerConsole</Name>
-    </ProjectReference>
-    <ProjectReference Include="..\UaclServer\UaclServer.csproj">
-      <Project>{6650e264-d095-40be-893e-442294651d29}</Project>
-      <Name>UaclServer</Name>
-    </ProjectReference>
+    <None Include="packages.config" />
   </ItemGroup>
   <ItemGroup>
-    <None Include="packages.config" />
+    <ProjectReference Include="..\UaclUtils\UaclUtils.csproj">
+      <Project>{0749e410-6901-49a3-b74c-859a6515a92a}</Project>
+      <Name>UaclUtils</Name>
+    </ProjectReference>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 

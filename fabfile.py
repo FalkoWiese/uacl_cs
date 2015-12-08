@@ -15,12 +15,12 @@ except ImportError:
 logging.basicConfig()
 
 # some global settings
-ms_build_path = r'C:\Windows\Microsoft.NET\Framework\v4.0.30319'
+ms_build_path = r'C:\Program Files (x86)\MSBuild\14.0\Bin'
 nunit_path = r'C:\Program Files (x86)\NUnit.org\nunit-console'
 nuget_path = r'C:\Program Files (x86)\NuGet'
 
 # project path settings
-impl_projects = ['ServerConsole', 'UaclServer']
+impl_projects = ['ServerConsole', 'UaclServer', 'UaclUtils']
 test_projects = ['Test{p}'.format(p=p) for p in impl_projects]
 projects = impl_projects + test_projects
 solution = "ServerConsole"
@@ -71,7 +71,7 @@ def test_impl(path_to_dll):
 
 def ms_build(solution, target='Build', config=None, more='/m'):
     ms_build = os.path.join(ms_build_path, 'MSBuild.exe')
-    build_cmd = ms_build
+    build_cmd = '"{build_cmd}"'.format(build_cmd=ms_build)
     cmd_add = lambda cmd: build_cmd + ' {0}'.format(cmd) if cmd else build_cmd
     build_cmd = cmd_add(more)
     build_cmd = cmd_add('/t:' + target)
