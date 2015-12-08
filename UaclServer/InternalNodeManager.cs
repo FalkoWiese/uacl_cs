@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Reflection;
 using UaclUtils;
 using UnifiedAutomation.UaBase;
@@ -76,7 +77,7 @@ namespace UaclServer
         {
             var uaObject = businessObject.GetType().GetCustomAttribute<UaObject>();
             var uaObjectName = uaObject.Name ?? businessObject.GetType().Name;
-
+/*
             var typeNode = CreateObjectTypeNode(Server.DefaultRequestContext, new CreateObjectTypeSettings()
             {
                 ParentNodeId = ObjectTypeIds.BaseObjectType,
@@ -87,6 +88,7 @@ namespace UaclServer
             });
             AddReference(Server.DefaultRequestContext, typeRootNode.NodeId, ReferenceTypeIds.Organizes, false,
                 typeNode.NodeId, true);
+*/
 
             var node = CreateObject(Server.DefaultRequestContext, new CreateObjectSettings()
             {
@@ -102,7 +104,7 @@ namespace UaclServer
 
             foreach (var property in businessObject.GetType().GetProperties())
             {
-                AddVariable(businessObject, property, node, typeNode);
+                AddVariable(businessObject, property, node, null); //typeNode);
             }
 
             foreach (var method in businessObject.GetType().GetMethods())
@@ -119,16 +121,41 @@ namespace UaclServer
             if (uaMethodAttribute == null) return;
 
             var uaMethodName = uaMethodAttribute.Name ?? method.Name;
-            var methodNode = CreateMethod(Server.DefaultRequestContext,
-                new CreateMethodSettings()
-                {
-                    ParentNodeId = node.NodeId,
-                    ReferenceTypeId = ReferenceTypeIds.HasComponent,
-                    RequestedNodeId = new NodeId($"{node.NodeId.Identifier}.{uaMethodName}", InstanceNamespaceIndex),
-                    BrowseName = new QualifiedName(uaMethodName, InstanceNamespaceIndex),
-                    DisplayName = uaMethodName,
-                });
+            var settings = new CreateMethodSettings()
+            {
+                ParentNodeId = node.NodeId,
+                ReferenceTypeId = ReferenceTypeIds.HasComponent,
+                RequestedNodeId = new NodeId($"{node.NodeId.Identifier}.{uaMethodName}", InstanceNamespaceIndex),
+                BrowseName = new QualifiedName(uaMethodName, InstanceNamespaceIndex),
+                DisplayName = uaMethodName,
+                Executable = true,
+                InputArguments = new List<Argument>(),
+                OutputArguments = new List<Argument>()
+            };
 
+            foreach (var parameterInfo in method.GetParameters())
+            {
+                settings.InputArguments.Add(new Argument
+                {
+                    DataType = TypeMapping.Instance.MapDataTypeId(parameterInfo.ParameterType),
+                    Name = parameterInfo.Name,
+                    Description = new LocalizedText("en", parameterInfo.Name),
+                    ValueRank = ValueRanks.Scalar,
+                });
+            }
+
+            if (method.ReturnParameter != null)
+            {
+                settings.OutputArguments.Add(new Argument
+                {
+                    DataType = TypeMapping.Instance.MapDataTypeId(method.ReturnParameter.ParameterType),
+                    Name = "Result",
+                    Description = new LocalizedText("en", "Result"),
+                    ValueRank = ValueRanks.Scalar
+                });
+            }
+
+            var methodNode = CreateMethod(Server.DefaultRequestContext, settings);
             methodNode.UserData = new MethodNodeData {BusinessObject = businessObject, Method = method};
             Logger.Info($"Created method ... {methodNode.NodeId.Identifier}.");
         }
@@ -137,19 +164,21 @@ namespace UaclServer
         {
             var uaVariableAttribute = property.GetCustomAttribute<UaVariable>();
             if (uaVariableAttribute == null) return;
-
             var variableName = uaVariableAttribute.Name ?? property.Name;
-            var variableTypeNode = CreateVariableTypeNode(Server.DefaultRequestContext,
-                new CreateVariableTypeSettings()
-                {
-                    ParentNodeId = parentTypeNode.NodeId,
-                    ReferenceTypeId = ReferenceTypeIds.HasSubtype,
-                    RequestedNodeId = new NodeId($"{parentTypeNode.NodeId.Identifier}.{variableName}", TypeNamespaceIndex),
-                    BrowseName = new QualifiedName(variableName, TypeNamespaceIndex),
-                    DataType = TypeMapping.Instance.MapDataTypeId(property.PropertyType),
-                });
-            AddReference(Server.DefaultRequestContext, parentTypeNode.NodeId, ReferenceTypeIds.Organizes, false, variableTypeNode.NodeId, true);
 
+            /*
+                        var variableTypeNode = CreateVariableTypeNode(Server.DefaultRequestContext,
+                            new CreateVariableTypeSettings()
+                            {
+                                ParentNodeId = parentTypeNode.NodeId,
+                                ReferenceTypeId = ReferenceTypeIds.HasSubtype,
+                                RequestedNodeId = new NodeId($"{parentTypeNode.NodeId.Identifier}.{variableName}", TypeNamespaceIndex),
+                                BrowseName = new QualifiedName(variableName, TypeNamespaceIndex),
+                                DataType = TypeMapping.Instance.MapDataTypeId(property.PropertyType),
+                            });
+                        AddReference(Server.DefaultRequestContext, parentTypeNode.NodeId, ReferenceTypeIds.Organizes, false, variableTypeNode.NodeId, true);
+
+            */
             var variableNode = CreateVariable(Server.DefaultRequestContext,
                 new CreateVariableSettings()
                 {
@@ -157,11 +186,13 @@ namespace UaclServer
                     ReferenceTypeId = ReferenceTypeIds.HasComponent,
                     RequestedNodeId = new NodeId($"{parentNode.NodeId.Identifier}.{variableName}", InstanceNamespaceIndex),
                     BrowseName = new QualifiedName(variableName, InstanceNamespaceIndex),
-                    TypeDefinitionId = variableTypeNode.NodeId,
+                    TypeDefinitionId = VariableTypeIds.BaseDataVariableType,
+                    DataType = TypeMapping.Instance.MapDataTypeId(property.PropertyType),
                     AccessLevel = AccessLevels.CurrentReadOrWrite,
                 });
+            variableNode.UserData = new VariableNodeData { BusinessObject = businessObject, Property = property };
+            AddReference(Server.DefaultRequestContext, parentNode.NodeId, ReferenceTypeIds.Organizes, false, variableNode.NodeId, true);
 
-            variableNode.UserData = new VariableNodeData {BusinessObject = businessObject, Property = property};
             Logger.Info($"Created variable ... {variableNode.NodeId.Identifier}.");
         }
 
@@ -181,11 +212,20 @@ namespace UaclServer
             List<StatusCode> inputArgumentResults,
             List<Variant> outputArguments)
         {
-            MethodNodeData data = methodHandle.MethodData as MethodNodeData;
+            var data = methodHandle.MethodData as MethodNodeData;
 
-            object returnValue = data?.Method.Invoke(data.BusinessObject, new object[] {"", 0});
+            if (data == null) return StatusCodes.BadMethodInvalid;
+            if (outputArguments.Count > 1) return StatusCodes.BadSyntaxError;
+            if (data.Method.GetParameters().Length != inputArguments.Count) return StatusCodes.BadNodeAttributesInvalid;
 
-            return StatusCodes.BadNotImplemented;
+            var parameterList = inputArguments.Select(ia => TypeMapping.Instance.Convert(ia)).ToArray();
+            var returnValue = data?.Method.Invoke(data.BusinessObject, parameterList);
+            if (outputArguments.Count > 0 && returnValue != null)
+            {
+                outputArguments[0] = TypeMapping.Instance.Convert(returnValue, outputArguments[0]);
+            }
+
+            return StatusCodes.Good;
         }
 
         protected override void Read(
@@ -217,6 +257,10 @@ namespace UaclServer
             IList<NodeAttributeOperationHandle> operationHandles,
             IList<WriteValue> settings)
         {
+/*          
+            // **********************************************************************************************************
+            // Not implemented, yet!
+            // **********************************************************************************************************
             for (var ii = 0; ii < operationHandles.Count; ii++)
             {
                 // initialize with bad status
@@ -234,6 +278,10 @@ namespace UaclServer
                 ((WriteCompleteEventHandler) transaction.Callback)(processVariableHandle, transaction.CallbackData,
                     error, false);
             }
+            // **********************************************************************************************************
+            // Not implemented, yet!
+            // **********************************************************************************************************
+*/
         }
 
         public override void Shutdown()
