@@ -20,6 +20,10 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "UaclUtils", "UaclUtils\Uacl
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "TestUaclUtils", "TestUaclUtils\TestUaclUtils.csproj", "{823E4BB8-83A1-432A-B800-EC831F4522E7}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "OfficeConsole", "OfficeConsole\OfficeConsole.csproj", "{60B130C8-0560-4A6F-9A52-ACC87C62F353}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "TestOfficeConsole", "TestOfficeConsole\TestOfficeConsole.csproj", "{FCB6A4D8-F93B-4A52-A660-315C48F55116}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -50,6 +54,14 @@ Global
 		{823E4BB8-83A1-432A-B800-EC831F4522E7}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{823E4BB8-83A1-432A-B800-EC831F4522E7}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{823E4BB8-83A1-432A-B800-EC831F4522E7}.Release|Any CPU.Build.0 = Release|Any CPU
+		{60B130C8-0560-4A6F-9A52-ACC87C62F353}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{60B130C8-0560-4A6F-9A52-ACC87C62F353}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{60B130C8-0560-4A6F-9A52-ACC87C62F353}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{60B130C8-0560-4A6F-9A52-ACC87C62F353}.Release|Any CPU.Build.0 = Release|Any CPU
+		{FCB6A4D8-F93B-4A52-A660-315C48F55116}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{FCB6A4D8-F93B-4A52-A660-315C48F55116}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{FCB6A4D8-F93B-4A52-A660-315C48F55116}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{FCB6A4D8-F93B-4A52-A660-315C48F55116}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
