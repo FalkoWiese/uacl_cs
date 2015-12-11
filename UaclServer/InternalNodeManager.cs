@@ -77,7 +77,6 @@ namespace UaclServer
         {
             var uaObject = businessObject.GetType().GetCustomAttribute<UaObject>();
             var uaObjectName = uaObject.Name ?? businessObject.GetType().Name;
-/*
             var typeNode = CreateObjectTypeNode(Server.DefaultRequestContext, new CreateObjectTypeSettings()
             {
                 ParentNodeId = ObjectTypeIds.BaseObjectType,
@@ -88,7 +87,6 @@ namespace UaclServer
             });
             AddReference(Server.DefaultRequestContext, typeRootNode.NodeId, ReferenceTypeIds.Organizes, false,
                 typeNode.NodeId, true);
-*/
 
             var node = CreateObject(Server.DefaultRequestContext, new CreateObjectSettings()
             {
@@ -98,13 +96,11 @@ namespace UaclServer
                 BrowseName = new QualifiedName(uaObjectName, InstanceNamespaceIndex),
                 TypeDefinitionId = ObjectTypeIds.BaseObjectType
             });
-            AddReference(Server.DefaultRequestContext, rootNode.NodeId, ReferenceTypeIds.Organizes, false, node.NodeId,
-                true);
             Logger.Info($"Created node ... {node.NodeId.Identifier}.");
 
             foreach (var property in businessObject.GetType().GetProperties())
             {
-                AddVariable(businessObject, property, node, null); //typeNode);
+                AddVariable(businessObject, property, node, typeNode);
             }
 
             foreach (var method in businessObject.GetType().GetMethods())
@@ -160,25 +156,24 @@ namespace UaclServer
             Logger.Info($"Created method ... {methodNode.NodeId.Identifier}.");
         }
 
-        private void AddVariable(object businessObject, PropertyInfo property, ObjectNode parentNode, ObjectTypeNode parentTypeNode)
+        private void AddVariable(object businessObject, PropertyInfo property, ObjectNode parentNode,
+            ObjectTypeNode parentTypeNode)
         {
             var uaVariableAttribute = property.GetCustomAttribute<UaVariable>();
             if (uaVariableAttribute == null) return;
             var variableName = uaVariableAttribute.Name ?? property.Name;
 
-            /*
-                        var variableTypeNode = CreateVariableTypeNode(Server.DefaultRequestContext,
-                            new CreateVariableTypeSettings()
-                            {
-                                ParentNodeId = parentTypeNode.NodeId,
-                                ReferenceTypeId = ReferenceTypeIds.HasSubtype,
-                                RequestedNodeId = new NodeId($"{parentTypeNode.NodeId.Identifier}.{variableName}", TypeNamespaceIndex),
-                                BrowseName = new QualifiedName(variableName, TypeNamespaceIndex),
-                                DataType = TypeMapping.Instance.MapDataTypeId(property.PropertyType),
-                            });
-                        AddReference(Server.DefaultRequestContext, parentTypeNode.NodeId, ReferenceTypeIds.Organizes, false, variableTypeNode.NodeId, true);
+            var variableTypeNode = CreateVariableTypeNode(Server.DefaultRequestContext,
+                new CreateVariableTypeSettings()
+                {
+                    ParentNodeId = parentTypeNode.NodeId,
+                    ReferenceTypeId = ReferenceTypeIds.HasSubtype,
+                    RequestedNodeId = new NodeId($"{parentTypeNode.NodeId.Identifier}.{variableName}", TypeNamespaceIndex),
+                    BrowseName = new QualifiedName(variableName, TypeNamespaceIndex),
+                    DataType = TypeMapping.Instance.MapDataTypeId(property.PropertyType),
+                });
+            AddReference(Server.DefaultRequestContext, parentTypeNode.NodeId, ReferenceTypeIds.Organizes, false, variableTypeNode.NodeId, true);
 
-            */
             var variableNode = CreateVariable(Server.DefaultRequestContext,
                 new CreateVariableSettings()
                 {
@@ -186,12 +181,12 @@ namespace UaclServer
                     ReferenceTypeId = ReferenceTypeIds.HasComponent,
                     RequestedNodeId = new NodeId($"{parentNode.NodeId.Identifier}.{variableName}", InstanceNamespaceIndex),
                     BrowseName = new QualifiedName(variableName, InstanceNamespaceIndex),
-                    TypeDefinitionId = VariableTypeIds.BaseDataVariableType,
-                    DataType = TypeMapping.Instance.MapDataTypeId(property.PropertyType),
-                    AccessLevel = AccessLevels.CurrentReadOrWrite,
+                    DisplayName = variableName,
+                    Description = new LocalizedText("en", variableName),
+                    TypeDefinitionId = variableTypeNode.NodeId,
+                    Value = new Variant("None"),
                 });
             variableNode.UserData = new VariableNodeData { BusinessObject = businessObject, Property = property };
-            AddReference(Server.DefaultRequestContext, parentNode.NodeId, ReferenceTypeIds.Organizes, false, variableNode.NodeId, true);
 
             Logger.Info($"Created variable ... {variableNode.NodeId.Identifier}.");
         }
@@ -212,20 +207,28 @@ namespace UaclServer
             List<StatusCode> inputArgumentResults,
             List<Variant> outputArguments)
         {
-            var data = methodHandle.MethodData as MethodNodeData;
-
-            if (data == null) return StatusCodes.BadMethodInvalid;
-            if (outputArguments.Count > 1) return StatusCodes.BadSyntaxError;
-            if (data.Method.GetParameters().Length != inputArguments.Count) return StatusCodes.BadNodeAttributesInvalid;
-
-            var parameterList = inputArguments.Select(ia => TypeMapping.Instance.Convert(ia)).ToArray();
-            var returnValue = data?.Method.Invoke(data.BusinessObject, parameterList);
-            if (outputArguments.Count > 0 && returnValue != null)
+            try
             {
-                outputArguments[0] = TypeMapping.Instance.Convert(returnValue, outputArguments[0]);
-            }
+                var data = methodHandle.MethodData as MethodNodeData;
 
-            return StatusCodes.Good;
+                if (data == null) return StatusCodes.BadMethodInvalid;
+                if (outputArguments.Count > 1) return StatusCodes.BadSyntaxError;
+                if (data.Method.GetParameters().Length != inputArguments.Count) return StatusCodes.BadNodeAttributesInvalid;
+
+                var parameterList = inputArguments.Select(ia => TypeMapping.Instance.Convert(ia)).ToArray();
+                var returnValue = data?.Method.Invoke(data.BusinessObject, parameterList);
+                if (outputArguments.Count > 0 && returnValue != null)
+                {
+                    outputArguments[0] = TypeMapping.Instance.Convert(returnValue, outputArguments[0]);
+                }
+
+                return StatusCodes.Good;
+            }
+            catch (Exception e)
+            {
+                ExceptionHandler.Log(e, "Error while invoke a remote method ...");
+                return StatusCodes.Bad;
+            }
         }
 
         protected override void Read(
@@ -257,10 +260,6 @@ namespace UaclServer
             IList<NodeAttributeOperationHandle> operationHandles,
             IList<WriteValue> settings)
         {
-/*          
-            // **********************************************************************************************************
-            // Not implemented, yet!
-            // **********************************************************************************************************
             for (var ii = 0; ii < operationHandles.Count; ii++)
             {
                 // initialize with bad status
@@ -278,10 +277,6 @@ namespace UaclServer
                 ((WriteCompleteEventHandler) transaction.Callback)(processVariableHandle, transaction.CallbackData,
                     error, false);
             }
-            // **********************************************************************************************************
-            // Not implemented, yet!
-            // **********************************************************************************************************
-*/
         }
 
         public override void Shutdown()

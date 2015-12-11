@@ -2,32 +2,32 @@
 using UaclServer;
 using UaclUtils;
 
-namespace ServerConsole
+namespace OfficeConsole
 {
-	class Program
-	{
-		static void Main(string[] args)
-		{
-		    InternalServer server = null;
-		    try
-		    {
-		        server = new ServerConsoleServer();
+    class Program
+    {
+        static void Main(string[] args)
+        {
+            InternalServer server = null;
+            try
+            {
+                server = new OfficeConsoleServer();
                 server.RegisterObject(new BusinessLogic());
                 server.Start();
 
-		        while (true)
-		        {
-		            System.Threading.Thread.Sleep(100);
-		        }
+                while (true)
+                {
+                    System.Threading.Thread.Sleep(100);
+                }
             }
             catch (Exception e)
-		    {
+            {
                 ExceptionHandler.Log(e, "Error while starting the OfficeServerConsole ...");
                 Logger.Info("Press <enter> to exit the program.");
                 Console.ReadLine();
-		    }
-		    finally
-		    {
+            }
+            finally
+            {
                 // Stop the server.
                 server?.Stop();
             }

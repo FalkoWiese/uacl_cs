@@ -4,16 +4,14 @@
   <PropertyGroup>
     <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
     <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
-    <ProjectGuid>{1CD68920-FD19-4D9F-A47D-82E2BD7F88E4}</ProjectGuid>
+    <ProjectGuid>{60B130C8-0560-4A6F-9A52-ACC87C62F353}</ProjectGuid>
     <OutputType>Exe</OutputType>
     <AppDesignerFolder>Properties</AppDesignerFolder>
-    <RootNamespace>ServerConsole</RootNamespace>
-    <AssemblyName>ServerConsole</AssemblyName>
+    <RootNamespace>OfficeConsole</RootNamespace>
+    <AssemblyName>OfficeConsole</AssemblyName>
     <TargetFrameworkVersion>v4.5.2</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
     <AutoGenerateBindingRedirects>true</AutoGenerateBindingRedirects>
-    <NuGetPackageImportStamp>
-    </NuGetPackageImportStamp>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
     <PlatformTarget>AnyCPU</PlatformTarget>
@@ -45,25 +43,22 @@
     <Reference Include="System.Xml" />
     <Reference Include="UnifiedAutomation.UaBase, Version=2.0.0.0, Culture=neutral, PublicKeyToken=90c158e6f23d82c1, processorArchitecture=MSIL">
       <SpecificVersion>False</SpecificVersion>
-      <HintPath>..\..\..\..\..\..\..\..\Program Files (x86)\UnifiedAutomation\UaSdkNetBundleEval\assemblies\NET_4.5\UnifiedAutomation.UaBase.dll</HintPath>
+      <HintPath>..\..\..\Program Files (x86)\UnifiedAutomation\UaSdkNetBundleEval\bin\UnifiedAutomation.UaBase.dll</HintPath>
     </Reference>
     <Reference Include="UnifiedAutomation.UaServer, Version=2.0.0.0, Culture=neutral, PublicKeyToken=90c158e6f23d82c1, processorArchitecture=MSIL">
       <SpecificVersion>False</SpecificVersion>
-      <HintPath>..\..\..\..\..\..\..\..\Program Files (x86)\UnifiedAutomation\UaSdkNetBundleEval\assemblies\NET_4.5\UnifiedAutomation.UaServer.dll</HintPath>
+      <HintPath>..\..\..\Program Files (x86)\UnifiedAutomation\UaSdkNetBundleEval\bin\UnifiedAutomation.UaServer.dll</HintPath>
     </Reference>
   </ItemGroup>
   <ItemGroup>
     <Compile Include="BusinessLogic.cs" />
+    <Compile Include="OfficeConsoleServer.cs" />
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
-    <Compile Include="ServerConsoleServer.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="App.config" />
     <None Include="packages.config" />
-  </ItemGroup>
-  <ItemGroup>
-    <Service Include="{82A7F48D-3B50-4B1E-B82E-3ADA8210C358}" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\UaclServer\UaclServer.csproj">

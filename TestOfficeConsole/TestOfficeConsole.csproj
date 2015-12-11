@@ -3,11 +3,11 @@
   <PropertyGroup>
     <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
     <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
-    <ProjectGuid>{0F80AAC4-20F2-476A-A633-3BAB811D2E85}</ProjectGuid>
+    <ProjectGuid>{FCB6A4D8-F93B-4A52-A660-315C48F55116}</ProjectGuid>
     <OutputType>Library</OutputType>
     <AppDesignerFolder>Properties</AppDesignerFolder>
-    <RootNamespace>TestUaclServer</RootNamespace>
-    <AssemblyName>TestUaclServer</AssemblyName>
+    <RootNamespace>TestOfficeConsole</RootNamespace>
+    <AssemblyName>TestOfficeConsole</AssemblyName>
     <TargetFrameworkVersion>v4.5.2</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
     <ProjectTypeGuids>{3AC096D0-A1C2-E12C-1390-A8335801FDAB};{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}</ProjectTypeGuids>
@@ -32,20 +32,32 @@
   <ItemGroup>
     <Reference Include="nunit.framework, Version=3.0.5797.27534, Culture=neutral, PublicKeyToken=2638cd05610744eb, processorArchitecture=MSIL" />
     <Reference Include="System" />
+    <Reference Include="UnifiedAutomation.UaBase, Version=2.0.0.0, Culture=neutral, PublicKeyToken=90c158e6f23d82c1, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\..\..\Program Files (x86)\UnifiedAutomation\UaSdkNetBundleEval\bin\UnifiedAutomation.UaBase.dll</HintPath>
+    </Reference>
+    <Reference Include="UnifiedAutomation.UaServer, Version=2.0.0.0, Culture=neutral, PublicKeyToken=90c158e6f23d82c1, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\..\..\Program Files (x86)\UnifiedAutomation\UaSdkNetBundleEval\bin\UnifiedAutomation.UaServer.dll</HintPath>
+    </Reference>
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="BusinessObject.cs" />
-    <Compile Include="TestServerStart.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
-  </ItemGroup>
-  <ItemGroup>
-    <ProjectReference Include="..\UaclServer\UaclServer.csproj">
-      <Project>{6650e264-d095-40be-893e-442294651d29}</Project>
-      <Name>UaclServer</Name>
-    </ProjectReference>
+    <Compile Include="TestBusinessLogic.cs" />
+    <Compile Include="TestServerStart.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="packages.config" />
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\OfficeConsole\OfficeConsole.csproj">
+      <Project>{60b130c8-0560-4a6f-9a52-acc87c62f353}</Project>
+      <Name>OfficeConsole</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\UaclServer\UaclServer.csproj">
+      <Project>{6650E264-D095-40BE-893E-442294651D29}</Project>
+      <Name>UaclServer</Name>
+    </ProjectReference>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
