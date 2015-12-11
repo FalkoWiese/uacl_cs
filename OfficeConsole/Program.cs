@@ -15,8 +15,10 @@ namespace OfficeConsole
                 server.RegisterObject(new BusinessLogic());
                 server.Start();
 
-                Logger.Info("Press <enter> to exit the program.");
-                Console.ReadLine();
+                while (true)
+                {
+                    System.Threading.Thread.Sleep(100);
+                }
             }
             catch (Exception e)
             {
