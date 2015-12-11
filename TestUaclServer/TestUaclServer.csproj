@@ -34,14 +34,11 @@
     <Reference Include="System" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="BusinessObject.cs" />
     <Compile Include="TestServerStart.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\ServerConsole\ServerConsole.csproj">
-      <Project>{1cd68920-fd19-4d9f-a47d-82e2bd7f88e4}</Project>
-      <Name>ServerConsole</Name>
-    </ProjectReference>
     <ProjectReference Include="..\UaclServer\UaclServer.csproj">
       <Project>{6650e264-d095-40be-893e-442294651d29}</Project>
       <Name>UaclServer</Name>

@@ -11,17 +11,20 @@ namespace ServerConsole
 		    InternalServer server = null;
 		    try
 		    {
-		        server = new InternalServer("localhost", 48030, "ServerConsole");
+		        server = new ServerConsoleServer();
                 server.RegisterObject(new BusinessLogic());
-		        server.Start();
+                server.Start();
 
-		        Logger.Info("Press <enter> to exit the program.");
-		        Console.ReadLine();
-		    }
-		    catch (Exception e)
+		        while (true)
+		        {
+		            System.Threading.Thread.Sleep(100);
+		        }
+            }
+            catch (Exception e)
 		    {
-                ExceptionHandler.Log(e, "Press <enter> to exit the program.");
-		        Console.ReadLine();
+                ExceptionHandler.Log(e, "Error while starting the OfficeServerConsole ...");
+                Logger.Info("Press <enter> to exit the program.");
+                Console.ReadLine();
 		    }
 		    finally
 		    {

@@ -1,7 +1,6 @@
 ﻿using NUnit.Framework;
 using UaclServer;
 using System.Threading;
-using ServerConsole;
 
 namespace TestUaclServer
 {
@@ -9,20 +8,20 @@ namespace TestUaclServer
     public class TestServerStart
     {
         [Test]
-        public void StartAndStopTheServer()
+        public void StartAndStopFirstServer()
         {
-            var server = new InternalServer("localhost", 48040, "ControlConsole");
+            var server = new InternalServer("localhost", 48040, "FirstServer");
             Assert.IsTrue(server.Start());
             Thread.Sleep(1000);
             Assert.IsTrue(server.Stop());
         }
 
         [Test]
-        public void RegisterAnObject()
+        public void RegisterAnObjectToSecondServer()
         {
-            var server = new InternalServer("localhost", 48030, "ServerConsole");
+            var server = new InternalServer("localhost", 48030, "SecondServer");
             Assert.IsNotNull(server);
-            var bo = new BusinessLogic();
+            var bo = new BusinessObject();
             Assert.IsNotNull(bo);
             Assert.IsTrue(server.RegisterObject(bo));
         }
