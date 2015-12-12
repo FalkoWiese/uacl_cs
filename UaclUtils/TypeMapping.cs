@@ -2,9 +2,9 @@ using System;
 using System.Collections.Generic;
 using UnifiedAutomation.UaBase;
 
-namespace UaclServer
+namespace UaclUtils
 {
-    internal sealed class TypeMapping
+    public sealed class TypeMapping
     {
         private TypeMapping()
         {
@@ -44,7 +44,7 @@ namespace UaclServer
             throw new Exception($"Cannot find type {type.Name} in mapping table!");
         }
 
-        public object Convert(Variant item)
+        public object ToObject(Variant item)
         {
             if (item.DataType == BuiltInType.Boolean) return item.ToBoolean();
             if (item.DataType == BuiltInType.Byte) return item.ToByte();
@@ -63,7 +63,24 @@ namespace UaclServer
 
         public static TypeMapping Instance { get; } = new TypeMapping();
 
-        internal Variant Convert(object value, Variant item)
+        public Variant ToVariant<T>(object value)
+        {
+            if (typeof(T) == typeof(bool)) return new Variant((bool)value);
+            if (typeof(T) == typeof(byte)) return new Variant((byte)value);
+            if (typeof(T) == typeof(short)) return new Variant((short)value);
+            if (typeof(T) == typeof(int)) return new Variant((int)value);
+            if (typeof(T) == typeof(long)) return new Variant((long)value);
+            if (typeof(T) == typeof(ushort)) return new Variant((ushort)value);
+            if (typeof(T) == typeof(uint)) return new Variant((uint)value);
+            if (typeof(T) == typeof(ulong)) return new Variant((ulong)value);
+            if (typeof(T) == typeof(float)) return new Variant((float)value);
+            if (typeof(T) == typeof(double)) return new Variant((double)value);
+            if (typeof(T) == typeof(string)) return new Variant((string)value);
+
+            throw new Exception($"Cannot find type {typeof(T)} in mapping table!");
+        }
+
+        public Variant ToVariant(object value, Variant item)
         {
             if (item.DataType == BuiltInType.Boolean) return new Variant((bool)value);
             if (item.DataType == BuiltInType.Byte) return new Variant((byte)value);
