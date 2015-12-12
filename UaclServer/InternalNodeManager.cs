@@ -215,11 +215,11 @@ namespace UaclServer
                 if (outputArguments.Count > 1) return StatusCodes.BadSyntaxError;
                 if (data.Method.GetParameters().Length != inputArguments.Count) return StatusCodes.BadNodeAttributesInvalid;
 
-                var parameterList = inputArguments.Select(ia => TypeMapping.Instance.Convert(ia)).ToArray();
+                var parameterList = inputArguments.Select(ia => TypeMapping.Instance.ToObject(ia)).ToArray();
                 var returnValue = data?.Method.Invoke(data.BusinessObject, parameterList);
                 if (outputArguments.Count > 0 && returnValue != null)
                 {
-                    outputArguments[0] = TypeMapping.Instance.Convert(returnValue, outputArguments[0]);
+                    outputArguments[0] = TypeMapping.Instance.ToVariant(returnValue, outputArguments[0]);
                 }
 
                 return StatusCodes.Good;
