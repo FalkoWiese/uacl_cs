@@ -65,7 +65,6 @@
     <Compile Include="VariableNodeData.cs" />
   </ItemGroup>
   <ItemGroup>
-    <None Include="App.config" />
     <EmbeddedResource Include="License.lic" />
     <None Include="packages.config" />
   </ItemGroup>
