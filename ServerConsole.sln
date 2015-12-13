@@ -24,6 +24,10 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "OfficeConsole", "OfficeCons
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "TestOfficeConsole", "TestOfficeConsole\TestOfficeConsole.csproj", "{FCB6A4D8-F93B-4A52-A660-315C48F55116}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "UaclClient", "UaclClient\UaclClient.csproj", "{DD33AE1B-1A85-4A66-B22B-8A4D0A22D254}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "TestUaclClient", "TestUaclClient\TestUaclClient.csproj", "{39EC6DE4-28D7-4BFE-9EDF-134336A3B05F}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -62,6 +66,14 @@ Global
 		{FCB6A4D8-F93B-4A52-A660-315C48F55116}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{FCB6A4D8-F93B-4A52-A660-315C48F55116}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{FCB6A4D8-F93B-4A52-A660-315C48F55116}.Release|Any CPU.Build.0 = Release|Any CPU
+		{DD33AE1B-1A85-4A66-B22B-8A4D0A22D254}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{DD33AE1B-1A85-4A66-B22B-8A4D0A22D254}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{DD33AE1B-1A85-4A66-B22B-8A4D0A22D254}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{DD33AE1B-1A85-4A66-B22B-8A4D0A22D254}.Release|Any CPU.Build.0 = Release|Any CPU
+		{39EC6DE4-28D7-4BFE-9EDF-134336A3B05F}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{39EC6DE4-28D7-4BFE-9EDF-134336A3B05F}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{39EC6DE4-28D7-4BFE-9EDF-134336A3B05F}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{39EC6DE4-28D7-4BFE-9EDF-134336A3B05F}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

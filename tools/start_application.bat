@@ -1,4 +1,4 @@
-rem @echo off
+@echo off
 setlocal
 
 if "%1"=="" goto ARG_ERROR

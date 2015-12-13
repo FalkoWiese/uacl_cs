@@ -13,6 +13,7 @@ namespace OfficeConsole
             {
                 server = new OfficeConsoleServer();
                 server.RegisterObject(new BusinessLogic());
+                server.RegisterObject(new RemoteBusinessLogic());
                 server.Start();
 
                 while (true)

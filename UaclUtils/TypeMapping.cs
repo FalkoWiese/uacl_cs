@@ -1,28 +1,29 @@
 using System;
-using System.Collections.Generic;
 using UnifiedAutomation.UaBase;
 
-namespace UaclServer
+namespace UaclUtils
 {
-    internal sealed class TypeMapping
+    public sealed class TypeMapping
     {
         private TypeMapping()
         {
         }
 
-        public uint MapType(Type dataType)
+        public Variant MapType<T>()
         {
-            if (dataType == typeof(bool)) return DataTypes.Boolean;
-            if (dataType == typeof(byte)) return DataTypes.Byte;
-            if (dataType == typeof(short)) return DataTypes.Int16;
-            if (dataType == typeof(int)) return DataTypes.Int32;
-            if (dataType == typeof(long)) return DataTypes.Int64;
-            if (dataType == typeof(ushort)) return DataTypes.UInt16;
-            if (dataType == typeof(uint)) return DataTypes.UInt32;
-            if (dataType == typeof(ulong)) return DataTypes.UInt64;
-            if (dataType == typeof(float)) return DataTypes.Float;
-            if (dataType == typeof(double)) return DataTypes.Double;
-            if (dataType == typeof(string)) return DataTypes.String;
+            var dataType = typeof (T);
+
+            if (dataType == typeof(bool)) return ToVariant(false);
+            if (dataType == typeof(byte)) return ToVariant(byte.MinValue);
+            if (dataType == typeof(short)) return ToVariant(short.MinValue);
+            if (dataType == typeof(int)) return ToVariant(int.MinValue);
+            if (dataType == typeof(long)) return ToVariant(long.MinValue);
+            if (dataType == typeof(ushort)) return ToVariant(ushort.MinValue);
+            if (dataType == typeof(uint)) return ToVariant(uint.MinValue);
+            if (dataType == typeof(ulong)) return ToVariant(ulong.MinValue);
+            if (dataType == typeof(float)) return ToVariant(float.MinValue);
+            if (dataType == typeof(double)) return ToVariant(double.MinValue);
+            if (dataType == typeof(string)) return ToVariant(string.Empty);
 
             throw new Exception($"Cannot find type {dataType.Name} in mapping table!");
         }
@@ -44,7 +45,7 @@ namespace UaclServer
             throw new Exception($"Cannot find type {type.Name} in mapping table!");
         }
 
-        public object Convert(Variant item)
+        public object ToObject(Variant item)
         {
             if (item.DataType == BuiltInType.Boolean) return item.ToBoolean();
             if (item.DataType == BuiltInType.Byte) return item.ToByte();
@@ -63,7 +64,26 @@ namespace UaclServer
 
         public static TypeMapping Instance { get; } = new TypeMapping();
 
-        internal Variant Convert(object value, Variant item)
+        public Variant ToVariant(object value)
+        {
+            Type objectType = value.GetType();
+
+            if (objectType == typeof(bool)) return new Variant((bool)value);
+            if (objectType == typeof(byte)) return new Variant((byte)value);
+            if (objectType == typeof(short)) return new Variant((short)value);
+            if (objectType == typeof(int)) return new Variant((int)value);
+            if (objectType == typeof(long)) return new Variant((long)value);
+            if (objectType == typeof(ushort)) return new Variant((ushort)value);
+            if (objectType == typeof(uint)) return new Variant((uint)value);
+            if (objectType == typeof(ulong)) return new Variant((ulong)value);
+            if (objectType == typeof(float)) return new Variant((float)value);
+            if (objectType == typeof(double)) return new Variant((double)value);
+            if (objectType == typeof(string)) return new Variant((string)value);
+
+            throw new Exception($"Cannot find type {objectType} in mapping table!");
+        }
+
+        public Variant ToVariant(object value, Variant item)
         {
             if (item.DataType == BuiltInType.Boolean) return new Variant((bool)value);
             if (item.DataType == BuiltInType.Byte) return new Variant((byte)value);

@@ -21,3 +21,7 @@ OfficeConsole/bin/
 OfficeConsole/obj/
 TestOfficeConsole/bin/
 TestOfficeConsole/obj/
+TestUaclClient/obj/
+UaclClient/bin/
+UaclClient/obj/
+TestUaclClient/bin/
