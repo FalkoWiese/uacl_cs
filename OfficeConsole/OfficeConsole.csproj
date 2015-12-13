@@ -45,6 +45,10 @@
       <SpecificVersion>False</SpecificVersion>
       <HintPath>..\..\..\Program Files (x86)\UnifiedAutomation\UaSdkNetBundleEval\bin\UnifiedAutomation.UaBase.dll</HintPath>
     </Reference>
+    <Reference Include="UnifiedAutomation.UaClient, Version=2.0.0.0, Culture=neutral, PublicKeyToken=90c158e6f23d82c1, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\..\..\Program Files (x86)\UnifiedAutomation\UaSdkNetBundleEval\bin\UnifiedAutomation.UaClient.dll</HintPath>
+    </Reference>
     <Reference Include="UnifiedAutomation.UaServer, Version=2.0.0.0, Culture=neutral, PublicKeyToken=90c158e6f23d82c1, processorArchitecture=MSIL">
       <SpecificVersion>False</SpecificVersion>
       <HintPath>..\..\..\Program Files (x86)\UnifiedAutomation\UaSdkNetBundleEval\bin\UnifiedAutomation.UaServer.dll</HintPath>
@@ -55,12 +59,16 @@
     <Compile Include="OfficeConsoleServer.cs" />
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="RemoteBusinessLogic.cs" />
   </ItemGroup>
   <ItemGroup>
-    <None Include="App.config" />
     <None Include="packages.config" />
   </ItemGroup>
   <ItemGroup>
+    <ProjectReference Include="..\UaclClient\UaclClient.csproj">
+      <Project>{dd33ae1b-1a85-4a66-b22b-8a4d0a22d254}</Project>
+      <Name>UaclClient</Name>
+    </ProjectReference>
     <ProjectReference Include="..\UaclServer\UaclServer.csproj">
       <Project>{6650e264-d095-40be-893e-442294651d29}</Project>
       <Name>UaclServer</Name>
