@@ -1,0 +1,59 @@
+# include requirements for production
+-r requirements.txt
+
+#development:
+#----------------------------------
+
+wheel==0.26.0
+
+xlrd==0.9.4
+requests==1.2.3
+poster==0.8.1
+enum34==1.0.4
+
+# if only VS 2010 is installed, call this before:
+# SET VS90COMNTOOLS=%VS100COMNTOOLS%
+# on Powershell:
+# $env:VS90COMNTOOLS=$env:VS100COMNTOOLS
+# fabric requires pywin32 (on windows):
+# python -m easy_install --always-unzip http://downloads.sourceforge.net/project/pywin32/pywin32/Build%20218/pywin32-218.win32-py2.7.exe
+# pywin32==218
+Fabric==1.10.2 # requires paramiko pycrypto
+paramiko==1.15.2
+quik==0.2.2
+
+# python -m easy_install PySide # ProxyBase Syntax Error kann ignoriert werden
+## call for pip 1.5.x :: pip install --allow-unverified PySide PySide
+#--allow-unverified PySide
+PySide==1.2.4
+
+# installer generation:
+#-----------------------------------
+# PyInstaller 2.1 depends on distribute - current versions of virtualenv do not install distribute anymore
+# (distribute was back-merged into setuptools) -> install distribute or install PyInstaller from GitHub
+PyInstaller==3.0
+#git+https://github.com/pyinstaller/pyinstaller.git@develop#egg=PyInstaller
+## call for pip 1.5.x :: pip install --allow-unverified pefile pefile
+#--allow-unverified pefile
+pefile==1.2.10.post114
+
+# remote control: tools/rcl
+#-----------------------------------
+qdarkstyle==1.16
+
+# parameter help files generation
+#-----------------------------------
+openpyxl==2.3.1
+
+# documentation
+#-----------------------------------
+# Sphinx relies on markupsafe: this library contains a C extension for speedups (but runs also without it)
+# to use C extension: set ENV variable VS90COMNTOOLS like mentioned in development section
+Sphinx==1.3.1
+alabaster==0.7.6
+breathe==3.2.0
+
+# ipython
+#-----------------------------------
+ipython==4.0
+pyreadline==2.1

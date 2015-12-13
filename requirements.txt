@@ -1,0 +1,9 @@
+# These are 'general' requirements for 'my software' in production.
+# General requirements for development are listed in requirements_development.txt.
+
+#--find-links http://<your own ip>/cheeseshop/
+
+yoyo-migrations==4.2.4
+# Have a look in update_python_env.bat
+# python -m easy_install --always-unzip http://www.stickpeople.com/projects/python/win-psycopg/2.6.1/psycopg2-2.6.1.win32-py2.7-pg9.4.4-release.exe
+# psycopg2==2.5.1
