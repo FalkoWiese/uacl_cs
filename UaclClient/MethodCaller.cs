@@ -16,7 +16,8 @@ namespace UaclClient
         private readonly NodeId _parentNode;
         private readonly BrowseContext _browseContext;
         private const int OpcUaIdRootFolder = 84;
-        private Dictionary<string, NodeId> _nodeIds;
+        private readonly Dictionary<string, NodeId> _nodeIds;
+        private AsyncCallback ResultCallback { get; set; }
 
         private MethodCaller(OpcUaSession session)
         {
@@ -33,9 +34,10 @@ namespace UaclClient
             _session.ConnectionStatusUpdate += SessionOnConnectionStatusUpdate;
         }
 
-        public MethodCaller(OpcUaSession session, string parentNodeName) : this(session)
+        public MethodCaller(OpcUaSession session, string parentNodeName, AsyncCallback methodResult=null) : this(session)
         {
-            _parentNode = BrowseNodeidByName(null, parentNodeName);
+            ResultCallback = methodResult;
+            _parentNode = BrowseNodeIdByName(null, parentNodeName);
         }
 
         /// <summary>
@@ -58,7 +60,8 @@ namespace UaclClient
 
         /// <summary>
         /// Asynchronously calls a method on a server.
-        /// The given <param name="parentNodeName">parentNodeName</param> and <param name="methodName">methodName</param> are required to create the corresponding NodeIds to these Modes at the server.
+        /// The given <param name="parentNodeName">parentNodeName</param> and <param name="methodName">methodName</param> are 
+        /// required to create the corresponding NodeIds to these Nodes on server side.
         /// </summary>
         /// <param name="parentNodeName"> The parent NodeId of the desired Method, needed by the SDK to identify the method</param>
         /// <param name="methodName"> </param>
@@ -66,7 +69,7 @@ namespace UaclClient
         public void BeginCallMethod(string parentNodeName, string methodName, List<Variant> arguments)
         {
             // parse the object id.
-            var objectId = BrowseNodeidByName(null, parentNodeName);
+            var objectId = BrowseNodeIdByName(null, parentNodeName);
 
             // get the selected method id.
             var methodId = CreateNodeIdByName(objectId, methodName);
@@ -90,7 +93,7 @@ namespace UaclClient
                     methodId,
                     arguments,
                     new RequestSettings {OperationTimeout = 10000},
-                    OnCallMethodComplete,
+                    ResultCallback ?? DefaultResultCallback,
                     new CallObjectsContainer {Session = _session, Node = methodId});
             }
             catch (Exception e)
@@ -122,7 +125,7 @@ namespace UaclClient
         /// <summary>
         /// Finishes an asynchronous read request.
         /// </summary>
-        private static void OnCallMethodComplete(IAsyncResult result)
+        private void DefaultResultCallback(IAsyncResult result)
         {
             // get the session used to send the request which was passed as the userData in the Begin call.
             var callObj = (CallObjectsContainer) result.AsyncState;
@@ -179,7 +182,7 @@ namespace UaclClient
             return resultNode;
         }
 
-        private NodeId BrowseNodeidByName(NodeId parentNode, string nodeName)
+        private NodeId BrowseNodeIdByName(NodeId parentNode, string nodeName)
         {
             NodeId resultNode = null;
             if (parentNode == null)
@@ -203,7 +206,7 @@ namespace UaclClient
                 {
                     var n = new NodeId(reference.NodeId.IdType, reference.NodeId.Identifier,
                         reference.NodeId.NamespaceIndex);
-                    resultNode = reference.DisplayName.Text == nodeName ? n : BrowseNodeidByName(n, nodeName);
+                    resultNode = reference.DisplayName.Text == nodeName ? n : BrowseNodeIdByName(n, nodeName);
                     if (resultNode != null)
                     {
                         if (!_nodeIds.ContainsKey(nodeKey)) _nodeIds.Add(nodeKey, resultNode);

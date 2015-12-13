@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Threading;
 using NUnit.Framework;
+using NUnit.Framework.Constraints;
 using UaclClient;
 using UaclUtils;
 using UnifiedAutomation.UaBase;
@@ -11,14 +12,46 @@ namespace TestUaclClient
     [TestFixture]
     public class TestOpcUaSessionHandling
     {
-        [Test]
-        public void TestMethod1()
+        //[Test]
+        public void InvokeAMethodPlain()
         {
-            OpcUaSession session = OpcUaSession.Instance;
+            OpcUaSession session = SessionFactory.Instance.Create("localhost", 48030).Session;
             session.SessionIsConnectedEvent += SessionIsConnectedEvent;
             var thread = new Thread(session.EstablishOpcUaSession);
             thread.Start();
             thread.Join();
+        }
+
+        [Test]
+        public void InvokeViaRemoteMethod()
+        {
+            RemoteObject obj = new RemoteObject("localhost", 48030, "BusinessLogic");
+            RemoteMethod method = new RemoteMethod
+            {
+                Name = "CalculateJob",
+                ArgumentDescriptions = new List<Variant>
+                {
+                    TypeMapping.Instance.ToVariant<string>(""),
+                    TypeMapping.Instance.ToVariant<int>(-1)
+                },
+                ValueDescription = TypeMapping.Instance.ToVariant<bool>(false)
+            };
+
+            Variant r1 = obj.Invoke(method, new List<Variant>
+            {
+                TypeMapping.Instance.ToVariant<string>("BIG JOB"),
+                TypeMapping.Instance.ToVariant<int>(2)
+            });
+            Assert.That(()=>r1.ToBoolean(), $"Return value is {true}");
+
+/*
+            Variant r2 = obj.Invoke(method, new List<Variant>
+            {
+                TypeMapping.Instance.ToVariant<string>("small job"),
+                TypeMapping.Instance.ToVariant<int>(-1)
+            });
+            Assert.That(()=>r2.ToBoolean()==false, $"Return value is {false}");
+*/
         }
 
         private void SessionIsConnectedEvent(object sender, EventArgs eventArgs)

@@ -22,17 +22,45 @@ namespace UaclClient
 
         // Wrap the event in a protected virtual method
         // to enable derived classes to raise the event.
-        internal void RaiseSessionIsConnectedEvent(OpcUaSession opcUaSession)
+        private void RaiseSessionIsConnectedEvent(OpcUaSession opcUaSession)
         {
             Logger.Trace("SessionIsConnectedEvent raised!");
             // Raise the event by using the () operator.
             SessionIsConnectedEvent?.Invoke(opcUaSession, new EventArgs());
         }
 
+        /// <summary>
+        /// Returns an established Connection to the OPC UA Server
+        /// </summary>
+        /// <returns></returns>
+        public void EstablishOpcUaSession()
+        {
+            do
+            {
+                try
+                {
+                    if (ConnectionStatus != ServerConnectionStatus.Connected)
+                    {
+                        Logger.Info($"Try to connect to:{SessionUri.Uri.AbsoluteUri}");
+                        Connect(SessionUri.Uri.AbsoluteUri, SecuritySelection.None);
+                    }
+                    Logger.Info($"Connection to {SessionUri.Uri.AbsoluteUri} established.");
+                    RaiseSessionIsConnectedEvent(this);
+                }
+                catch (Exception e)
+                {
+                    ExceptionHandler.Log(e,
+                        $"An error occurred while try to connect to server: {SessionUri.Uri.AbsoluteUri}.");
+                }
+            } while (ConnectionStatus != ServerConnectionStatus.Connected);
+        }
 
-        private static readonly Lazy<OpcUaSession> Lazy = new Lazy<OpcUaSession>(() =>
+        private UriBuilder SessionUri { get; }
+
+        internal static OpcUaSession Create(ConnectionInfo connection)
         {
             var appSettings = new SecuredApplication();
+/*
             var traceSettings = new TraceSettings
             {
                 MasterTraceEnabled = true,
@@ -41,45 +69,20 @@ namespace UaclClient
                 // TraceFile = @"log\UaclClient.log.txt",
                 // DefaultTraceLevel = UnifiedAutomation.UaSchema.TraceLevel.Info
             };
-
             appSettings.Set<TraceSettings>(traceSettings);
+*/
             ApplicationInstance.Default.SetApplicationSettings(appSettings);
-            var uaSession = new OpcUaSession(ApplicationInstance.Default);
-            return uaSession;
-        } , LazyThreadSafetyMode.None);
 
-        /// <summary>
-        /// Returns an established Connection to the OPC UA Server
-        /// </summary>
-        /// <returns></returns>
-        public void EstablishOpcUaSession()
-        {
-            var opcUaSession = this; //new OpcUaSession();
-            _uriBuilder = new UriBuilder("opc.tcp", "localhost", 48030);
-            do
-            {
-                try
-                {
-                    Logger.Info($"Try to connect to:{_uriBuilder.Uri.AbsoluteUri}");
-                    opcUaSession.Connect(_uriBuilder.Uri.AbsoluteUri, SecuritySelection.None);
-                    Logger.Info($"Connection to {_uriBuilder.Uri.AbsoluteUri} established.");
-                    RaiseSessionIsConnectedEvent(opcUaSession);
-                }
-                catch (Exception e)
-                {
-                    ExceptionHandler.Log(e,
-                        $"An error occurred while try to connect to server:{_uriBuilder.Uri.AbsoluteUri}");
-                }
-            } while (opcUaSession.ConnectionStatus != ServerConnectionStatus.Connected);
+            return new OpcUaSession(ApplicationInstance.Default, connection);
         }
 
-        private static UriBuilder _uriBuilder;
-
-        public static OpcUaSession Instance => Lazy.Value;
-
-        private OpcUaSession(ApplicationInstance application) : base(application)
+        private OpcUaSession(ApplicationInstance application, ConnectionInfo connection) : base(application)
         {
+            Connection = connection;
+            SessionUri = new UriBuilder("opc.tcp", Connection.Ip, Connection.Port);
         }
+
+        private ConnectionInfo Connection { get; }
 
         /// <summary>
         /// This Method will be invoked, if the ServerConnectionStatus changed from Connected to another Status.
@@ -87,8 +90,8 @@ namespace UaclClient
         /// </summary>
         public void Reconnect()
         {
-            Logger.Info($"Trying to reconnect to Server URI:{_uriBuilder.Uri.AbsoluteUri}");
-            Connect(_uriBuilder.Uri.AbsoluteUri, SecuritySelection.None);
+            Logger.Info($"Trying to reconnect to Server URI: {SessionUri.Uri.AbsoluteUri}");
+            Connect(SessionUri.Uri.AbsoluteUri, SecuritySelection.None);
         }
     }
 }
