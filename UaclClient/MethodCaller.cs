@@ -93,7 +93,7 @@ namespace UaclClient
                     methodId,
                     arguments,
                     new RequestSettings {OperationTimeout = 10000},
-                    ResultCallback ?? DefaultResultCallback,
+                    ResultCallback,
                     new CallObjectsContainer {Session = _session, Node = methodId});
             }
             catch (Exception e)
@@ -216,6 +216,35 @@ namespace UaclClient
             }
 
             return resultNode;
+        }
+
+        public Variant CallMethod(RemoteMethod remoteMethod)
+        {
+            string methodName = remoteMethod.Name;
+
+            if (string.IsNullOrWhiteSpace(methodName))
+            {
+                throw new Exception("Method name is empty!");
+            }
+
+            if (_parentNode == null)
+            {
+                throw new Exception($"Parent node is null for method '{methodName}'!");
+            }
+
+            List<StatusCode> inputArgumentErrors;
+            List<Variant> outputArguments;
+            // call the method on the server.
+            StatusCode result = this._session.Call(
+                _parentNode,
+                CreateNodeIdByName(_parentNode, methodName),
+                remoteMethod.InputArguments,
+                out inputArgumentErrors,
+                out outputArguments);
+
+            remoteMethod.ReturnValue = !result.IsGood() ? Variant.Null : outputArguments[0];
+
+            return remoteMethod.ReturnValue;
         }
     }
 }

@@ -27,6 +27,7 @@ namespace UaclClient
             Logger.Trace("SessionIsConnectedEvent raised!");
             // Raise the event by using the () operator.
             SessionIsConnectedEvent?.Invoke(opcUaSession, new EventArgs());
+            SessionIsConnectedEvent = null;
         }
 
         /// <summary>
@@ -55,7 +56,7 @@ namespace UaclClient
             } while (ConnectionStatus != ServerConnectionStatus.Connected);
         }
 
-        private UriBuilder SessionUri { get; }
+        public UriBuilder SessionUri { get; }
 
         internal static OpcUaSession Create(ConnectionInfo connection)
         {
@@ -83,6 +84,11 @@ namespace UaclClient
         }
 
         private ConnectionInfo Connection { get; }
+
+        public bool NotConnected()
+        {
+            return ConnectionStatus != ServerConnectionStatus.Connected;
+        }
 
         /// <summary>
         /// This Method will be invoked, if the ServerConnectionStatus changed from Connected to another Status.

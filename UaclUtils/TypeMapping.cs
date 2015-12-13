@@ -1,5 +1,4 @@
 using System;
-using System.Collections.Generic;
 using UnifiedAutomation.UaBase;
 
 namespace UaclUtils
@@ -10,19 +9,21 @@ namespace UaclUtils
         {
         }
 
-        public uint MapType(Type dataType)
+        public Variant MapType<T>()
         {
-            if (dataType == typeof(bool)) return DataTypes.Boolean;
-            if (dataType == typeof(byte)) return DataTypes.Byte;
-            if (dataType == typeof(short)) return DataTypes.Int16;
-            if (dataType == typeof(int)) return DataTypes.Int32;
-            if (dataType == typeof(long)) return DataTypes.Int64;
-            if (dataType == typeof(ushort)) return DataTypes.UInt16;
-            if (dataType == typeof(uint)) return DataTypes.UInt32;
-            if (dataType == typeof(ulong)) return DataTypes.UInt64;
-            if (dataType == typeof(float)) return DataTypes.Float;
-            if (dataType == typeof(double)) return DataTypes.Double;
-            if (dataType == typeof(string)) return DataTypes.String;
+            var dataType = typeof (T);
+
+            if (dataType == typeof(bool)) return ToVariant(false);
+            if (dataType == typeof(byte)) return ToVariant(byte.MinValue);
+            if (dataType == typeof(short)) return ToVariant(short.MinValue);
+            if (dataType == typeof(int)) return ToVariant(int.MinValue);
+            if (dataType == typeof(long)) return ToVariant(long.MinValue);
+            if (dataType == typeof(ushort)) return ToVariant(ushort.MinValue);
+            if (dataType == typeof(uint)) return ToVariant(uint.MinValue);
+            if (dataType == typeof(ulong)) return ToVariant(ulong.MinValue);
+            if (dataType == typeof(float)) return ToVariant(float.MinValue);
+            if (dataType == typeof(double)) return ToVariant(double.MinValue);
+            if (dataType == typeof(string)) return ToVariant(string.Empty);
 
             throw new Exception($"Cannot find type {dataType.Name} in mapping table!");
         }
@@ -63,21 +64,23 @@ namespace UaclUtils
 
         public static TypeMapping Instance { get; } = new TypeMapping();
 
-        public Variant ToVariant<T>(object value)
+        public Variant ToVariant(object value)
         {
-            if (typeof(T) == typeof(bool)) return new Variant((bool)value);
-            if (typeof(T) == typeof(byte)) return new Variant((byte)value);
-            if (typeof(T) == typeof(short)) return new Variant((short)value);
-            if (typeof(T) == typeof(int)) return new Variant((int)value);
-            if (typeof(T) == typeof(long)) return new Variant((long)value);
-            if (typeof(T) == typeof(ushort)) return new Variant((ushort)value);
-            if (typeof(T) == typeof(uint)) return new Variant((uint)value);
-            if (typeof(T) == typeof(ulong)) return new Variant((ulong)value);
-            if (typeof(T) == typeof(float)) return new Variant((float)value);
-            if (typeof(T) == typeof(double)) return new Variant((double)value);
-            if (typeof(T) == typeof(string)) return new Variant((string)value);
+            Type objectType = value.GetType();
 
-            throw new Exception($"Cannot find type {typeof(T)} in mapping table!");
+            if (objectType == typeof(bool)) return new Variant((bool)value);
+            if (objectType == typeof(byte)) return new Variant((byte)value);
+            if (objectType == typeof(short)) return new Variant((short)value);
+            if (objectType == typeof(int)) return new Variant((int)value);
+            if (objectType == typeof(long)) return new Variant((long)value);
+            if (objectType == typeof(ushort)) return new Variant((ushort)value);
+            if (objectType == typeof(uint)) return new Variant((uint)value);
+            if (objectType == typeof(ulong)) return new Variant((ulong)value);
+            if (objectType == typeof(float)) return new Variant((float)value);
+            if (objectType == typeof(double)) return new Variant((double)value);
+            if (objectType == typeof(string)) return new Variant((string)value);
+
+            throw new Exception($"Cannot find type {objectType} in mapping table!");
         }
 
         public Variant ToVariant(object value, Variant item)

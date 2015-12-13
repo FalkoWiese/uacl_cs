@@ -32,6 +32,12 @@ namespace UaclClient
             Methods.Add(method);
         }
 
+        /// <summary>
+        /// @Todo - Annotate RemoteMethod classes to execute a better type check for Name, InputParameter, and ReturnValue!
+        /// </summary>
+        /// <param name="methodName"></param>
+        /// <param name="arguments"></param>
+        /// <returns></returns>
         internal RemoteMethod Find(string methodName, List<Variant> arguments)
         {
             RemoteMethod method = Methods.FirstOrDefault(m => m.Name == methodName);
@@ -41,14 +47,14 @@ namespace UaclClient
                 throw new Exception($"Cannot find method {Name}.{methodName}().");
             };
 
-            if (method.ArgumentDescriptions.Count != arguments.Count)
+            if (method.InputArguments.Count != arguments.Count)
             {
                 throw new Exception($"The number of arguments for {Name}.{method}() isn't equal to the description.");
             }
 
             for (var i = 0; i < arguments.Count; i++)
             {
-                var desc = method.ArgumentDescriptions[i];
+                var desc = method.InputArguments[i];
                 var arg = arguments[i];
                 if (desc.DataType == arg.DataType) continue;
                 throw new Exception($"The data types for argument number {i} of {Name}.{methodName}() aren't equal - description={desc.DataType}, given argument={arg.DataType}!");
@@ -57,24 +63,31 @@ namespace UaclClient
             return method;
         }
 
-        public Variant Invoke(RemoteMethod method, List<Variant> inputArguments)
+        public T Invoke<T>(string name, params object[] parameters)
         {
-            RegisterMethod(method);
-            return Invoke(method.Name, inputArguments);
+            RemoteMethod method = new RemoteMethod
+            {
+                Name = name,
+                InputArguments = parameters.Select(iA => TypeMapping.Instance.ToVariant(iA)).ToList(),
+                ReturnValue = TypeMapping.Instance.MapType<T>()
+            };
+            // RegisterMethod(method); // @Todo - Registering should be something like a check for correct types etc.
+            Variant returnValue = Invoke(method);
+            return (T) TypeMapping.Instance.ToObject(returnValue);
         }
 
-        public Variant Invoke(string methodName, List<Variant> inputArguments)
+        public Variant Invoke(RemoteMethod method)
         {
             try
             {
-                RemoteMethod method = Find(methodName, inputArguments);
+                // RemoteMethod method = Find(remoteMethod.Name, remoteMethod.InputArguments); // @Todo - Replace the Find by a Check for the method signature.
                 OpcUaSession session = SessionFactory.Instance.Create(Connection.Ip, Connection.Port).Session;
-                Variant result = method.Invoke(session, inputArguments);
+                Variant result = method.Invoke(session, this);
                 return result;
             }
             catch (Exception e)
             {
-                ExceptionHandler.LogAndRaise(e, $"Cannot invoke {Name}.{methodName}() without errors!");
+                ExceptionHandler.LogAndRaise(e, $"Cannot invoke {Name}.{method.Name}() without errors!");
             }
 
             return Variant.Null;
