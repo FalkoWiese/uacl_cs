@@ -11,7 +11,7 @@ namespace UaclServer
         private CallbackHandler ConnectHandler { get; set; }
         private CallbackHandler DisconnectHandler { get; set; }
 
-	    internal class CallbackHandler
+	    private class CallbackHandler
 	    {
 	        public Func<object, object, object> Callback { get; set; }
 	        public object HandlerContext { get; set; }
