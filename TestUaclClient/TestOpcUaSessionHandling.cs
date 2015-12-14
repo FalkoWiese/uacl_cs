@@ -2,7 +2,6 @@
 using System.Collections.Generic;
 using System.Threading;
 using NUnit.Framework;
-using NUnit.Framework.Constraints;
 using UaclClient;
 using UaclUtils;
 using UnifiedAutomation.UaBase;

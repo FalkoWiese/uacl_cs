@@ -14,6 +14,7 @@ namespace OfficeConsole
                 server = new OfficeConsoleServer();
                 server.RegisterObject(new BusinessLogic());
                 server.RegisterObject(new RemoteBusinessLogic());
+                server.RegisterObject(new RemoteBoProxy());
                 server.Start();
 
                 while (true)

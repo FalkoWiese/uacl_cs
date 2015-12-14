@@ -9,11 +9,11 @@ namespace ServerConsole
 {
     public class ServerConsoleServer : InternalServer
     {
-        public ServerConsoleServer() : this("localhost", 48030, "ServerConsole")
+        public ServerConsoleServer() : this("[::1]", 48030, "ServerConsole")
         {
         }
 
-        public ServerConsoleServer(string ip, int port, string applicationName) : base(ip, port, applicationName)
+        private ServerConsoleServer(string ip, int port, string applicationName) : base(ip, port, applicationName)
         {
         }
     }

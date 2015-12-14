@@ -13,6 +13,7 @@ namespace ServerConsole
 		    {
 		        server = new ServerConsoleServer();
                 server.RegisterObject(new BusinessLogic());
+		        server.RegisterObject(new BoProxy());
                 server.Start();
 
 		        while (true)
