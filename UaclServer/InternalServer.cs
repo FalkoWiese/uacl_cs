@@ -12,7 +12,6 @@ namespace UaclServer
         private int Port { get; set; }
         private string Ip { get; set; }
         private string ApplicationName { get; set; }
-        private Thread ServerThread { get; set; }
 
         public const string CompanyUri = "http://http://www.concept-laser.de";
 
@@ -21,7 +20,6 @@ namespace UaclServer
             Ip = ip;
             Port = port;
             ApplicationName = applicationName;
-            ServerThread = new Thread(new ThreadStart(ServerMethod));
             Manager = new InternalServerManager(CompanyUri, applicationName);
         }
 
@@ -97,45 +95,12 @@ namespace UaclServer
             instance.SetApplicationSettings(application);
         }
 
-
-        private void RunServer(object state)
-        {
-            ServerThread.Start();
-        }
-
-        private void ServerMethod()
-        {
-            Logger.Info("UA Convenience Layer is running ...");
-            try
-            {
-                while (ServerThread.IsAlive)
-                {
-                    Thread.Sleep(1);
-                }
-            }
-            catch (ThreadInterruptedException)
-            {
-                Logger.Info("UA Convenience Layer stopped.");
-            }
-        }
-
         public bool Stop()
         {
-            var correctlyStopped = false;
-
-            if (Manager.IsRunning)
-            {
-                Manager.Stop();
-                correctlyStopped = true;
-            }
-
-            if (!ServerThread.IsAlive) return correctlyStopped;
-
-            ServerThread.Interrupt();
-            ServerThread.Join();
-            correctlyStopped = true && correctlyStopped;
-
-            return correctlyStopped;
+            if (!Manager.IsRunning) return false;
+            Manager.Stop();
+            Logger.Info("UA Convenience Layer stopped.");
+            return true;
         }
 
         private InternalServerManager Manager { get; set; }
@@ -148,14 +113,13 @@ namespace UaclServer
 
         public bool Start()
         {
-            if (ServerThread.IsAlive) return false;
             if (Manager.IsRunning) return false;
 
             ApplicationLicenseManager.AddProcessLicenses(System.Reflection.Assembly.GetExecutingAssembly(), "License.lic");
             var application = new ApplicationInstance();
             ConfigureOpcUaApplicationFromCode(application, Ip, Port);
-            application.Start(Manager, RunServer, Manager);
-
+            application.Start(Manager, (o) => { }, Manager);
+            Logger.Info("UA Convenience Layer is running ...");
             return true;
         }
 
