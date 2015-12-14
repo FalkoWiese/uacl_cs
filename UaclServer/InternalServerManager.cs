@@ -17,12 +17,12 @@ namespace UaclServer
 	        public object HandlerContext { get; set; }
 	    } 
 
-	    public void AnnounceConnectCallback(Func<object, object, object> callback, object handlerContext)
+	    public void SetConnectCallback(Func<object, object, object> callback, object handlerContext)
 	    {
 	        ConnectHandler = new CallbackHandler {Callback = callback, HandlerContext=handlerContext};
 	    }
 
-	    public void AnnounceDisconnectCallback(Func<object, object, object> callback, object handlerContext)
+	    public void SetDisconnectCallback(Func<object, object, object> callback, object handlerContext)
 	    {
             DisconnectHandler = new CallbackHandler { Callback = callback, HandlerContext = handlerContext };
         }
@@ -54,6 +54,9 @@ namespace UaclServer
         }
 
         private string[] InternalUris { get; set; }
+
+
+
 
 		protected override void OnRootNodeManagerStarted(RootNodeManager nodeManager)
 		{

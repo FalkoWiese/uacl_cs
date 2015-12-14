@@ -110,6 +110,16 @@ namespace UaclServer
             return Manager != null && Manager.RegisterObject(modelObject);
         }
 
+        public void SetConnectCallback(Func<object, object, object> callback, object handlerContext)
+        {
+            Manager?.SetConnectCallback(callback, handlerContext);
+        }
+
+        public void SetDisconnectCallback(Func<object, object, object> callback, object handlerContext)
+        {
+            Manager?.SetDisconnectCallback(callback, handlerContext);
+        }
+
 
         public bool Start()
         {
