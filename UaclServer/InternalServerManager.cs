@@ -8,6 +8,45 @@ namespace UaclServer
 {
 	public class InternalServerManager : ServerManager
 	{
+        private CallbackHandler ConnectHandler { get; set; }
+        private CallbackHandler DisconnectHandler { get; set; }
+
+	    internal class CallbackHandler
+	    {
+	        public Func<object, object, object> Callback { get; set; }
+	        public object HandlerContext { get; set; }
+	    } 
+
+	    public void AnnounceConnectCallback(Func<object, object, object> callback, object handlerContext)
+	    {
+	        ConnectHandler = new CallbackHandler {Callback = callback, HandlerContext=handlerContext};
+	    }
+
+	    public void AnnounceDisconnectCallback(Func<object, object, object> callback, object handlerContext)
+	    {
+            DisconnectHandler = new CallbackHandler { Callback = callback, HandlerContext = handlerContext };
+        }
+
+	    private Dictionary<Session, object> _sessionContext;
+        private Dictionary<Session, object> GetSessionContext()
+        {
+            return _sessionContext ?? (_sessionContext = new Dictionary<Session, object>());
+        }
+
+	    public void OnConnect(RequestContext clientContext)
+	    {
+	        object result = ConnectHandler.Callback(ConnectHandler.HandlerContext, clientContext);
+	        Session clientSession = clientContext.Session;
+	        GetSessionContext()[clientSession] = result;
+	    }
+
+	    public void OnDisconnect(RequestContext clientContext)
+	    {
+	        DisconnectHandler.Callback(DisconnectHandler.HandlerContext, clientContext);
+	        Session clientSession = clientContext.Session;
+	        GetSessionContext().Remove(clientSession);
+	    }
+
         public InternalServerManager(params string[] uris)
         {
             InternalUris = uris;
