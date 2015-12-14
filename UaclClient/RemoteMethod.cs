@@ -37,7 +37,8 @@ namespace UaclClient
             }
             catch (Exception e)
             {
-                ExceptionHandler.LogAndRaise(e, $"Error while invoking method {Name}().");
+                ExceptionHandler.Log(e, $"Error while invoking method {Name}().");
+                throw;
             }
             finally
             {
@@ -46,8 +47,6 @@ namespace UaclClient
                     session.Disconnect();
                 }
             }
-
-            return Variant.Null;
         }
     }
 }
