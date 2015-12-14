@@ -122,43 +122,6 @@ namespace UaclClient
             BeginCallMethod(_parentNode, CreateNodeIdByName(_parentNode, methodName), arguments);
         }
 
-        /// <summary>
-        /// Finishes an asynchronous read request.
-        /// </summary>
-        private void DefaultResultCallback(IAsyncResult result)
-        {
-            // get the session used to send the request which was passed as the userData in the Begin call.
-            var callObj = (CallObjectsContainer) result.AsyncState;
-            try
-            {
-                // get the results.
-                List<StatusCode> inputArgumentErrors;
-                List<Variant> outputArguments;
-                // call the method.
-                var error = callObj.Session.EndCall(
-                    result,
-                    out inputArgumentErrors,
-                    out outputArguments);
-                // check for error.
-                if (StatusCode.IsBad(error))
-                {
-                    Logger.Error($"Server returned an error while calling method: {error.ToString(true)}");
-                    var identifier = callObj.Node != null ? callObj.Node.Identifier : "Method node object is null!";
-                    Logger.Error($"Method: {identifier}");
-                    return;
-                }
-                //Log the inputArgumentErrors
-                inputArgumentErrors.ForEach(
-                    x => Logger.Trace($"inputArgumentErrors from method call are: {x.ToString()}"));
-                //Log the OutputArguments
-                outputArguments.ForEach(x => Logger.Trace($"outputArguments from method call are: {x}"));
-            }
-            catch (Exception e)
-            {
-                ExceptionHandler.Log(e, "An Exception occurred while finishing the asynchronous method call.");
-            }
-        }
-
         private string GetNodeKey(NodeId parentNode, string nodeName)
         {
             return parentNode.Identifier.ToString() + '/' + nodeName;
@@ -235,7 +198,7 @@ namespace UaclClient
             List<StatusCode> inputArgumentErrors;
             List<Variant> outputArguments;
             // call the method on the server.
-            StatusCode result = this._session.Call(
+            var result = _session.Call(
                 _parentNode,
                 CreateNodeIdByName(_parentNode, methodName),
                 remoteMethod.InputArguments,

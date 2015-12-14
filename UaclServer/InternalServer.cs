@@ -1,6 +1,5 @@
 ﻿using System;
 using UnifiedAutomation.UaBase;
-using System.Threading;
 using UaclUtils;
 using UnifiedAutomation.UaSchema;
 
@@ -13,14 +12,14 @@ namespace UaclServer
         private string Ip { get; set; }
         private string ApplicationName { get; set; }
 
-        public const string CompanyUri = "http://http://www.concept-laser.de";
+        private const string CompanyUri = "http://http://www.concept-laser.de";
 
         public InternalServer(string ip, int port, string applicationName)
         {
             Ip = ip;
             Port = port;
             ApplicationName = applicationName;
-            Manager = new InternalServerManager(CompanyUri, applicationName);
+            Manager = new InternalServerManager(CompanyUri, ApplicationName);
         }
 
         // Fill in the application settings in code
@@ -76,20 +75,20 @@ namespace UaclServer
                 DefaultTraceLevel = UnifiedAutomation.UaSchema.TraceLevel.Info,
                 TraceFile = @"%CommonApplicationData%\unifiedautomation\logs\ConfigurationServer.log.txt",
                 MaxLogFileBackups = 3,
-                ModuleSettings = new ModuleTraceSettings[]
+                ModuleSettings = new[]
                 {
                     new ModuleTraceSettings() {ModuleName = "UnifiedAutomation.Stack", TraceEnabled = true},
                     new ModuleTraceSettings() {ModuleName = "UnifiedAutomation.Server", TraceEnabled = true},
                 }
             };
-            application.Set<TraceSettings>(trace);
+            application.Set(trace);
             // Installation settings
             var installation = new InstallationSettings
             {
                 GenerateCertificateIfNone = true,
                 DeleteCertificateOnUninstall = true
             };
-            application.Set<InstallationSettings>(installation);
+            application.Set(installation);
             // set the configuration for the application (must be called before start to have any effect).
             // these settings are discarded if the /configFile flag is specified on the command line.
             instance.SetApplicationSettings(application);
@@ -128,7 +127,7 @@ namespace UaclServer
             ApplicationLicenseManager.AddProcessLicenses(System.Reflection.Assembly.GetExecutingAssembly(), "License.lic");
             var application = new ApplicationInstance();
             ConfigureOpcUaApplicationFromCode(application, Ip, Port);
-            application.Start(Manager, (o) => { }, Manager);
+            application.Start(Manager, o => { }, Manager);
             Logger.Info("UA Convenience Layer is running ...");
             return true;
         }

@@ -35,6 +35,18 @@ namespace UaclServer
             return (InternalServerManager) Server;
         }
 
+        public override void SessionClosed(Session session)
+        {
+            base.SessionClosed(session);
+            GetManager().OnDisconnect(session);
+        }
+
+        public override void SessionOpened(Session session)
+        {
+            base.SessionOpened(session);
+            GetManager().OnConnect(session);
+        }
+
         public override void Startup()
         {
             Logger.Info(@"InternalNodeManager: Startup()");
@@ -73,7 +85,7 @@ namespace UaclServer
             }
         }
 
-        private ObjectNode AddNode(object businessObject, ObjectNode rootNode, ObjectTypeNode typeRootNode)
+        private void AddNode(object businessObject, ObjectNode rootNode, ObjectTypeNode typeRootNode)
         {
             var uaObject = businessObject.GetType().GetCustomAttribute<UaObject>();
             var uaObjectName = uaObject.Name ?? businessObject.GetType().Name;
@@ -107,8 +119,6 @@ namespace UaclServer
             {
                 AddMethod(businessObject, method, node);
             }
-
-            return node;
         }
 
         private void AddMethod(object businessObject, MethodInfo method, ObjectNode node)
@@ -216,7 +226,7 @@ namespace UaclServer
                 if (data.Method.GetParameters().Length != inputArguments.Count) return StatusCodes.BadNodeAttributesInvalid;
 
                 var parameterList = inputArguments.Select(ia => TypeMapping.Instance.ToObject(ia)).ToArray();
-                var returnValue = data?.Method.Invoke(data.BusinessObject, parameterList);
+                var returnValue = data.Method.Invoke(data.BusinessObject, parameterList);
                 if (outputArguments.Count > 0 && returnValue != null)
                 {
                     outputArguments[0] = TypeMapping.Instance.ToVariant(returnValue, outputArguments[0]);

@@ -1,5 +1,4 @@
 ﻿using System;
-using System.Threading;
 using UaclUtils;
 using UnifiedAutomation.UaBase;
 using UnifiedAutomation.UaClient;

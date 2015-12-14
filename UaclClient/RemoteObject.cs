@@ -1,10 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Text;
-using System.Threading;
-using System.Threading.Tasks;
-using UaclClient;
 using UaclUtils;
 using UnifiedAutomation.UaBase;
 
@@ -40,12 +36,12 @@ namespace UaclClient
         /// <returns></returns>
         internal RemoteMethod Find(string methodName, List<Variant> arguments)
         {
-            RemoteMethod method = Methods.FirstOrDefault(m => m.Name == methodName);
+            var method = Methods.FirstOrDefault(m => m.Name == methodName);
 
             if (method == null)
             {
                 throw new Exception($"Cannot find method {Name}.{methodName}().");
-            };
+            }
 
             if (method.InputArguments.Count != arguments.Count)
             {
