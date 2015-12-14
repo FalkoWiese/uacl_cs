@@ -54,14 +54,12 @@ namespace UaclServer
         {
             var result = ConnectHandler.Callback(ConnectHandler.HandlerContext, session);
             GetSessionContext()[session] = result;
-            Logger.Info($"Client({session}) connected.");
         }
 
         public void OnDisconnect(Session session)
         {
             DisconnectHandler.Callback(DisconnectHandler.HandlerContext, session);
             GetSessionContext().Remove(session);
-            Logger.Info($"Client({session}) disconnected.");
         }
 
         public bool RegisterObject(object modelObject)

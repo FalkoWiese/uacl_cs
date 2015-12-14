@@ -38,12 +38,14 @@ namespace UaclServer
         public override void SessionClosed(Session session)
         {
             base.SessionClosed(session);
+            Logger.Info($"Client({session.ClientCertificate.SerialNumber}) disconnected.");
             GetManager().OnDisconnect(session);
         }
 
         public override void SessionOpened(Session session)
         {
             base.SessionOpened(session);
+            Logger.Info($"Client({session.ClientCertificate.SerialNumber}) connected.");
             GetManager().OnConnect(session);
         }
 
