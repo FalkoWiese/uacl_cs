@@ -1,7 +1,9 @@
 ﻿using System;
+using System.Collections.Generic;
 using UnifiedAutomation.UaBase;
 using UaclUtils;
 using UnifiedAutomation.UaSchema;
+using UnifiedAutomation.UaServer;
 
 namespace UaclServer
 {
@@ -109,16 +111,30 @@ namespace UaclServer
             return Manager != null && Manager.RegisterObject(modelObject);
         }
 
+        private CallbackHandler ConnectHandler { get; set; }
+        private CallbackHandler DisconnectHandler { get; set; }
+
+        private class CallbackHandler
+        {
+            public Func<object, object, object> Callback { get; set; }
+            public object HandlerContext { get; set; }
+        }
+
         public void SetConnectCallback(Func<object, object, object> callback, object handlerContext)
         {
-            Manager?.SetConnectCallback(callback, handlerContext);
+            ConnectHandler = new CallbackHandler { Callback = callback, HandlerContext = handlerContext };
         }
 
         public void SetDisconnectCallback(Func<object, object, object> callback, object handlerContext)
         {
-            Manager?.SetDisconnectCallback(callback, handlerContext);
+            DisconnectHandler = new CallbackHandler { Callback = callback, HandlerContext = handlerContext };
         }
 
+        private Dictionary<Session, object> _sessionContext;
+        private Dictionary<Session, object> GetSessionContext()
+        {
+            return _sessionContext ?? (_sessionContext = new Dictionary<Session, object>());
+        }
 
         public bool Start()
         {
@@ -128,6 +144,28 @@ namespace UaclServer
             var application = new ApplicationInstance();
             ConfigureOpcUaApplicationFromCode(application, Ip, Port);
             application.Start(Manager, o => { }, Manager);
+            if (Manager.SessionManager != null)
+            {
+                Manager.SessionManager.SessionCreated += (session, reason) => 
+                {
+                    Logger.Info($"Client({session.ClientCertificate.SerialNumber}) connected.");
+                    if (ConnectHandler == null) return;
+                    var result = ConnectHandler.Callback(ConnectHandler.HandlerContext, session);
+                    GetSessionContext()[session] = result;
+                };
+                Manager.SessionManager.SessionClosing += (session, reason) =>
+                {
+                    Logger.Info($"Client({session.ClientCertificate.SerialNumber}) disconnected.");
+                    if (DisconnectHandler == null) return;
+                    DisconnectHandler.Callback(DisconnectHandler.HandlerContext, session);
+                    GetSessionContext().Remove(session);
+                };
+            }
+            else
+            {
+                Logger.Warn("Cannot append events SessionCreated, and SessionClosing to the SessionManager, due to the instance is null!");
+            }
+
             Logger.Info("UA Convenience Layer is running ...");
             return true;
         }
