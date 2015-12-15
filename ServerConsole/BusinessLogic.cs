@@ -1,4 +1,5 @@
-﻿using UaclServer;
+﻿using System;
+using UaclServer;
 using UaclUtils;
 
 namespace ServerConsole
@@ -13,6 +14,15 @@ namespace ServerConsole
             Running = 2,
             Finished = 3,
             Error = 4,
+        }
+
+        [InsertUaState]
+        [UaMethod]
+        public int GetInteger(object state, string value)
+        {
+            int val;
+            Int32.TryParse(value, out val);
+            return val;
         }
 
         [UaMethod]

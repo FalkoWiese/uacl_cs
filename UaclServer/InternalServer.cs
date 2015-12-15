@@ -1,9 +1,7 @@
 ﻿using System;
-using System.Collections.Generic;
 using UnifiedAutomation.UaBase;
 using UaclUtils;
 using UnifiedAutomation.UaSchema;
-using UnifiedAutomation.UaServer;
 
 namespace UaclServer
 {
@@ -111,29 +109,14 @@ namespace UaclServer
             return Manager != null && Manager.RegisterObject(modelObject);
         }
 
-        private CallbackHandler ConnectHandler { get; set; }
-        private CallbackHandler DisconnectHandler { get; set; }
-
-        private class CallbackHandler
-        {
-            public Func<object, object, object> Callback { get; set; }
-            public object HandlerContext { get; set; }
-        }
-
         public void SetConnectCallback(Func<object, object, object> callback, object handlerContext)
         {
-            ConnectHandler = new CallbackHandler { Callback = callback, HandlerContext = handlerContext };
+            Manager.SetConnectCallback(callback, handlerContext);
         }
 
         public void SetDisconnectCallback(Func<object, object, object> callback, object handlerContext)
         {
-            DisconnectHandler = new CallbackHandler { Callback = callback, HandlerContext = handlerContext };
-        }
-
-        private Dictionary<Session, object> _sessionContext;
-        private Dictionary<Session, object> GetSessionContext()
-        {
-            return _sessionContext ?? (_sessionContext = new Dictionary<Session, object>());
+            Manager.SetDisconnectCallback(callback, handlerContext);
         }
 
         public bool Start()
@@ -149,16 +132,16 @@ namespace UaclServer
                 Manager.SessionManager.SessionCreated += (session, reason) => 
                 {
                     Logger.Info($"Client({session.Id.Identifier}) connected.");
-                    if (ConnectHandler == null) return;
-                    var result = ConnectHandler.Callback(ConnectHandler.HandlerContext, session);
-                    GetSessionContext()[session] = result;
+                    if (Manager.ConnectHandler?.Callback == null) return;
+                    var result = Manager.ConnectHandler.Callback(Manager.ConnectHandler.HandlerContext, session);
+                    Manager.GetSessionContext()[session] = result;
                 };
                 Manager.SessionManager.SessionClosing += (session, reason) =>
                 {
                     Logger.Info($"Client({session.Id.Identifier}) disconnected.");
-                    if (DisconnectHandler == null) return;
-                    DisconnectHandler.Callback(DisconnectHandler.HandlerContext, session);
-                    GetSessionContext().Remove(session);
+                    if (Manager.DisconnectHandler?.Callback == null) return;
+                    Manager.DisconnectHandler.Callback(Manager.DisconnectHandler.HandlerContext, session);
+                    Manager.GetSessionContext().Remove(session);
                 };
             }
             else

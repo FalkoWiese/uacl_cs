@@ -25,6 +25,31 @@ namespace UaclServer
 
         internal List<object> BusinessModel { get; set; }
 
+        internal CallbackHandler ConnectHandler { get; set; }
+        internal CallbackHandler DisconnectHandler { get; set; }
+
+        internal class CallbackHandler
+        {
+            public Func<object, object, object> Callback { get; set; }
+            public object HandlerContext { get; set; }
+        }
+
+        internal void SetConnectCallback(Func<object, object, object> callback, object handlerContext)
+        {
+            ConnectHandler = new CallbackHandler { Callback = callback, HandlerContext = handlerContext };
+        }
+
+        internal void SetDisconnectCallback(Func<object, object, object> callback, object handlerContext)
+        {
+            DisconnectHandler = new CallbackHandler { Callback = callback, HandlerContext = handlerContext };
+        }
+
+        private Dictionary<Session, object> _sessionContext;
+        internal Dictionary<Session, object> GetSessionContext()
+        {
+            return _sessionContext ?? (_sessionContext = new Dictionary<Session, object>());
+        }
+
         public bool RegisterObject(object modelObject)
 	    {
             try

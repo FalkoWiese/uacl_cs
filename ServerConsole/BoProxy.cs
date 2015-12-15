@@ -10,8 +10,9 @@ namespace ServerConsole
     [UaObject]
     public class BoProxy
     {
+        [InsertUaState]
         [UaMethod]
-        public string GetInformation(int id)
+        public string GetInformation(object state, int id)
         {
             var information = new Dictionary<int, string>
             {

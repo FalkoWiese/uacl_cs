@@ -49,6 +49,7 @@
     </Reference>
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="InsertUaState.cs" />
     <Compile Include="InternalNodeManager.cs" />
     <Compile Include="InternalServerManager.cs" />
     <Compile Include="InternalServer.cs" />

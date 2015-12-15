@@ -127,7 +127,13 @@ namespace UaclServer
                 OutputArguments = new List<Argument>()
             };
 
-            foreach (var parameterInfo in method.GetParameters())
+            var parameterList = method.GetParameters().Select(p => p).ToList();
+            if (ExistsInsertUaState(method))
+            {
+                parameterList.Remove(parameterList[0]);
+            }
+
+            foreach (var parameterInfo in parameterList)
             {
                 settings.InputArguments.Add(new Argument
                 {
@@ -211,10 +217,28 @@ namespace UaclServer
 
                 if (data == null) return StatusCodes.BadMethodInvalid;
                 if (outputArguments.Count > 1) return StatusCodes.BadSyntaxError;
-                if (data.Method.GetParameters().Length != inputArguments.Count) return StatusCodes.BadNodeAttributesInvalid;
+                var argumentCount = inputArguments.Count + (ExistsInsertUaState(data.Method)? 1:0);
+                if (data.Method.GetParameters().Length != argumentCount) return StatusCodes.BadNodeAttributesInvalid;
 
-                var parameterList = inputArguments.Select(ia => TypeMapping.Instance.ToObject(ia)).ToArray();
-                var returnValue = data.Method.Invoke(data.BusinessObject, parameterList);
+                var parameterList = new List<object>();
+                if (ExistsInsertUaState(data.Method))
+                {
+                    object handler = null;
+                    if (GetManager().GetSessionContext().ContainsKey(context.Session))
+                    {
+                        handler = GetManager().GetSessionContext()[context.Session];
+                    }
+                    parameterList.Add(handler);
+                }
+                parameterList.AddRange(inputArguments.Select(o => TypeMapping.Instance.ToObject(o)));
+
+                var parameterArray = new object[parameterList.Count];
+                for (var i = 0; i < parameterArray.Length; i++)
+                {
+                    parameterArray[i] = parameterList[i];
+                }
+
+                var returnValue = data.Method.Invoke(data.BusinessObject, parameterArray);
                 if (outputArguments.Count > 0 && returnValue != null)
                 {
                     outputArguments[0] = TypeMapping.Instance.ToVariant(returnValue, outputArguments[0]);
@@ -227,6 +251,12 @@ namespace UaclServer
                 ExceptionHandler.Log(e, "Error while invoke a remote method ...");
                 return StatusCodes.Bad;
             }
+        }
+
+        private static bool ExistsInsertUaState(MethodInfo method)
+        {
+            var stateAttributes = method.GetCustomAttributes<InsertUaState>();
+            return stateAttributes != null && stateAttributes.Any();
         }
 
         protected override void Read(
