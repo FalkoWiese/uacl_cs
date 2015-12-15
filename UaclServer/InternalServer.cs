@@ -148,14 +148,14 @@ namespace UaclServer
             {
                 Manager.SessionManager.SessionCreated += (session, reason) => 
                 {
-                    Logger.Info($"Client({session.ClientCertificate.SerialNumber}) connected.");
+                    Logger.Info($"Client({session.Id.Identifier}) connected.");
                     if (ConnectHandler == null) return;
                     var result = ConnectHandler.Callback(ConnectHandler.HandlerContext, session);
                     GetSessionContext()[session] = result;
                 };
                 Manager.SessionManager.SessionClosing += (session, reason) =>
                 {
-                    Logger.Info($"Client({session.ClientCertificate.SerialNumber}) disconnected.");
+                    Logger.Info($"Client({session.Id.Identifier}) disconnected.");
                     if (DisconnectHandler == null) return;
                     DisconnectHandler.Callback(DisconnectHandler.HandlerContext, session);
                     GetSessionContext().Remove(session);
