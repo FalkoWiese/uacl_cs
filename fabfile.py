@@ -27,6 +27,16 @@ solution = "ServerConsole"
 
 
 @task
+def start():
+    local("tools\start.bat")
+
+
+@task
+def stop():
+    local("tools\stop.bat")
+
+
+@task
 def all():
     clean()
     update_env()
