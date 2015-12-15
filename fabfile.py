@@ -37,11 +37,10 @@ def stop():
 
 
 @task
-def all():
+def rebuild():
     clean()
     update_env()
     build()
-    test()
 
 
 @task
