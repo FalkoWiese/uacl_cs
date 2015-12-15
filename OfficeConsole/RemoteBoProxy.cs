@@ -12,7 +12,7 @@ namespace OfficeConsole
     [UaObject]
     public class RemoteBoProxy : RemoteObject
     {
-        public RemoteBoProxy() : base("[::1]", 48030, "BoProxy")
+        public RemoteBoProxy() : base("localhost", 48030, "BoProxy")
         {
         }
 

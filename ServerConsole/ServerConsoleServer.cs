@@ -9,7 +9,7 @@ namespace ServerConsole
 {
     public class ServerConsoleServer : InternalServer
     {
-        public ServerConsoleServer() : this("[::1]", 48030, "ServerConsole")
+        public ServerConsoleServer() : this("localhost", 48030, "ServerConsole")
         {
         }
 
