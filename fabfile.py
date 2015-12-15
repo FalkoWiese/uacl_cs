@@ -27,6 +27,13 @@ solution = "ServerConsole"
 
 
 @task
+def restart():
+    stop()
+    rebuild()
+    start()
+
+
+@task
 def start():
     local("tools\start.bat")
 
