@@ -47,5 +47,10 @@ namespace UaclClient
                 }
             }
         }
+
+        public bool HasReturnValue()
+        {
+            return !ReturnValue.Equals(Variant.Null);
+        }
     }
 }

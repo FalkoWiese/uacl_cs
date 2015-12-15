@@ -58,6 +58,9 @@ namespace TestUaclClient
 
             var r2 = obj.Invoke<bool>("CalculateJob", (string) "small job", (int) -1);
             Assert.That(()=>!r2, $"Return value is {false}");
+
+            var r3 = obj.Invoke<bool>("CalculateJob", (string) "small job", (int) -1);
+            Assert.That(()=>!r2, $"Return value is {false}");
         }
     }
 }

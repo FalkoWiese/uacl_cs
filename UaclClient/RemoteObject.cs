@@ -59,6 +59,18 @@ namespace UaclClient
             return method;
         }
 
+        public void Invoke(string name, params object[] parameters)
+        {
+            RemoteMethod method = new RemoteMethod
+            {
+                Name = name,
+                InputArguments = parameters.Select(iA => TypeMapping.Instance.ToVariant(iA)).ToList(),
+                ReturnValue = Variant.Null
+            };
+            // RegisterMethod(method); // @Todo - Registering should be something like a check for correct types etc.
+            Invoke(method);
+        }
+
         public T Invoke<T>(string name, params object[] parameters)
         {
             RemoteMethod method = new RemoteMethod

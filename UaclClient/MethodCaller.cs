@@ -205,7 +205,10 @@ namespace UaclClient
                 out inputArgumentErrors,
                 out outputArguments);
 
-            remoteMethod.ReturnValue = !result.IsGood() ? Variant.Null : outputArguments[0];
+            if (remoteMethod.HasReturnValue() && outputArguments.Count > 0)
+            {
+                remoteMethod.ReturnValue = !result.IsGood() ? Variant.Null : outputArguments[0];
+            }
 
             return remoteMethod.ReturnValue;
         }

@@ -144,7 +144,7 @@ namespace UaclServer
                 });
             }
 
-            if (method.ReturnParameter != null)
+            if (method.ReturnParameter != null && method.ReturnParameter.ParameterType != typeof(void))
             {
                 settings.OutputArguments.Add(new Argument
                 {

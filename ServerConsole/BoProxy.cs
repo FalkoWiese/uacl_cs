@@ -4,26 +4,33 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using UaclServer;
+using UaclUtils;
 
 namespace ServerConsole
 {
     [UaObject]
     public class BoProxy
     {
+        private Dictionary<int, string> _information; 
+        private Dictionary<int, string> Information()
+        {
+            return _information ?? (_information = new Dictionary<int, string>());
+        }
+
         [InsertUaState]
         [UaMethod]
         public string GetInformation(object state, int id)
         {
-            var information = new Dictionary<int, string>
-            {
-                {0, "Null"},
-                {1, "One"},
-                {2, "Two"},
-                {3, "Three"},
-                {4, "Four"},
-                {5, "Five"},
-            };
-            return !information.ContainsKey(id) ? string.Empty : information[id];
+            var retVal = !Information().ContainsKey(id) ? string.Empty : Information()[id];
+            Logger.Trace($"GetInformation({id}) => '{retVal}'");
+            return retVal;
+        }
+
+        [UaMethod]
+        public void SetInformation(int id, string name)
+        {
+            Information()[id] = name;
+            Logger.Trace($"SetInformation({id}, '{name}') => void");
         }
     }
 }

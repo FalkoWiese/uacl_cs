@@ -17,7 +17,7 @@ namespace OfficeConsole
         }
 
         [UaMethod]
-        public string Information(int id)
+        public string GetInformation(int id)
         {
             const string remoteMethodName = "GetInformation";
             try
@@ -30,6 +30,21 @@ namespace OfficeConsole
                 var errorMessage = $"Error while calling {remoteMethodName}";
                 ExceptionHandler.Log(e, errorMessage);
                 return errorMessage;
+            }
+        }
+
+        [UaMethod]
+        public void SetInformation(int id, string information)
+        {
+            const string remoteMethodName = "SetInformation";
+            try
+            {
+                Invoke(remoteMethodName, id, information);
+            }
+            catch (Exception e)
+            {
+                var errorMessage = $"Error while calling {remoteMethodName}";
+                ExceptionHandler.Log(e, errorMessage);
             }
         }
     }
