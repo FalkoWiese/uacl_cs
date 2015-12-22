@@ -24,6 +24,7 @@ namespace UaclUtils
             if (dataType == typeof(float)) return ToVariant(float.MinValue);
             if (dataType == typeof(double)) return ToVariant(double.MinValue);
             if (dataType == typeof(string)) return ToVariant(string.Empty);
+            if (dataType == typeof (byte[])) return ToVariant(new byte[0]);
 
             throw new Exception($"Cannot find type {dataType.Name} in mapping table!");
         }
@@ -41,6 +42,7 @@ namespace UaclUtils
             if (type == typeof(float)) return DataTypeIds.Float;
             if (type == typeof(double)) return DataTypeIds.Double;
             if (type == typeof(string)) return DataTypeIds.String;
+            if (type == typeof (byte[])) return DataTypeIds.ByteString;
 
             throw new Exception($"Cannot find type {type.Name} in mapping table!");
         }
@@ -58,6 +60,17 @@ namespace UaclUtils
             if (item.DataType == BuiltInType.Float) return item.ToFloat();
             if (item.DataType == BuiltInType.Double) return item.ToDouble();
             if (item.DataType == BuiltInType.String) return item.ToString();
+            if (item.DataType == BuiltInType.Variant)
+            {
+                Variant[] variantArray = item.ToVariantArray();
+                byte[] bytes = new byte[variantArray.Length];
+                for (int i = 0; i < bytes.Length; i++)
+                {
+                    bytes[i] = variantArray[i].ToByte();
+                }
+
+                return bytes;
+            }
 
             throw new Exception($"Cannot find type {item.DataType} in mapping table!");
         }
@@ -79,6 +92,17 @@ namespace UaclUtils
             if (objectType == typeof(float)) return new Variant((float)value);
             if (objectType == typeof(double)) return new Variant((double)value);
             if (objectType == typeof(string)) return new Variant((string)value);
+            if (objectType == typeof (byte[]))
+            {
+
+                var bytes = (byte[]) value;
+                var result = new Variant[bytes.Length];
+                for(var i=0; i<bytes.Length; i++)
+                {
+                   result[i] = new Variant(bytes[i]);
+                }
+                return result;
+            }
 
             throw new Exception($"Cannot find type {objectType} in mapping table!");
         }
@@ -96,6 +120,16 @@ namespace UaclUtils
             if (item.DataType == BuiltInType.Float) return new Variant((float)value);
             if (item.DataType == BuiltInType.Double) return new Variant((double)value);
             if (item.DataType == BuiltInType.String) return new Variant((string)value);
+            if (item.DataType == BuiltInType.Variant)
+            {
+                    var bytes = (byte[])value;
+                    var variantArray = new Variant[bytes.Length];
+                    for (var i = 0; i < bytes.Length; i++)
+                    {
+                        variantArray[i] = new Variant(bytes[i]);
+                    }
+                    return variantArray;
+            }
 
             throw new Exception($"Cannot find type {item.DataType} in mapping table!");
         }

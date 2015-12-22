@@ -241,6 +241,11 @@ namespace UaclServer
                 var returnValue = data.Method.Invoke(data.BusinessObject, parameterArray);
                 if (outputArguments.Count > 0 && returnValue != null)
                 {
+                    if (returnValue.GetType().IsArray)
+                    {
+                        Variant[] returnValueDesc = new Variant[0];
+                        outputArguments[0] = returnValueDesc;
+                    }
                     outputArguments[0] = TypeMapping.Instance.ToVariant(returnValue, outputArguments[0]);
                 }
 

@@ -30,6 +30,5 @@ namespace ServerConsole
             Assert.IsTrue(result.Length > 0);
         }
 
-
     }
 }

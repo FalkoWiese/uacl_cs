@@ -32,5 +32,11 @@ namespace ServerConsole
             Information()[id] = name;
             Logger.Trace($"SetInformation({id}, '{name}') => void");
         }
+
+        [UaMethod]
+        public byte[] GetBytes(string value)
+        {
+            return Encoding.UTF8.GetBytes(value);
+        }
     }
 }

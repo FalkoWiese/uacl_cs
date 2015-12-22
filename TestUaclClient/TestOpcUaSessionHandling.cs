@@ -62,5 +62,14 @@ namespace TestUaclClient
             var r3 = obj.Invoke<bool>("CalculateJob", (string) "small job", (int) -1);
             Assert.That(()=>!r2, $"Return value is {false}");
         }
+
+        [Test]
+        public void InvokeGetBytes()
+        {
+            RemoteObject obj = new RemoteObject("localhost", 48030, "BoProxy");
+            string value = "Falko und Anke Wiese";
+            var bytes = obj.Invoke<byte[]>("GetBytes", value);
+            Assert.NotNull(bytes);
+        }
     }
 }

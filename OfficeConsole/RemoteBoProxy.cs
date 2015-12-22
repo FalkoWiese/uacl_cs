@@ -47,5 +47,12 @@ namespace OfficeConsole
                 ExceptionHandler.Log(e, errorMessage);
             }
         }
+
+        [UaMethod]
+        public byte[] GetBytes(string value)
+        {
+            var bytes = Invoke<byte[]>("GetBytes");
+            return bytes;
+        }
     }
 }
