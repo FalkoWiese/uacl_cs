@@ -60,17 +60,7 @@ namespace UaclUtils
             if (item.DataType == BuiltInType.Float) return item.ToFloat();
             if (item.DataType == BuiltInType.Double) return item.ToDouble();
             if (item.DataType == BuiltInType.String) return item.ToString();
-            if (item.DataType == BuiltInType.Variant)
-            {
-                Variant[] variantArray = item.ToVariantArray();
-                byte[] bytes = new byte[variantArray.Length];
-                for (int i = 0; i < bytes.Length; i++)
-                {
-                    bytes[i] = variantArray[i].ToByte();
-                }
-
-                return bytes;
-            }
+            if (item.DataType == BuiltInType.ByteString) return item.ToByteString();
 
             throw new Exception($"Cannot find type {item.DataType} in mapping table!");
         }
@@ -92,17 +82,7 @@ namespace UaclUtils
             if (objectType == typeof(float)) return new Variant((float)value);
             if (objectType == typeof(double)) return new Variant((double)value);
             if (objectType == typeof(string)) return new Variant((string)value);
-            if (objectType == typeof (byte[]))
-            {
-
-                var bytes = (byte[]) value;
-                var result = new Variant[bytes.Length];
-                for(var i=0; i<bytes.Length; i++)
-                {
-                   result[i] = new Variant(bytes[i]);
-                }
-                return result;
-            }
+            if (objectType == typeof (byte[])) return new Variant((byte[])value);
 
             throw new Exception($"Cannot find type {objectType} in mapping table!");
         }
@@ -120,16 +100,7 @@ namespace UaclUtils
             if (item.DataType == BuiltInType.Float) return new Variant((float)value);
             if (item.DataType == BuiltInType.Double) return new Variant((double)value);
             if (item.DataType == BuiltInType.String) return new Variant((string)value);
-            if (item.DataType == BuiltInType.Variant)
-            {
-                    var bytes = (byte[])value;
-                    var variantArray = new Variant[bytes.Length];
-                    for (var i = 0; i < bytes.Length; i++)
-                    {
-                        variantArray[i] = new Variant(bytes[i]);
-                    }
-                    return variantArray;
-            }
+            if (item.DataType == BuiltInType.ByteString) return new Variant((byte[])value);
 
             throw new Exception($"Cannot find type {item.DataType} in mapping table!");
         }
