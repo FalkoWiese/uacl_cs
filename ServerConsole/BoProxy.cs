@@ -17,7 +17,7 @@ namespace ServerConsole
             return _information ?? (_information = new Dictionary<int, string>());
         }
 
-        [InsertUaState]
+        [UaclInsertState]
         [UaMethod]
         public string GetInformation(object state, int id)
         {

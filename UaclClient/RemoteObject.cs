@@ -14,16 +14,18 @@ namespace UaclClient
             Name = name;
         }
 
-        public ConnectionInfo Connection { get; }
+        private ConnectionInfo Connection { get; }
 
         public string Name { get; }
 
-        private readonly Lazy<List<RemoteMethod>> _lazyMethods = new Lazy<List<RemoteMethod>>(()=>new List<RemoteMethod>());
+        private readonly Lazy<List<RemoteMethod>> _lazyMethods =
+            new Lazy<List<RemoteMethod>>(() => new List<RemoteMethod>());
+
         private List<RemoteMethod> Methods => _lazyMethods.Value;
 
         public void RegisterMethod(RemoteMethod method)
         {
-            RemoteMethod rm = Methods.FirstOrDefault(m => m.Name == method.Name);
+            var rm = Methods.FirstOrDefault(m => m.Name == method.Name);
             if (rm != null) return;
             Methods.Add(method);
         }
@@ -53,7 +55,8 @@ namespace UaclClient
                 var desc = method.InputArguments[i];
                 var arg = arguments[i];
                 if (desc.DataType == arg.DataType) continue;
-                throw new Exception($"The data types for argument number {i} of {Name}.{methodName}() aren't equal - description={desc.DataType}, given argument={arg.DataType}!");
+                throw new Exception(
+                    $"The data types for argument number {i} of {Name}.{methodName}() aren't equal - description={desc.DataType}, given argument={arg.DataType}!");
             }
 
             return method;
@@ -61,7 +64,7 @@ namespace UaclClient
 
         public void Invoke(string name, params object[] parameters)
         {
-            RemoteMethod method = new RemoteMethod
+            var method = new RemoteMethod
             {
                 Name = name,
                 InputArguments = parameters.Select(iA => TypeMapping.Instance.ToVariant(iA)).ToList(),
@@ -73,18 +76,18 @@ namespace UaclClient
 
         public T Invoke<T>(string name, params object[] parameters)
         {
-            RemoteMethod method = new RemoteMethod
+            var method = new RemoteMethod
             {
                 Name = name,
                 InputArguments = parameters.Select(iA => TypeMapping.Instance.ToVariant(iA)).ToList(),
                 ReturnValue = TypeMapping.Instance.MapType<T>()
             };
             // RegisterMethod(method); // @Todo - Registering should be something like a check for correct types etc.
-            Variant returnValue = Invoke(method);
+            var returnValue = Invoke(method);
             return (T) TypeMapping.Instance.ToObject(returnValue);
         }
 
-        public Variant Invoke(RemoteMethod method)
+        private Variant Invoke(RemoteMethod method)
         {
             try
             {

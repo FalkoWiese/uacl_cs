@@ -51,7 +51,7 @@ namespace OfficeConsole
         [UaMethod]
         public byte[] GetBytes(string value)
         {
-            var bytes = Invoke<byte[]>("GetBytes");
+            var bytes = Invoke<byte[]>("GetBytes", value);
             return bytes;
         }
     }

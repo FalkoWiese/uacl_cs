@@ -243,7 +243,7 @@ namespace UaclServer
                 {
                     if (returnValue.GetType().IsArray)
                     {
-                        Variant[] returnValueDesc = new Variant[0];
+                        Variant returnValueDesc = new Variant(new byte[0]);
                         outputArguments[0] = returnValueDesc;
                     }
                     outputArguments[0] = TypeMapping.Instance.ToVariant(returnValue, outputArguments[0]);
@@ -260,7 +260,7 @@ namespace UaclServer
 
         private static bool ExistsInsertUaState(MethodInfo method)
         {
-            var stateAttributes = method.GetCustomAttributes<InsertUaState>();
+            var stateAttributes = method.GetCustomAttributes<UaclInsertState>();
             return stateAttributes != null && stateAttributes.Any();
         }
 

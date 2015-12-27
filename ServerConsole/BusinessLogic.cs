@@ -16,7 +16,7 @@ namespace ServerConsole
             Error = 4,
         }
 
-        [InsertUaState]
+        [UaclInsertState]
         [UaMethod]
         public int GetInteger(object state, string value)
         {

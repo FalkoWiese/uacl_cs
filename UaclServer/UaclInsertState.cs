@@ -7,9 +7,9 @@ using System.Threading.Tasks;
 namespace UaclServer
 {
     [AttributeUsage(AttributeTargets.Method)]
-    public class InsertUaState : System.Attribute
+    public class UaclInsertState : System.Attribute
     {
-        public InsertUaState()
+        public UaclInsertState()
         {
         }
     }
