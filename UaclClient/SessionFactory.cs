@@ -23,7 +23,7 @@ namespace UaclClient
             var connectionInfo = new ConnectionInfo(ip, port);
             if (!Sessions.ContainsKey(connectionInfo))
             {
-                OpcUaSession session = OpcUaSession.Create(connectionInfo);
+                var session = OpcUaSession.Create(connectionInfo);
                 Sessions[connectionInfo] = new OpcUaSessionHandle(session);
             }
 
