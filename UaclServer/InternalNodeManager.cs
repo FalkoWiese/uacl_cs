@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
+using System.Xml;
 using UaclUtils;
 using UnifiedAutomation.UaBase;
 using UnifiedAutomation.UaServer;
@@ -144,7 +145,7 @@ namespace UaclServer
                 });
             }
 
-            if (method.ReturnParameter != null && method.ReturnParameter.ParameterType != typeof(void))
+            if (method.ReturnParameter != null && method.ReturnParameter.ParameterType != typeof (void))
             {
                 settings.OutputArguments.Add(new Argument
                 {
@@ -172,25 +173,29 @@ namespace UaclServer
                 {
                     ParentNodeId = parentTypeNode.NodeId,
                     ReferenceTypeId = ReferenceTypeIds.HasSubtype,
-                    RequestedNodeId = new NodeId($"{parentTypeNode.NodeId.Identifier}.{variableName}", TypeNamespaceIndex),
+                    RequestedNodeId =
+                        new NodeId($"{parentTypeNode.NodeId.Identifier}.{variableName}", TypeNamespaceIndex),
                     BrowseName = new QualifiedName(variableName, TypeNamespaceIndex),
                     DataType = TypeMapping.Instance.MapDataTypeId(property.PropertyType),
                 });
-            AddReference(Server.DefaultRequestContext, parentTypeNode.NodeId, ReferenceTypeIds.Organizes, false, variableTypeNode.NodeId, true);
+            AddReference(Server.DefaultRequestContext, parentTypeNode.NodeId, ReferenceTypeIds.Organizes, false,
+                variableTypeNode.NodeId, true);
 
             var variableNode = CreateVariable(Server.DefaultRequestContext,
                 new CreateVariableSettings()
                 {
                     ParentNodeId = parentNode.NodeId,
                     ReferenceTypeId = ReferenceTypeIds.HasComponent,
-                    RequestedNodeId = new NodeId($"{parentNode.NodeId.Identifier}.{variableName}", InstanceNamespaceIndex),
+                    RequestedNodeId =
+                        new NodeId($"{parentNode.NodeId.Identifier}.{variableName}", InstanceNamespaceIndex),
                     BrowseName = new QualifiedName(variableName, InstanceNamespaceIndex),
                     DisplayName = variableName,
                     Description = new LocalizedText("en", variableName),
-                    TypeDefinitionId = variableTypeNode.NodeId,
+                    TypeDefinitionId = VariableTypeIds.BaseVariableType,
                     Value = new Variant("None"),
                 });
-            variableNode.UserData = new VariableNodeData { BusinessObject = businessObject, Property = property };
+            variableNode.UserData = new VariableNodeData {BusinessObject = businessObject, Property = property};
+            //SetVariableConfiguration(variableNode.NodeId, variableNode.BrowseName, NodeHandleType.ExternalPolled, variableNode.Value);
 
             Logger.Info($"Created variable ... {variableNode.NodeId.Identifier}.");
         }
@@ -217,7 +222,7 @@ namespace UaclServer
 
                 if (data == null) return StatusCodes.BadMethodInvalid;
                 if (outputArguments.Count > 1) return StatusCodes.BadSyntaxError;
-                var argumentCount = inputArguments.Count + (ExistsInsertUaState(data.Method)? 1:0);
+                var argumentCount = inputArguments.Count + (ExistsInsertUaState(data.Method) ? 1 : 0);
                 if (data.Method.GetParameters().Length != argumentCount) return StatusCodes.BadNodeAttributesInvalid;
 
                 var parameterList = new List<object>();
@@ -264,52 +269,38 @@ namespace UaclServer
             return stateAttributes != null && stateAttributes.Any();
         }
 
-        protected override void Read(
+        protected override DataValue Read(
             RequestContext context,
-            TransactionHandle transaction,
-            IList<NodeAttributeOperationHandle> operationHandles,
-            IList<ReadValueId> settings)
+            NodeAttributeHandle nodeHandle,
+            string indexRange,
+            QualifiedName dataEncoding)
         {
-            foreach (var processVariableHandle in operationHandles)
-            {
-                // Initialize with bad status
-                var dv = new DataValue(new StatusCode(StatusCodes.BadNodeIdUnknown));
-                // the data passed to CreateVariable is returned as the UserData in the handle.
-                var processVariable = processVariableHandle.NodeHandle.UserData as VariableNodeData;
-                if (processVariable != null)
-                {
-                    // read the data from the underlying system.
-                    dv = new DataValue(processVariable.ReadValue(), DateTime.UtcNow);
-                }
-                // return the data to the caller.
-                ((ReadCompleteEventHandler) transaction.Callback)(processVariableHandle, transaction.CallbackData, dv,
-                    false);
-            }
+            var processVariable = nodeHandle?.UserData as VariableNode;
+            var processVariableData = processVariable?.UserData as VariableNodeData;
+
+            if (processVariableData == null) return new DataValue("");
+
+            var v = new DataValue(processVariableData.ReadValue());
+
+            return v;
         }
 
-        protected override void Write(
+        protected override StatusCode? Write(
             RequestContext context,
-            TransactionHandle transaction,
-            IList<NodeAttributeOperationHandle> operationHandles,
-            IList<WriteValue> settings)
+            NodeAttributeHandle nodeHandle,
+            string indexRange,
+            DataValue value)
         {
-            for (var ii = 0; ii < operationHandles.Count; ii++)
-            {
-                // initialize with bad status
-                StatusCode error = StatusCodes.BadNodeIdUnknown;
-                // the data passed to CreateVariable is returned as the UserData in the handle.
-                var processVariableHandle = operationHandles[ii];
-                var processVariable = processVariableHandle.NodeHandle.UserData as VariableNodeData;
-                if (processVariable != null)
-                {
-                    error = processVariable.WriteValue(settings[ii].Value.Value)
-                        ? StatusCodes.Good
-                        : StatusCodes.BadUserAccessDenied;
-                }
-                // return the data to the caller.
-                ((WriteCompleteEventHandler) transaction.Callback)(processVariableHandle, transaction.CallbackData,
-                    error, false);
-            }
+            if (value == null) return StatusCodes.BadNoDataAvailable;
+            if (nodeHandle == null) return StatusCodes.BadNodeAttributesInvalid;
+
+            var processVariable = nodeHandle.UserData as VariableNode;
+            var processVariableData = processVariable?.UserData as VariableNodeData;
+            if (processVariableData == null) return StatusCodes.BadNoDataAvailable;
+
+            return processVariableData.WriteValue(value.Value)
+                ? StatusCodes.Good
+                : StatusCodes.Bad;
         }
 
         public override void Shutdown()
