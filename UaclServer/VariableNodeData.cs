@@ -7,8 +7,8 @@ namespace UaclServer
 {
     internal class VariableNodeData
     {
-        public object BusinessObject { private get; set; }
-        public PropertyInfo Property { private get; set; }
+        public object BusinessObject { get; set; }
+        public PropertyInfo Property { get; set; }
 
 
         public Variant ReadValue()
