@@ -195,7 +195,7 @@ namespace UaclServer
                     Value = new Variant("None"),
                 });
             variableNode.UserData = new VariableNodeData {BusinessObject = businessObject, Property = property};
-            //SetVariableConfiguration(variableNode.NodeId, variableNode.BrowseName, NodeHandleType.ExternalPolled, variableNode.Value);
+            SetVariableConfiguration(variableNode.NodeId, variableNode.BrowseName, NodeHandleType.ExternalPolled, variableNode.Value);
 
             Logger.Info($"Created variable ... {variableNode.NodeId.Identifier}.");
         }
@@ -275,10 +275,15 @@ namespace UaclServer
             string indexRange,
             QualifiedName dataEncoding)
         {
+            if (nodeHandle.AttributeId != 13) return base.Read(context, nodeHandle, indexRange, dataEncoding);
+
             var processVariable = nodeHandle?.UserData as VariableNode;
+
+            if (processVariable == null) return base.Read(context, nodeHandle, indexRange, dataEncoding);
+
             var processVariableData = processVariable?.UserData as VariableNodeData;
 
-            if (processVariableData == null) return new DataValue("");
+            if (processVariableData == null) return base.Read(context, nodeHandle, indexRange, dataEncoding);
 
             var v = new DataValue(processVariableData.ReadValue());
 
@@ -291,16 +296,16 @@ namespace UaclServer
             string indexRange,
             DataValue value)
         {
-            if (value == null) return StatusCodes.BadNoDataAvailable;
-            if (nodeHandle == null) return StatusCodes.BadNodeAttributesInvalid;
+            if (value == null) return base.Write(context, nodeHandle, indexRange, null);
+            if (nodeHandle == null) return base.Write(context, null, indexRange, value);
 
             var processVariable = nodeHandle.UserData as VariableNode;
             var processVariableData = processVariable?.UserData as VariableNodeData;
-            if (processVariableData == null) return StatusCodes.BadNoDataAvailable;
+            if (processVariableData == null) return base.Write(context, nodeHandle, indexRange, value);
 
             return processVariableData.WriteValue(value.Value)
                 ? StatusCodes.Good
-                : StatusCodes.Bad;
+                : base.Write(context, nodeHandle, indexRange, value);
         }
 
         public override void Shutdown()
