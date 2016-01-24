@@ -54,8 +54,7 @@
   <ItemGroup>
     <Compile Include="CallObjectsContainer.cs" />
     <Compile Include="ConnectionInfo.cs" />
-    <Compile Include="IMethodCaller.cs" />
-    <Compile Include="MethodCaller.cs" />
+    <Compile Include="RemoteInvoker.cs" />
     <Compile Include="OpcUaSession.cs" />
     <Compile Include="OpcUaSessionHandle.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
@@ -63,7 +62,6 @@
     <Compile Include="RemoteVariable.cs" />
     <Compile Include="SessionFactory.cs" />
     <Compile Include="RemoteObject.cs" />
-    <Compile Include="VariableInvoker.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="packages.config" />

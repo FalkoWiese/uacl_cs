@@ -16,45 +16,18 @@ namespace UaclClient
         {
             return remoteObject.Execute(() =>
             {
-                var vi = new VariableInvoker(session, remoteObject.Name);
-                return vi.Read(this);
+                var invoker = new RemoteInvoker(session, remoteObject.Name);
+                return invoker.ReadVariable(this);
             }, session);
         }
 
-        public void Write(OpcUaSession session, RemoteObject remoteObject)
+        public Variant Write(OpcUaSession session, RemoteObject remoteObject)
         {
-            do
+            return remoteObject.Execute(() =>
             {
-                try
-                {
-                    Logger.Info($"Try to connect to:{session.SessionUri.Uri.AbsoluteUri}");
-                    session.Connect(session.SessionUri.Uri.AbsoluteUri, SecuritySelection.None);
-                    Logger.Info($"Connection to {session.SessionUri.Uri.AbsoluteUri} established.");
-                }
-                catch (Exception e)
-                {
-                    ExceptionHandler.Log(e,
-                        $"An error occurred while try to connect to server: {session.SessionUri.Uri.AbsoluteUri}.");
-                }
-            } while (session.NotConnected());
-
-            try
-            {
-                var vi = new VariableInvoker(session, remoteObject.Name);
-                vi.Write(this);
-            }
-            catch (Exception e)
-            {
-                ExceptionHandler.Log(e, $"Error while invoking property '{Name}'.");
-                throw;
-            }
-            finally
-            {
-                if (!session.NotConnected())
-                {
-                    session.Disconnect();
-                }
-            }
+                var invoker = new RemoteInvoker(session, remoteObject.Name);
+                return invoker.WriteVariable(this);
+            }, session);
         }
 
 

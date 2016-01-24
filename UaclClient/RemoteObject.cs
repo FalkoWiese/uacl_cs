@@ -90,41 +90,41 @@ namespace UaclClient
 
         public void Write(string name, object parameter)
         {
-            var variable = new RemoteVariable
-            {
-                Name = name,
-                Value = TypeMapping.Instance.ToVariant(parameter)
-            };
-
             try
             {
+                var variable = new RemoteVariable
+                {
+                    Name = name,
+                    Value = TypeMapping.Instance.ToVariant(parameter)
+                };
+
                 variable.Write(SessionFactory.Instance.Create(Connection.Ip, Connection.Port).Session, this);
             }
             catch (Exception e)
             {
-                ExceptionHandler.Log(e, $"Cannot write {Name}.{variable.Name} without errors!");
+                ExceptionHandler.Log(e, $"Cannot write {Name}.{name} without errors!");
             }
         }
 
         public T Read<T>(string name)
         {
-            var variable = new RemoteVariable
-            {
-                Name = name,
-                Value = TypeMapping.Instance.MapType<T>()
-            };
-
             try
             {
+                var variable = new RemoteVariable
+                {
+                    Name = name,
+                    Value = TypeMapping.Instance.MapType<T>()
+                };
+
                 var result = variable.Read(SessionFactory.Instance.Create(Connection.Ip, Connection.Port).Session, this);
                 return (T) TypeMapping.Instance.ToObject(result);
             }
             catch (Exception e)
             {
-                ExceptionHandler.Log(e, $"Cannot read {Name}.{variable.Name} without errors!");
+                ExceptionHandler.Log(e, $"Cannot read {Name}.{name} without errors!");
             }
 
-            return (T) TypeMapping.Instance.ToObject(variable.Value);
+            return (T) TypeMapping.Instance.ToObject(TypeMapping.Instance.MapType<T>());
         }
 
         private Variant Invoke(RemoteMethod method)

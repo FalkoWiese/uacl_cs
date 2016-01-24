@@ -14,38 +14,11 @@ namespace UaclClient
 
         public Variant Invoke(OpcUaSession session, RemoteObject remoteObject)
         {
-            do
+            return remoteObject.Execute(() =>
             {
-                try
-                {
-                    Logger.Info($"Try to connect to:{session.SessionUri.Uri.AbsoluteUri}");
-                    session.Connect(session.SessionUri.Uri.AbsoluteUri, SecuritySelection.None);
-                    Logger.Info($"Connection to {session.SessionUri.Uri.AbsoluteUri} established.");
-                }
-                catch (Exception e)
-                {
-                    ExceptionHandler.Log(e,
-                        $"An error occurred while try to connect to server: {session.SessionUri.Uri.AbsoluteUri}.");
-                }
-            } while (session.NotConnected());
-
-            try
-            {
-                var methodCaller = new MethodCaller(session, remoteObject.Name);
-                return methodCaller.CallMethod(this);
-            }
-            catch (Exception e)
-            {
-                ExceptionHandler.Log(e, $"Error while invoking method '{Name}()'.");
-                throw;
-            }
-            finally
-            {
-                if (!session.NotConnected())
-                {
-                    session.Disconnect();
-                }
-            }
+                var invoker = new RemoteInvoker(session, remoteObject.Name);
+                return invoker.CallMethod(this);
+            }, session);
         }
 
         public bool HasReturnValue()

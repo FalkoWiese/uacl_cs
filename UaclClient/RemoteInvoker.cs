@@ -10,7 +10,7 @@ namespace UaclClient
     /// Class to call a Method on a OPC UA Server
     /// This class can be instanciated with an <see cref="OpcUaSession"/> OpcUaSession, this session is ment to be instantiated and connected to the desired Server.
     /// </summary>
-    public class MethodCaller : IMethodCaller
+    public class RemoteInvoker
     {
         private readonly OpcUaSession _session;
         private readonly NodeId _parentNode;
@@ -19,7 +19,7 @@ namespace UaclClient
         private readonly Dictionary<string, NodeId> _nodeIds;
         private AsyncCallback ResultCallback { get; set; }
 
-        private MethodCaller(OpcUaSession session)
+        private RemoteInvoker(OpcUaSession session)
         {
             _session = session;
             _nodeIds = new Dictionary<string, NodeId>();
@@ -34,9 +34,8 @@ namespace UaclClient
             _session.ConnectionStatusUpdate += SessionOnConnectionStatusUpdate;
         }
 
-        public MethodCaller(OpcUaSession session, string parentNodeName, AsyncCallback methodResult=null) : this(session)
+        public RemoteInvoker(OpcUaSession session, string parentNodeName) : this(session)
         {
-            ResultCallback = methodResult;
             _parentNode = BrowseNodeIdByName(null, parentNodeName);
         }
 
@@ -212,5 +211,65 @@ namespace UaclClient
 
             return remoteMethod.ReturnValue;
         }
+ 
+
+        public Variant ReadVariable(RemoteVariable remoteVariable)
+        {
+            if (string.IsNullOrWhiteSpace(remoteVariable.Name))
+            {
+                throw new Exception("Method name is empty!");
+            }
+
+            if (_parentNode == null)
+            {
+                throw new Exception($"Parent node is null for method '{remoteVariable.Name}'!");
+            }
+
+            var readValue = new ReadValueId
+            {
+                NodeId = BrowseNodeIdByName(_parentNode, remoteVariable.Name),
+                AttributeId = Attributes.Value
+            };
+
+            var result = _session.Read(new List<ReadValueId> {readValue}, 0, TimestampsToReturn.Both,
+                new RequestSettings {OperationTimeout = 10000});
+
+            if (result == null || result.Count < 1)
+            {
+                throw new Exception($"Cannot read UA Variable {_parentNode.Identifier}.{remoteVariable.Name} on server.");
+            }
+
+            return result[0].WrappedValue;
+        }
+
+        public Variant WriteVariable(RemoteVariable remoteVariable)
+        {
+            if (string.IsNullOrWhiteSpace(remoteVariable.Name))
+            {
+                throw new Exception("Method name is empty!");
+            }
+
+            if (_parentNode == null)
+            {
+                throw new Exception($"Parent node is null for method '{remoteVariable.Name}'!");
+            }
+
+            var writeValue = new WriteValue
+            {
+                NodeId = BrowseNodeIdByName(_parentNode, remoteVariable.Name),
+                AttributeId = Attributes.Value,
+                Value = new DataValue() {WrappedValue = remoteVariable.Value}
+            };
+
+            var result = _session.Write(new List<WriteValue> {writeValue}, new RequestSettings {OperationTimeout = 10000});
+
+            if (result == null || result.Count < 1 || result[0] != StatusCodes.Good)
+            {
+                throw new Exception($"Cannot write UA Variable {_parentNode.Identifier}.{remoteVariable.Name} on server.");
+            }
+
+            return remoteVariable.Value;
+        }
     }
+
 }
