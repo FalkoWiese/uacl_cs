@@ -17,7 +17,6 @@ namespace UaclClient
         private readonly BrowseContext _browseContext;
         private const int OpcUaIdRootFolder = 84;
         private readonly Dictionary<string, NodeId> _nodeIds;
-        private AsyncCallback ResultCallback { get; set; }
 
         private RemoteInvoker(OpcUaSession session)
         {
@@ -44,7 +43,7 @@ namespace UaclClient
         /// </summary>
         /// <param name="sender"></param>
         /// <param name="serverConnectionStatusUpdateEventArgs"></param>
-        public void SessionOnConnectionStatusUpdate(Session sender,
+        private void SessionOnConnectionStatusUpdate(Session sender,
             ServerConnectionStatusUpdateEventArgs serverConnectionStatusUpdateEventArgs)
         {
             //Log.InfoFormat("Connections Status has changed to {0}", sender.ConnectionStatus);
@@ -55,70 +54,6 @@ namespace UaclClient
                 _session.Reconnect();
             }
             Logger.Trace($"Connection status has changed to {sender.ConnectionStatus}");
-        }
-
-        /// <summary>
-        /// Asynchronously calls a method on a server.
-        /// The given <param name="parentNodeName">parentNodeName</param> and <param name="methodName">methodName</param> are 
-        /// required to create the corresponding NodeIds to these Nodes on server side.
-        /// </summary>
-        /// <param name="parentNodeName"> The parent NodeId of the desired Method, needed by the SDK to identify the method</param>
-        /// <param name="methodName"> </param>
-        /// <param name="arguments"> </param>
-        public void BeginCallMethod(string parentNodeName, string methodName, List<Variant> arguments)
-        {
-            // parse the object id.
-            var objectId = BrowseNodeIdByName(null, parentNodeName);
-
-            // get the selected method id.
-            var methodId = CreateNodeIdByName(objectId, methodName);
-
-            BeginCallMethod(objectId, methodId, arguments);
-        }
-
-        public void BeginCallMethod(NodeId objectId, NodeId methodId, List<Variant> arguments)
-        {
-            try
-            {
-                Logger.Trace($"Invoke {methodId} with arguments ...");
-                for (var i = 0; i < arguments.Count; i++)
-                {
-                    Logger.Trace($"\ta[{i}] -> {arguments[i].Value}");
-                }
-
-                // call the method.               
-                _session.BeginCall(
-                    objectId,
-                    methodId,
-                    arguments,
-                    new RequestSettings {OperationTimeout = 10000},
-                    ResultCallback,
-                    new CallObjectsContainer {Session = _session, Node = methodId});
-            }
-            catch (Exception e)
-            {
-                ExceptionHandler.Log(e, "An exception occurred while asynchronously calling method.");
-                var parentInfo = objectId?.Identifier.ToString() ?? "parent node is null!";
-                var methodInfo = methodId?.Identifier.ToString() ?? "method node is null!";
-                Logger.Error($"Exception by calling parent:{parentInfo}, method:{methodInfo}");
-            }
-        }
-
-        public void BeginCallMethod(string methodName, List<Variant> arguments)
-        {
-            if (string.IsNullOrWhiteSpace(methodName))
-            {
-                Logger.Error("Method name is empty!");
-                return;
-            }
-
-            if (_parentNode == null)
-            {
-                Logger.Error($"Parent node is null for method '{methodName}'!");
-                return;
-            }
-
-            BeginCallMethod(_parentNode, CreateNodeIdByName(_parentNode, methodName), arguments);
         }
 
         private string GetNodeKey(NodeId parentNode, string nodeName)
@@ -182,7 +117,7 @@ namespace UaclClient
 
         public Variant CallMethod(RemoteMethod remoteMethod)
         {
-            string methodName = remoteMethod.Name;
+            var methodName = remoteMethod.Name;
 
             if (string.IsNullOrWhiteSpace(methodName))
             {
