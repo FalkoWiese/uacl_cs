@@ -24,7 +24,6 @@ namespace UaclClient
         private void RaiseSessionIsConnectedEvent(OpcUaSession opcUaSession)
         {
             Logger.Trace("SessionIsConnectedEvent raised!");
-            // Raise the event by using the () operator.
             SessionIsConnectedEvent?.Invoke(opcUaSession, new EventArgs());
             SessionIsConnectedEvent = null;
         }

@@ -24,13 +24,6 @@ namespace UaclClient
 
         private List<RemoteMethod> Methods => _lazyMethods.Value;
 
-        public void RegisterMethod(RemoteMethod method)
-        {
-            var rm = Methods.FirstOrDefault(m => m.Name == method.Name);
-            if (rm != null) return;
-            Methods.Add(method);
-        }
-
         /// <summary>
         /// @Todo - Annotate RemoteMethod classes to execute a better type check for Name, InputParameter, and ReturnValue!
         /// </summary>
@@ -63,7 +56,7 @@ namespace UaclClient
             return method;
         }
 
-        public void Invoke(string name, params object[] parameters)
+        protected void Invoke(string name, params object[] parameters)
         {
             var method = new RemoteMethod
             {
