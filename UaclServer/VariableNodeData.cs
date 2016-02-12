@@ -7,13 +7,13 @@ namespace UaclServer
 {
     internal class VariableNodeData
     {
-        public object BusinessObject { private get; set; }
-        public PropertyInfo Property { private get; set; }
+        public object BusinessObject { get; set; }
+        public PropertyInfo Property { get; set; }
 
 
         public Variant ReadValue()
         {
-            var value = BusinessObject != null ? Property?.GetMethod.Invoke(BusinessObject, null) : null;
+            var value = BusinessObject != null ? Property.GetValue(BusinessObject, null) : null;
             return value != null ? new Variant(value, null) : new Variant();
         }
 
@@ -26,10 +26,7 @@ namespace UaclServer
         {
             try
             {
-                lock (Property)
-                {
-                    Property.SetMethod.Invoke(BusinessObject, new object[] {value});
-                }
+                Property.SetValue(BusinessObject, value);
                 return true;
             }
             catch (Exception e)

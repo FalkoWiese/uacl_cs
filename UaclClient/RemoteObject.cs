@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using UaclUtils;
 using UnifiedAutomation.UaBase;
+using UnifiedAutomation.UaClient;
 
 namespace UaclClient
 {
@@ -22,13 +23,6 @@ namespace UaclClient
             new Lazy<List<RemoteMethod>>(() => new List<RemoteMethod>());
 
         private List<RemoteMethod> Methods => _lazyMethods.Value;
-
-        public void RegisterMethod(RemoteMethod method)
-        {
-            var rm = Methods.FirstOrDefault(m => m.Name == method.Name);
-            if (rm != null) return;
-            Methods.Add(method);
-        }
 
         /// <summary>
         /// @Todo - Annotate RemoteMethod classes to execute a better type check for Name, InputParameter, and ReturnValue!
@@ -62,7 +56,7 @@ namespace UaclClient
             return method;
         }
 
-        public void Invoke(string name, params object[] parameters)
+        protected void Invoke(string name, params object[] parameters)
         {
             var method = new RemoteMethod
             {
@@ -87,6 +81,45 @@ namespace UaclClient
             return (T) TypeMapping.Instance.ToObject(returnValue);
         }
 
+        public void Write(string name, object parameter)
+        {
+            try
+            {
+                var variable = new RemoteVariable
+                {
+                    Name = name,
+                    Value = TypeMapping.Instance.ToVariant(parameter)
+                };
+
+                variable.Write(SessionFactory.Instance.Create(Connection.Ip, Connection.Port).Session, this);
+            }
+            catch (Exception e)
+            {
+                ExceptionHandler.Log(e, $"Cannot write {Name}.{name} without errors!");
+            }
+        }
+
+        public T Read<T>(string name)
+        {
+            try
+            {
+                var variable = new RemoteVariable
+                {
+                    Name = name,
+                    Value = TypeMapping.Instance.MapType<T>()
+                };
+
+                var result = variable.Read(SessionFactory.Instance.Create(Connection.Ip, Connection.Port).Session, this);
+                return (T) TypeMapping.Instance.ToObject(result);
+            }
+            catch (Exception e)
+            {
+                ExceptionHandler.Log(e, $"Cannot read {Name}.{name} without errors!");
+            }
+
+            return (T) TypeMapping.Instance.ToObject(TypeMapping.Instance.MapType<T>());
+        }
+
         private Variant Invoke(RemoteMethod method)
         {
             try
@@ -98,10 +131,45 @@ namespace UaclClient
             }
             catch (Exception e)
             {
-                ExceptionHandler.LogAndRaise(e, $"Cannot invoke {Name}.{method.Name}() without errors!");
+                ExceptionHandler.Log(e, $"Cannot invoke {Name}.{method.Name}() without errors!");
             }
 
-            return Variant.Null;
+            return method.HasReturnValue() ? method.ReturnValue : Variant.Null;
+        }
+
+        public Variant Execute(Func<Variant> action, OpcUaSession session)
+        {
+            do
+            {
+                try
+                {
+                    Logger.Info($"Try to connect to:{session.SessionUri.Uri.AbsoluteUri}");
+                    session.Connect(session.SessionUri.Uri.AbsoluteUri, SecuritySelection.None);
+                    Logger.Info($"Connection to {session.SessionUri.Uri.AbsoluteUri} established.");
+                }
+                catch (Exception e)
+                {
+                    ExceptionHandler.Log(e,
+                        $"An error occurred while try to connect to server: {session.SessionUri.Uri.AbsoluteUri}.");
+                }
+            } while (session.NotConnected());
+
+            try
+            {
+                return action();
+            }
+            catch (Exception e)
+            {
+                ExceptionHandler.Log(e, $"Error while invoking property '{Name}'.");
+                throw;
+            }
+            finally
+            {
+                if (!session.NotConnected())
+                {
+                    session.Disconnect();
+                }
+            }
         }
     }
 }

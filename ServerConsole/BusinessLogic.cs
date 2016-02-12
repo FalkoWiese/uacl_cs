@@ -61,6 +61,16 @@ namespace ServerConsole
         }
 
         [UaVariable]
-        public string State { get; set; }
+        public string State
+        {
+            get { return _state; }
+            set
+            {
+                _state = value;
+                Logger.Trace($"Wrote property State to '{value}'.");
+            }
+        }
+
+        private string _state;
     }
 }
