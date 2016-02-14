@@ -15,7 +15,7 @@ namespace UaclClient
             Name = name;
         }
 
-        private ConnectionInfo Connection { get; }
+        public ConnectionInfo Connection { get; }
 
         public string Name { get; }
 
@@ -54,7 +54,7 @@ namespace UaclClient
                     Value = TypeMapping.Instance.ToVariant(parameter)
                 };
 
-                variable.Write(SessionFactory.Instance.Create(Connection.Ip, Connection.Port).Session, this);
+                variable.Write(SessionHandler.Instance.GetSession(this).Session, this);
             }
             catch (Exception e)
             {
@@ -72,7 +72,7 @@ namespace UaclClient
                     Value = TypeMapping.Instance.MapType<T>()
                 };
 
-                var result = variable.Read(SessionFactory.Instance.Create(Connection.Ip, Connection.Port).Session, this);
+                var result = variable.Read(SessionHandler.Instance.GetSession(this).Session, this);
                 return (T) TypeMapping.Instance.ToObject(result);
             }
             catch (Exception e)
@@ -87,7 +87,7 @@ namespace UaclClient
         {
             try
             {
-                OpcUaSession session = SessionFactory.Instance.Create(Connection.Ip, Connection.Port).Session;
+                OpcUaSession session = SessionHandler.Instance.GetSession(this).Session;
                 Variant result = method.Invoke(session, this);
                 return result;
             }

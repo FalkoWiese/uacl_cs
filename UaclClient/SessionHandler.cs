@@ -13,20 +13,21 @@ namespace UaclClient
         private static readonly Lazy<SessionHandler> LazyInstance = new Lazy<SessionHandler>(() => new SessionHandler());
         public static SessionHandler Instance => LazyInstance.Value;
 
-        private readonly Lazy<Dictionary<RemoteObject, OpcUaSessionHandle>> _lazySessions =
-            new Lazy<Dictionary<RemoteObject, OpcUaSessionHandle>>(() => new Dictionary<RemoteObject, OpcUaSessionHandle>());
+        private readonly Lazy<Dictionary<ConnectionInfo, OpcUaSessionHandle>> _lazySessions =
+            new Lazy<Dictionary<ConnectionInfo, OpcUaSessionHandle>>(() => new Dictionary<ConnectionInfo, OpcUaSessionHandle>());
 
-        private Dictionary<RemoteObject, OpcUaSessionHandle> Sessions => _lazySessions.Value;
+        private Dictionary<ConnectionInfo, OpcUaSessionHandle> Sessions => _lazySessions.Value;
 
         public OpcUaSessionHandle GetSession(RemoteObject remoteObject)
         {
-            if (!Sessions.ContainsKey(remoteObject))
+            var connection = remoteObject.Connection;
+            if (!Sessions.ContainsKey(connection))
             {
-                var session = OpcUaSession.Create(remoteObject.Connection);
-                Sessions[remoteObject] = new OpcUaSessionHandle(session);
+                var session = OpcUaSession.Create(connection);
+                Sessions[connection] = new OpcUaSessionHandle(session);
             }
 
-            return Sessions[remoteObject];
+            return Sessions[connection];
         }
     }
 }
