@@ -1,5 +1,4 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.Linq;
 using UaclUtils;
 using UnifiedAutomation.UaBase;
@@ -99,39 +98,5 @@ namespace UaclClient
             return method.HasReturnValue() ? method.ReturnValue : Variant.Null;
         }
 
-        public Variant Execute(Func<Variant> action, OpcUaSession session)
-        {
-            do
-            {
-                try
-                {
-                    Logger.Info($"Try to connect to:{session.SessionUri.Uri.AbsoluteUri}");
-                    session.Connect(session.SessionUri.Uri.AbsoluteUri, SecuritySelection.None);
-                    Logger.Info($"Connection to {session.SessionUri.Uri.AbsoluteUri} established.");
-                }
-                catch (Exception e)
-                {
-                    ExceptionHandler.Log(e,
-                        $"An error occurred while try to connect to server: {session.SessionUri.Uri.AbsoluteUri}.");
-                }
-            } while (session.NotConnected());
-
-            try
-            {
-                return action();
-            }
-            catch (Exception e)
-            {
-                ExceptionHandler.Log(e, $"Error while invoking property '{Name}'.");
-                throw;
-            }
-            finally
-            {
-                if (!session.NotConnected())
-                {
-                    session.Disconnect();
-                }
-            }
-        }
     }
 }
