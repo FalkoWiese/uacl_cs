@@ -206,42 +206,6 @@ namespace UaclClient
             return remoteVariable.Value;
         }
 
-        public Variant Execute(Func<OpcUaSession, Variant> action)
-        {
-            lock (SessionHandler.Instance.GetSession(_remoteObject).Lock)
-            {
-                var session = SessionHandler.Instance.GetSession(_remoteObject).Session;
-                while (session.NotConnected())
-                    try
-                    {
-                        Logger.Info($"Try to connect to:{session.SessionUri.Uri.AbsoluteUri}");
-                        session.Connect(session.SessionUri.Uri.AbsoluteUri, SecuritySelection.None);
-                        Logger.Info($"Connection to {session.SessionUri.Uri.AbsoluteUri} established.");
-                    }
-                    catch (Exception e)
-                    {
-                        ExceptionHandler.Log(e,
-                            $"An error occurred while try to connect to server: {session.SessionUri.Uri.AbsoluteUri}.");
-                    }
-
-                try
-                {
-                    return action(session);
-                }
-                catch (Exception e)
-                {
-                    ExceptionHandler.Log(e, $"Error while invoke something on '{_remoteObject.Name}'.");
-                    throw;
-                }
-                finally
-                {
-                    if (!session.NotConnected())
-                    {
-                        session.Disconnect();
-                    }
-                }
-            }
-        }
 
     }
 

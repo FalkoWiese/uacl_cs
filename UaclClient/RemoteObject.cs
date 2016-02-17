@@ -98,5 +98,37 @@ namespace UaclClient
             return method.HasReturnValue() ? method.ReturnValue : Variant.Null;
         }
 
+        public Variant Execute(Func<Variant> action, OpcUaSession session)
+        {
+            while (session.NotConnected())
+                try
+                {
+                    Logger.Info($"Try to connect to:{session.SessionUri.Uri.AbsoluteUri}");
+                    session.Connect(session.SessionUri.Uri.AbsoluteUri, SecuritySelection.None);
+                    Logger.Info($"Connection to {session.SessionUri.Uri.AbsoluteUri} established.");
+                }
+                catch (Exception e)
+                {
+                    ExceptionHandler.Log(e,
+                        $"An error occurred while try to connect to server: {session.SessionUri.Uri.AbsoluteUri}.");
+                }
+
+            try
+            {
+                return action();
+            }
+            catch (Exception e)
+            {
+                ExceptionHandler.Log(e, $"Error while invoke something on '{Name}'.");
+                throw;
+            }
+            finally
+            {
+                if (!session.NotConnected())
+                {
+                    session.Disconnect();
+                }
+            }
+        }
     }
 }
