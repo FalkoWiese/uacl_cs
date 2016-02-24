@@ -79,7 +79,7 @@ namespace UaclClient
             return resultNode;
         }
 
-        private NodeId BrowseNodeIdByName(NodeId parentNode, string nodeName)
+        public NodeId BrowseNodeIdByName(NodeId parentNode, string nodeName)
         {
             NodeId resultNode = null;
             if (parentNode == null)

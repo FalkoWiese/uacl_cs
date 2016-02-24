@@ -49,5 +49,13 @@ namespace TestUaclClient
             s1 = obj.Read<string>("State");
             Assert.That(() => s1 == s2, $"'{s1}' == '{s2}'");
         }
+
+        [Test]
+        public void BrowseServerTree()
+        {
+            var session = SessionFactory.Instance.Create("localhost", 48030);
+            var invoker = new RemoteInvoker(session.Session, "BusinessLogic");
+            invoker.BrowseNodeIdByName(null, "BusinessLogic");
+        }
     }
 }
