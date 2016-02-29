@@ -102,7 +102,7 @@ namespace UaclClient
         {
             if (session == null)
             {
-                session = SessionFactory.Instance.Create(Connection.Ip, Connection.Port).Session;
+                session = SessionHandler.Instance.GetSession(this).Session;
             }
 
             do
@@ -118,6 +118,7 @@ namespace UaclClient
                     ExceptionHandler.Log(e,
                         $"An error occurred while try to connect to server: {session.SessionUri.Uri.AbsoluteUri}.");
                 }
+            } while (session.NotConnected());
 
             try
             {
