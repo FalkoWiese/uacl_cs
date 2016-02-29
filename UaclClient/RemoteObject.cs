@@ -137,8 +137,13 @@ namespace UaclClient
             return method.HasReturnValue() ? method.ReturnValue : Variant.Null;
         }
 
-        public Variant Execute(Func<Variant> action, OpcUaSession session)
+        public Variant Execute(Func<Variant> action, OpcUaSession session=null)
         {
+            if (session == null)
+            {
+                session = SessionFactory.Instance.Create(Connection.Ip, Connection.Port).Session;
+            }
+
             do
             {
                 try

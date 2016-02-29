@@ -23,13 +23,13 @@ namespace OfficeConsole
         [UaMethod]
         public string ReadState()
         {
-            return Read<string>("State");
+            return Read<string>("BoState");
         }
 
         [UaMethod]
         public void WriteState(string jobState)
         {
-            Write("State", jobState);
+            Write("BoState", jobState);
         }
     }
 }
