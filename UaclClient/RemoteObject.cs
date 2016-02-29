@@ -98,9 +98,15 @@ namespace UaclClient
             return method.HasReturnValue() ? method.ReturnValue : Variant.Null;
         }
 
-        public Variant Execute(Func<Variant> action, OpcUaSession session)
+        public Variant Execute(Func<Variant> action, OpcUaSession session=null)
         {
-            while (session.NotConnected())
+            if (session == null)
+            {
+                session = SessionFactory.Instance.Create(Connection.Ip, Connection.Port).Session;
+            }
+
+            do
+            {
                 try
                 {
                     Logger.Info($"Try to connect to:{session.SessionUri.Uri.AbsoluteUri}");

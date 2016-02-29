@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Linq;
 using UaclUtils;
 using UnifiedAutomation.UaBase;
 using UnifiedAutomation.UaClient;
@@ -35,7 +36,7 @@ namespace UaclClient
 
         public RemoteInvoker(OpcUaSession session, string parentNodeName) : this(session)
         {
-            _parentNode = BrowseNodeIdByName(null, parentNodeName);
+            _parentNode = BrowseNodeId(null, parentNodeName);
         }
 
         /// <summary>
@@ -79,7 +80,31 @@ namespace UaclClient
             return resultNode;
         }
 
-        private NodeId BrowseNodeIdByName(NodeId parentNode, string nodeName)
+        public NodeId BrowseNodeId(NodeId parentNode, string name)
+        {
+            return name.Contains('.')
+                ? BrowseNodeIdByPath(null, name)
+                : BrowseNodeIdByName(null, name);
+
+        }
+
+        public NodeId BrowseNodeIdByPath(NodeId parentNode, string path)
+        {
+            string firstElement;
+            var restOfPath = RestOfPath(path, out firstElement);
+
+            var resultNode = BrowseNodeIdByName(parentNode, firstElement);
+            if (resultNode == null)
+            {
+                throw new Exception($"Cannot find node for path: '{path}'!");
+            }
+
+            return string.IsNullOrEmpty(restOfPath) 
+                ? resultNode 
+                : BrowseNodeIdByPath(resultNode, restOfPath);
+        }
+
+        public NodeId BrowseNodeIdByName(NodeId parentNode, string nodeName)
         {
             NodeId resultNode = null;
             if (parentNode == null)
@@ -103,12 +128,21 @@ namespace UaclClient
                 {
                     var n = new NodeId(reference.NodeId.IdType, reference.NodeId.Identifier,
                         reference.NodeId.NamespaceIndex);
-                    resultNode = reference.DisplayName.Text == nodeName ? n : BrowseNodeIdByName(n, nodeName);
-                    if (resultNode != null)
+
+                    resultNode = reference.DisplayName.Text == nodeName
+                        ? n
+                        : BrowseNodeIdByName(n, nodeName);
+
+                    if (resultNode == null) continue;
+
+                    Logger.Info($"Found Node ... {reference.DisplayName.Text}");
+
+                    if (!_nodeIds.ContainsKey(nodeKey))
                     {
-                        if (!_nodeIds.ContainsKey(nodeKey)) _nodeIds.Add(nodeKey, resultNode);
-                        break;
+                        _nodeIds.Add(nodeKey, resultNode);
                     }
+
+                    break;
                 }
             }
 
@@ -146,7 +180,7 @@ namespace UaclClient
 
             return remoteMethod.ReturnValue;
         }
- 
+
 
         public Variant ReadVariable(RemoteVariable remoteVariable)
         {
@@ -162,7 +196,7 @@ namespace UaclClient
 
             var readValue = new ReadValueId
             {
-                NodeId = BrowseNodeIdByName(_parentNode, remoteVariable.Name),
+                NodeId = BrowseNodeId(_parentNode, remoteVariable.Name),
                 AttributeId = Attributes.Value
             };
 
@@ -191,22 +225,37 @@ namespace UaclClient
 
             var writeValue = new WriteValue
             {
-                NodeId = BrowseNodeIdByName(_parentNode, remoteVariable.Name),
+                NodeId = BrowseNodeId(_parentNode, remoteVariable.Name),
                 AttributeId = Attributes.Value,
                 Value = new DataValue() {WrappedValue = remoteVariable.Value}
             };
 
-            var result = _session.Write(new List<WriteValue> {writeValue}, new RequestSettings {OperationTimeout = 10000});
+            var result = _session.Write(new List<WriteValue> {writeValue},
+                new RequestSettings {OperationTimeout = 10000});
 
             if (result == null || result.Count < 1 || result[0] != StatusCodes.Good)
             {
-                throw new Exception($"Cannot write UA Variable {_parentNode.Identifier}.{remoteVariable.Name} on server.");
+                throw new Exception(
+                    $"Cannot write UA Variable {_parentNode.Identifier}.{remoteVariable.Name} on server.");
             }
 
             return remoteVariable.Value;
         }
 
+        public static string RestOfPath(string path, out string firstElement)
+        {
+            var pathElements = path.Split('.').ToList();
 
+            if (pathElements.Count <= 0)
+            {
+                throw new Exception($"Cannot find at least one element of given path '{path}'!");
+            }
+
+            firstElement = pathElements[0];
+
+            return pathElements.Count == 1
+                ? ""
+                : path.Substring(path.IndexOf('.') + 1, path.Length - pathElements[0].Length - 1);
+        }
     }
-
 }
