@@ -33,24 +33,24 @@ namespace ServerConsole
             switch (state)
             {
                 case (int)JobState.None:
-                    State = $"Job {name} not exists!";
+                    BoState = $"Job {name} not exists!";
                     break;
                 case (int)JobState.Initialized:
-                    State = $"Job {name} is Initialized!";
+                    BoState = $"Job {name} is Initialized!";
                     break;
                 case (int)JobState.Running:
-                    State = $"Job {name} is Running!";
+                    BoState = $"Job {name} is Running!";
                     break;
                 case (int)JobState.Finished:
-                    State = $"Job {name} is Finished!";
+                    BoState = $"Job {name} is Finished!";
                     break;
                 default:
-                    State = $"Job {name} has an Error!";
+                    BoState = $"Job {name} has an Error!";
                     result = false;
                     break;
             }
 
-            Logger.Info($"Result => '{result}', State => '{State}'");
+            Logger.Info($"Result => '{result}', State => '{BoState}'");
             return result;
         }
 
@@ -61,16 +61,16 @@ namespace ServerConsole
         }
 
         [UaVariable]
-        public string State
+        public string BoState
         {
-            get { return _state; }
+            get { return _boState; }
             set
             {
-                _state = value;
+                _boState = value;
                 Logger.Trace($"Wrote property State to '{value}'.");
             }
         }
 
-        private string _state;
+        private string _boState;
     }
 }
