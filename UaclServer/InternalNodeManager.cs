@@ -2,7 +2,6 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
-using System.Xml;
 using UaclUtils;
 using UnifiedAutomation.UaBase;
 using UnifiedAutomation.UaServer;
