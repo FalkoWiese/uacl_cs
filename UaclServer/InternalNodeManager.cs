@@ -2,6 +2,8 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
+using System.Threading;
+using System.Threading.Tasks;
 using UaclUtils;
 using UnifiedAutomation.UaBase;
 using UnifiedAutomation.UaServer;
@@ -194,7 +196,8 @@ namespace UaclServer
                     Value = new Variant("None"),
                 });
             variableNode.UserData = new VariableNodeData {BusinessObject = businessObject, Property = property};
-            SetVariableConfiguration(variableNode.NodeId, variableNode.BrowseName, NodeHandleType.ExternalPolled, variableNode.Value);
+            SetVariableConfiguration(variableNode.NodeId, variableNode.BrowseName, NodeHandleType.ExternalPolled,
+                variableNode.Value);
 
             Logger.Info($"Created variable ... {variableNode.NodeId.Identifier}.");
         }
@@ -242,16 +245,23 @@ namespace UaclServer
                     parameterArray[i] = parameterList[i];
                 }
 
-                var returnValue = data.Method.Invoke(data.BusinessObject, parameterArray);
-                if (outputArguments.Count > 0 && returnValue != null)
+                if (data.Method.ReturnType == typeof (void))
                 {
-                    if (returnValue.GetType().IsArray)
-                    {
-                        Variant returnValueDesc = new Variant(new byte[0]);
-                        outputArguments[0] = returnValueDesc;
-                    }
-                    outputArguments[0] = TypeMapping.Instance.ToVariant(returnValue, outputArguments[0]);
+                    Task.Run(() => ExecuteMethodProtected(data, parameterArray));
+                    return StatusCodes.Good;
                 }
+
+                var returnValue = ExecuteMethod(data, parameterArray);
+
+                if (outputArguments.Count <= 0 || returnValue == null) return StatusCodes.Good;
+
+                if (returnValue.GetType().IsArray)
+                {
+                    var returnValueDesc = new Variant(new byte[0]);
+                    outputArguments[0] = returnValueDesc;
+                }
+
+                outputArguments[0] = TypeMapping.Instance.ToVariant(returnValue, outputArguments[0]);
 
                 return StatusCodes.Good;
             }
@@ -261,6 +271,24 @@ namespace UaclServer
                 return StatusCodes.Bad;
             }
         }
+
+        private static void ExecuteMethodProtected(MethodNodeData data, object[] parameterArray)
+        {
+            try
+            {
+                data.Method.Invoke(data.BusinessObject, parameterArray);
+            }
+            catch (Exception e)
+            {
+                ExceptionHandler.Log(e, "Error while invoke a remote method ...");
+            }
+        }
+
+        private static object ExecuteMethod(MethodNodeData data, object[] parameterArray)
+        {
+            return data.Method.Invoke(data.BusinessObject, parameterArray);
+        }
+
 
         private static bool ExistsInsertUaState(MethodInfo method)
         {

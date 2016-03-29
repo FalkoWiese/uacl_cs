@@ -5,9 +5,12 @@
     {
         public string Name { get; private set; }
 
-        public UaVariable(string name = null)
+        public bool Async { get; private set; }
+
+        public UaVariable(string name = null, bool async = false)
         {
             Name = name;
+            Async = async;
         }
     }
 }
