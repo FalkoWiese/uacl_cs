@@ -11,6 +11,11 @@ namespace ServerConsole
     [UaObject]
     public class BoProxy
     {
+        public BoProxy()
+        {
+            Items = new List<object>();
+        }
+
         private Dictionary<int, string> _information; 
         private Dictionary<int, string> Information()
         {
@@ -38,5 +43,8 @@ namespace ServerConsole
         {
             return Encoding.UTF8.GetBytes(value);
         }
+
+        [UaObjectList]
+        public List<object> Items { get; set; } 
     }
 }

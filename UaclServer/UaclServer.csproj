@@ -65,6 +65,7 @@
     </Compile>
     <Compile Include="UaMethod.cs" />
     <Compile Include="UaObject.cs" />
+    <Compile Include="UaObjectList.cs" />
     <Compile Include="UaVariable.cs" />
     <Compile Include="VariableNodeData.cs" />
   </ItemGroup>
