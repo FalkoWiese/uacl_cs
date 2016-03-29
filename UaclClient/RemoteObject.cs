@@ -1,5 +1,4 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.Linq;
 using UaclUtils;
 using UnifiedAutomation.UaBase;
@@ -15,46 +14,9 @@ namespace UaclClient
             Name = name;
         }
 
-        private ConnectionInfo Connection { get; }
+        public ConnectionInfo Connection { get; }
 
         public string Name { get; }
-
-        private readonly Lazy<List<RemoteMethod>> _lazyMethods =
-            new Lazy<List<RemoteMethod>>(() => new List<RemoteMethod>());
-
-        private List<RemoteMethod> Methods => _lazyMethods.Value;
-
-        /// <summary>
-        /// @Todo - Annotate RemoteMethod classes to execute a better type check for Name, InputParameter, and ReturnValue!
-        /// </summary>
-        /// <param name="methodName"></param>
-        /// <param name="arguments"></param>
-        /// <returns></returns>
-        internal RemoteMethod Find(string methodName, List<Variant> arguments)
-        {
-            var method = Methods.FirstOrDefault(m => m.Name == methodName);
-
-            if (method == null)
-            {
-                throw new Exception($"Cannot find method {Name}.{methodName}().");
-            }
-
-            if (method.InputArguments.Count != arguments.Count)
-            {
-                throw new Exception($"The number of arguments for {Name}.{method}() isn't equal to the description.");
-            }
-
-            for (var i = 0; i < arguments.Count; i++)
-            {
-                var desc = method.InputArguments[i];
-                var arg = arguments[i];
-                if (desc.DataType == arg.DataType) continue;
-                throw new Exception(
-                    $"The data types for argument number {i} of {Name}.{methodName}() aren't equal - description={desc.DataType}, given argument={arg.DataType}!");
-            }
-
-            return method;
-        }
 
         protected void Invoke(string name, params object[] parameters)
         {
@@ -64,7 +26,7 @@ namespace UaclClient
                 InputArguments = parameters.Select(iA => TypeMapping.Instance.ToVariant(iA)).ToList(),
                 ReturnValue = Variant.Null
             };
-            // RegisterMethod(method); // @Todo - Registering should be something like a check for correct types etc.
+
             Invoke(method);
         }
 
@@ -76,7 +38,7 @@ namespace UaclClient
                 InputArguments = parameters.Select(iA => TypeMapping.Instance.ToVariant(iA)).ToList(),
                 ReturnValue = TypeMapping.Instance.MapType<T>()
             };
-            // RegisterMethod(method); // @Todo - Registering should be something like a check for correct types etc.
+
             var returnValue = Invoke(method);
             return (T) TypeMapping.Instance.ToObject(returnValue);
         }
@@ -91,7 +53,7 @@ namespace UaclClient
                     Value = TypeMapping.Instance.ToVariant(parameter)
                 };
 
-                variable.Write(SessionFactory.Instance.Create(Connection.Ip, Connection.Port).Session, this);
+                variable.Write(SessionHandler.Instance.GetSession(this).Session, this);
             }
             catch (Exception e)
             {
@@ -109,7 +71,7 @@ namespace UaclClient
                     Value = TypeMapping.Instance.MapType<T>()
                 };
 
-                var result = variable.Read(SessionFactory.Instance.Create(Connection.Ip, Connection.Port).Session, this);
+                var result = variable.Read(SessionHandler.Instance.GetSession(this).Session, this);
                 return (T) TypeMapping.Instance.ToObject(result);
             }
             catch (Exception e)
@@ -124,8 +86,7 @@ namespace UaclClient
         {
             try
             {
-                // RemoteMethod method = Find(remoteMethod.Name, remoteMethod.InputArguments); // @Todo - Replace the Find by a Check for the method signature.
-                OpcUaSession session = SessionFactory.Instance.Create(Connection.Ip, Connection.Port).Session;
+                OpcUaSession session = SessionHandler.Instance.GetSession(this).Session;
                 Variant result = method.Invoke(session, this);
                 return result;
             }
@@ -141,7 +102,7 @@ namespace UaclClient
         {
             if (session == null)
             {
-                session = SessionFactory.Instance.Create(Connection.Ip, Connection.Port).Session;
+                session = SessionHandler.Instance.GetSession(this).Session;
             }
 
             do
@@ -165,7 +126,7 @@ namespace UaclClient
             }
             catch (Exception e)
             {
-                ExceptionHandler.Log(e, $"Error while invoking property '{Name}'.");
+                ExceptionHandler.Log(e, $"Error while invoke something on '{Name}'.");
                 throw;
             }
             finally
