@@ -247,7 +247,12 @@ namespace UaclServer
 
                 if (data.Method.ReturnType == typeof (void))
                 {
-                    Task.Run(() => ExecuteMethodProtected(data, parameterArray));
+                    ThreadPool.QueueUserWorkItem(
+                        delegate
+                        {
+                            ExecuteMethodProtected(data, parameterArray);
+                        }, null);
+
                     return StatusCodes.Good;
                 }
 
