@@ -15,7 +15,11 @@ namespace ServerConsole
 		        bo.CalculateJob("", 2);
 		        server = new InternalServer("localhost", 48030, "ServerConsole");
                 server.RegisterObject(bo);
-		        server.RegisterObject(new BoProxy());
+
+                var bo1 = new BoProxy();
+                bo1.Items.Add(new BusinessLogic());
+                server.RegisterObject(bo1);
+
                 server.Start();
 
 		        while (true)
