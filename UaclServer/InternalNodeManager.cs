@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
@@ -7,6 +8,7 @@ using System.Threading.Tasks;
 using UaclUtils;
 using UnifiedAutomation.UaBase;
 using UnifiedAutomation.UaServer;
+using TypeInfo = UnifiedAutomation.UaBase.TypeInfo;
 
 namespace UaclServer
 {
@@ -25,12 +27,22 @@ namespace UaclServer
 
             InstanceNamespaceIndex = AddNamespaceUri($"{CompanyUri}/{ApplicationUri}/instances");
             TypeNamespaceIndex = AddNamespaceUri($"{CompanyUri}/{ApplicationUri}/types");
+            _counter = 0;
         }
 
         private string ApplicationUri { get; set; }
         private string CompanyUri { get; set; }
         private ushort InstanceNamespaceIndex { get; set; }
         private ushort TypeNamespaceIndex { get; set; }
+
+
+        private int incrementCounter()
+        {
+            return ++_counter;
+        }
+
+        private int _counter;
+
 
         private InternalServerManager GetManager()
         {
@@ -79,11 +91,13 @@ namespace UaclServer
         {
             var uaObject = businessObject.GetType().GetCustomAttribute<UaObject>();
             var uaObjectName = uaObject.Name ?? businessObject.GetType().Name;
+            var nodeIdName = $"{uaObjectName}_{incrementCounter()}";
+
             var typeNode = CreateObjectTypeNode(Server.DefaultRequestContext, new CreateObjectTypeSettings()
             {
                 ParentNodeId = ObjectTypeIds.BaseObjectType,
                 ReferenceTypeId = ReferenceTypeIds.HasSubtype,
-                RequestedNodeId = new NodeId(uaObjectName, TypeNamespaceIndex),
+                RequestedNodeId = new NodeId(nodeIdName, TypeNamespaceIndex),
                 BrowseName = new QualifiedName(uaObjectName, TypeNamespaceIndex),
                 DisplayName = uaObjectName
             });
@@ -94,7 +108,7 @@ namespace UaclServer
             {
                 ParentNodeId = rootNode.NodeId,
                 ReferenceTypeId = ReferenceTypeIds.Organizes,
-                RequestedNodeId = new NodeId(uaObjectName, InstanceNamespaceIndex),
+                RequestedNodeId = new NodeId(nodeIdName, InstanceNamespaceIndex),
                 BrowseName = new QualifiedName(uaObjectName, InstanceNamespaceIndex),
                 TypeDefinitionId = ObjectTypeIds.BaseObjectType
             });
@@ -103,6 +117,7 @@ namespace UaclServer
             foreach (var property in businessObject.GetType().GetProperties())
             {
                 AddVariable(businessObject, property, node, typeNode);
+                AddUaNodes(businessObject, property, node, typeNode);
             }
 
             foreach (var method in businessObject.GetType().GetMethods())
@@ -200,6 +215,20 @@ namespace UaclServer
                 variableNode.Value);
 
             Logger.Info($"Created variable ... {variableNode.NodeId.Identifier}.");
+        }
+
+        private void AddUaNodes(object businessObject, PropertyInfo property, ObjectNode parentNode, ObjectTypeNode parentTypeNode)
+        {
+            var uaObjectListAttribute = property.GetCustomAttribute<UaObjectList>();
+            if (uaObjectListAttribute == null) return;
+
+            var uaNodeItems = property.GetValue(businessObject) as ICollection<object>;
+            if (uaNodeItems == null) return;
+
+            foreach (var o in uaNodeItems)
+            {
+                AddNode(o, parentNode, parentTypeNode);
+            }
         }
 
         protected override CallMethodEventHandler GetMethodDispatcher(RequestContext context, MethodHandle methodHandle)
