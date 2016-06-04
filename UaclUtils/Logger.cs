@@ -8,7 +8,7 @@ namespace UaclUtils
 {
     public class Logger
     {
-        public enum LogType
+        private enum LogType
         {
             Fatal = -1,
             Error = 0,
@@ -49,21 +49,20 @@ namespace UaclUtils
 
         private void LogImpl(string message, LogType type)
         {
-            if (message == null) return;
-
-            switch (type)
+            if (string.IsNullOrWhiteSpace(message))
             {
-                case LogType.Fatal:
-                case LogType.Error:
-                    Console.Error.WriteLine(message);
-                    break;
-                case LogType.Warn:
-                case LogType.Info:
-                case LogType.Trace:
-                    Console.Out.WriteLine(message);
-                    break;
-                default:
-                    throw new Exception("Cannot categorize the logging output, due to an unknown LOGGING TYPE!");
+                message = "<empty message>";
+            }
+
+            var typedMessage = $"[{Enum.GetName(typeof (LogType), type)?.ToUpper()}] {message}";
+
+            if (type == LogType.Fatal || type == LogType.Error)
+            {
+                Console.Error.WriteLine(typedMessage);
+            }
+            else
+            {
+                Console.Out.WriteLine(typedMessage);
             }
         }
 
