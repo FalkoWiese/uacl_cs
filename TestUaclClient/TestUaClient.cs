@@ -54,6 +54,13 @@ namespace TestUaclClient
         }
 
         [Test]
+        public void AddMonitoredItem()
+        {
+            RemoteObject obj = new RemoteObject("localhost", 48030, "ServerConsole.BusinessLogic");
+            obj.Monitor<string>("BoState", (string v)=> { Logger.Info($"Received value from {obj.Name}.BoState ... '{v}'.");});
+        }
+
+        [Test]
         public void BrowseServerTree()
         {
             RemoteObject obj = new RemoteObject("localhost", 48030, "ServerConsole.BusinessLogic");

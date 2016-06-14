@@ -54,6 +54,7 @@
   <ItemGroup>
     <Compile Include="CallObjectsContainer.cs" />
     <Compile Include="ConnectionInfo.cs" />
+    <Compile Include="RemoteDataMonitor.cs" />
     <Compile Include="RemoteInvoker.cs" />
     <Compile Include="OpcUaSession.cs" />
     <Compile Include="OpcUaSessionHandle.cs" />

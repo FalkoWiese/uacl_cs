@@ -18,6 +18,25 @@ namespace UaclClient
 
         public string Name { get; }
 
+        public void Monitor<T>(string name, Action<T> action)
+        {
+            try
+            {
+                var monitor = new RemoteDataMonitor<T>
+                {
+                    Name = name,
+                    Value = TypeMapping.Instance.MapType<T>(),
+                    Callback = action
+                };
+
+                monitor.Subscribe(SessionHandler.Instance.GetSession(this), this);
+            }
+            catch (Exception e)
+            {
+                ExceptionHandler.Log(e, $"Cannot subscribe MONITORED ITEM '{this.Name}.{name}'.");
+            }
+        }
+
         protected void Invoke(string name, params object[] parameters)
         {
             var method = new RemoteMethod

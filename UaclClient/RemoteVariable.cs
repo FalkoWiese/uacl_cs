@@ -1,8 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using UaclUtils;
-using UnifiedAutomation.UaBase;
-using UnifiedAutomation.UaClient;
+﻿using UnifiedAutomation.UaBase;
 
 namespace UaclClient
 {
