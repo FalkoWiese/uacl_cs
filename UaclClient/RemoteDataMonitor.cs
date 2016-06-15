@@ -25,5 +25,15 @@ namespace UaclClient
             ConvertedValue = (T) TypeMapping.Instance.ToObject(value);
             Callback(ConvertedValue);
         }
+
+        public void Announce(RemoteObject remoteObject)
+        {
+            remoteObject.Execute(() =>
+            {
+                var remoteHelper = new RemoteHelper(remoteObject);
+                remoteHelper.MonitorDataChange(this, remoteObject);
+                return Variant.Null;
+            });
+        }
     }
 }

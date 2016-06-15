@@ -34,6 +34,9 @@ namespace UaclClient
             _session.ConnectionStatusUpdate += SessionOnConnectionStatusUpdate;
         }
 
+        public RemoteHelper(RemoteObject remoteObject) : this(remoteObject.SessionHandle.Session, remoteObject.Name)
+        { }
+
         public RemoteHelper(OpcUaSession session, string parentNodeName) : this(session)
         {
             _parentNode = BrowseNodeId(null, parentNodeName);
@@ -257,17 +260,16 @@ namespace UaclClient
                 : path.Substring(path.IndexOf('.') + 1, path.Length - pathElements[0].Length - 1);
         }
 
-        public List<MonitoredItem> MonitorDataChange<T>(RemoteDataMonitor<T> monitor, OpcUaSessionHandle handle,
-            RemoteObject remoteObject)
+        public void MonitorDataChange<T>(RemoteDataMonitor<T> monitor, RemoteObject remoteObject)
         {
             var monitoredItems = new List<MonitoredItem>
             {
                 new DataMonitoredItem(BrowseNodeId(_parentNode, monitor.Name)) {UserData = monitor}
             };
 
-            handle.ClientSubscription.CreateMonitoredItems(monitoredItems,
+            remoteObject.SessionHandle.ClientSubscription().CreateMonitoredItems(monitoredItems,
                 new RequestSettings {OperationTimeout = 10000});
-            handle.SetDataChangeHandler(
+            remoteObject.SessionHandle.SetDataChangeHandler(
                 (Subscription ss, DataChangedEventArgs args) =>
                 {
                     foreach (var dataChange in args.DataChanges)
@@ -277,7 +279,7 @@ namespace UaclClient
                     }
                 });
 
-            return monitoredItems;
+            remoteObject.SessionHandle.MonitoredItems.AddRange(monitoredItems);
         }
     }
 }

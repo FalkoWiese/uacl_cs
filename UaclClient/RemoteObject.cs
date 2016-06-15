@@ -7,19 +7,29 @@ using UnifiedAutomation.UaClient;
 
 namespace UaclClient
 {
-    public class RemoteObject
+    public class RemoteObject : IDisposable
     {
         public RemoteObject(string ip, int port, string name)
         {
             Connection = new ConnectionInfo(ip, port);
             Name = name;
+            SessionLock = new object();
+            SessionHandle = new OpcUaSessionHandle(OpcUaSession.Create(Connection));
         }
+
+        public void Dispose()
+        {
+            if (SessionHandle.Session.ConnectionStatus == ServerConnectionStatus.Connected)
+            {
+                SessionHandle.Dispose();
+            }
+        }
+
+        public OpcUaSessionHandle SessionHandle { get; private set; }
 
         public ConnectionInfo Connection { get; }
 
         public string Name { get; }
-
-        public List<MonitoredItem> MonitoredItems { get; set; }
 
         public void Monitor<T>(string name, Action<T> action)
         {
@@ -32,9 +42,7 @@ namespace UaclClient
                     Callback = action
                 };
 
-                var handle = SessionHandler.Instance.GetSession(this);
-                var remoteHelper = new RemoteHelper(handle.Session, Name);
-                MonitoredItems.AddRange(remoteHelper.MonitorDataChange(monitor, handle, this));
+                monitor.Announce(this);
             }
             catch (Exception e)
             {
@@ -77,7 +85,7 @@ namespace UaclClient
                     Value = TypeMapping.Instance.ToVariant(parameter)
                 };
 
-                variable.Write(SessionHandler.Instance.GetSession(this).Session, this);
+                variable.Write(this);
             }
             catch (Exception e)
             {
@@ -95,7 +103,7 @@ namespace UaclClient
                     Value = TypeMapping.Instance.MapType<T>()
                 };
 
-                var result = variable.Read(SessionHandler.Instance.GetSession(this).Session, this);
+                var result = variable.Read(this);
                 return (T) TypeMapping.Instance.ToObject(result);
             }
             catch (Exception e)
@@ -110,8 +118,7 @@ namespace UaclClient
         {
             try
             {
-                OpcUaSession session = SessionHandler.Instance.GetSession(this).Session;
-                Variant result = method.Invoke(session, this);
+                Variant result = method.Invoke(this);
                 return result;
             }
             catch (Exception e)
@@ -122,44 +129,42 @@ namespace UaclClient
             return method.HasReturnValue() ? method.ReturnValue : Variant.Null;
         }
 
-        public Variant Execute(Func<Variant> action, OpcUaSession session=null)
-        {
-            if (session == null)
-            {
-                session = SessionHandler.Instance.GetSession(this).Session;
-            }
+        private object SessionLock { get; set; }
 
-            do
+        public Variant Execute(Func<Variant> action)
+        {
+            lock (SessionLock)
             {
+                var session = SessionHandle.Session;
+                if (SessionHandle.Session.ConnectionStatus != ServerConnectionStatus.Connected)
+                {
+                    do
+                    {
+                        try
+                        {
+                            Logger.Info($"Try to connect to:{session.SessionUri.Uri.AbsoluteUri}");
+                            session.Connect(session.SessionUri.Uri.AbsoluteUri, SecuritySelection.None);
+                            Logger.Info($"Connection to {session.SessionUri.Uri.AbsoluteUri} established.");
+                        }
+                        catch (Exception e)
+                        {
+                            ExceptionHandler.Log(e,
+                                $"An error occurred while try to connect to server: {session.SessionUri.Uri.AbsoluteUri}.");
+                        }
+                    } while (session.NotConnected());
+                }
+
                 try
                 {
-                    Logger.Info($"Try to connect to:{session.SessionUri.Uri.AbsoluteUri}");
-                    session.Connect(session.SessionUri.Uri.AbsoluteUri, SecuritySelection.None);
-                    Logger.Info($"Connection to {session.SessionUri.Uri.AbsoluteUri} established.");
+                    return action();
                 }
                 catch (Exception e)
                 {
-                    ExceptionHandler.Log(e,
-                        $"An error occurred while try to connect to server: {session.SessionUri.Uri.AbsoluteUri}.");
-                }
-            } while (session.NotConnected());
-
-            try
-            {
-                return action();
-            }
-            catch (Exception e)
-            {
-                ExceptionHandler.Log(e, $"Error while invoke something on '{Name}'.");
-                throw;
-            }
-            finally
-            {
-                if (!session.NotConnected())
-                {
-                    session.Disconnect();
+                    ExceptionHandler.Log(e, $"Error while invoke something on '{Name}'.");
+                    throw;
                 }
             }
         }
+
     }
 }

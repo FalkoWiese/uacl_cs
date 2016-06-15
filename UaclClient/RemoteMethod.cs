@@ -1,8 +1,5 @@
-﻿using System;
-using System.Collections.Generic;
-using UaclUtils;
+﻿using System.Collections.Generic;
 using UnifiedAutomation.UaBase;
-using UnifiedAutomation.UaClient;
 
 namespace UaclClient
 {
@@ -12,13 +9,13 @@ namespace UaclClient
         public Variant ReturnValue { get; set; }
         public List<Variant> InputArguments { get; set; }
 
-        public Variant Invoke(OpcUaSession session, RemoteObject remoteObject)
+        public Variant Invoke(RemoteObject remoteObject)
         {
             return remoteObject.Execute(() =>
             {
-                var invoker = new RemoteHelper(session, remoteObject.Name);
+                var invoker = new RemoteHelper(remoteObject);
                 return invoker.CallMethod(this);
-            }, session);
+            });
         }
 
         public bool HasReturnValue()

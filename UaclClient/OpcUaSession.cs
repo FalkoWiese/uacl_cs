@@ -2,7 +2,6 @@
 using UaclUtils;
 using UnifiedAutomation.UaBase;
 using UnifiedAutomation.UaClient;
-using UnifiedAutomation.UaSchema;
 
 namespace UaclClient
 {
@@ -58,20 +57,6 @@ namespace UaclClient
 
         internal static OpcUaSession Create(ConnectionInfo connection)
         {
-            var appSettings = new SecuredApplication();
-/*
-            var traceSettings = new TraceSettings
-            {
-                MasterTraceEnabled = true,
-                MaxLogFileBackups = 3,
-                MaxEntriesPerLog = 10000,
-                // TraceFile = @"log\UaclClient.log.txt",
-                // DefaultTraceLevel = UnifiedAutomation.UaSchema.TraceLevel.Info
-            };
-            appSettings.Set<TraceSettings>(traceSettings);
-*/
-            ApplicationInstance.Default.SetApplicationSettings(appSettings);
-
             return new OpcUaSession(ApplicationInstance.Default, connection);
         }
 

@@ -55,7 +55,6 @@
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="RemoteMethod.cs" />
     <Compile Include="RemoteVariable.cs" />
-    <Compile Include="SessionHandler.cs" />
     <Compile Include="RemoteObject.cs" />
   </ItemGroup>
   <ItemGroup>

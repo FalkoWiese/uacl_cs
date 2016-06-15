@@ -8,24 +8,31 @@ namespace UaclClient
 
         public Variant Value { get; set; }
 
-        public Variant Read(OpcUaSession session, RemoteObject remoteObject)
+        public Variant Read(RemoteObject remoteObject)
         {
             return remoteObject.Execute(() =>
             {
-                var invoker = new RemoteHelper(session, remoteObject.Name);
+                var invoker = new RemoteHelper(remoteObject);
                 return invoker.ReadVariable(this);
-            }, session);
+            });
         }
 
-        public Variant Write(OpcUaSession session, RemoteObject remoteObject)
+        public Variant Write(RemoteObject remoteObject)
         {
             return remoteObject.Execute(() =>
             {
-                var invoker = new RemoteHelper(session, remoteObject.Name);
+                var invoker = new RemoteHelper(remoteObject);
                 return invoker.WriteVariable(this);
-            }, session);
+            });
         }
 
-
+        public void Monitor(RemoteObject remoteObject)
+        {
+            remoteObject.Execute(() =>
+            {
+                var invoker = new RemoteHelper(remoteObject);
+                return invoker.WriteVariable(this);
+            });
+        }
     }
 }
