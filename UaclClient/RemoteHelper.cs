@@ -11,7 +11,7 @@ namespace UaclClient
     /// Class to call a Method on a OPC UA Server
     /// This class can be instanciated with an <see cref="OpcUaSession"/> OpcUaSession, this session is ment to be instantiated and connected to the desired Server.
     /// </summary>
-    public class RemoteInvoker
+    public class RemoteHelper
     {
         private readonly OpcUaSession _session;
         private readonly NodeId _parentNode;
@@ -19,7 +19,7 @@ namespace UaclClient
         private const int OpcUaIdRootFolder = 84;
         private readonly Dictionary<string, NodeId> _nodeIds;
 
-        private RemoteInvoker(OpcUaSession session)
+        private RemoteHelper(OpcUaSession session)
         {
             _session = session;
             _nodeIds = new Dictionary<string, NodeId>();
@@ -34,7 +34,7 @@ namespace UaclClient
             _session.ConnectionStatusUpdate += SessionOnConnectionStatusUpdate;
         }
 
-        public RemoteInvoker(OpcUaSession session, string parentNodeName) : this(session)
+        public RemoteHelper(OpcUaSession session, string parentNodeName) : this(session)
         {
             _parentNode = BrowseNodeId(null, parentNodeName);
         }
@@ -85,7 +85,6 @@ namespace UaclClient
             return name.Contains('.')
                 ? BrowseNodeIdByPath(null, name)
                 : BrowseNodeIdByName(null, name);
-
         }
 
         public NodeId BrowseNodeIdByPath(NodeId parentNode, string path)
@@ -99,8 +98,8 @@ namespace UaclClient
                 throw new Exception($"Cannot find node for path: '{path}'!");
             }
 
-            return string.IsNullOrEmpty(restOfPath) 
-                ? resultNode 
+            return string.IsNullOrEmpty(restOfPath)
+                ? resultNode
                 : BrowseNodeIdByPath(resultNode, restOfPath);
         }
 
@@ -256,6 +255,29 @@ namespace UaclClient
             return pathElements.Count == 1
                 ? ""
                 : path.Substring(path.IndexOf('.') + 1, path.Length - pathElements[0].Length - 1);
+        }
+
+        public List<MonitoredItem> MonitorDataChange<T>(RemoteDataMonitor<T> monitor, OpcUaSessionHandle handle,
+            RemoteObject remoteObject)
+        {
+            var monitoredItems = new List<MonitoredItem>
+            {
+                new DataMonitoredItem(BrowseNodeId(_parentNode, monitor.Name)) {UserData = monitor}
+            };
+
+            handle.ClientSubscription.CreateMonitoredItems(monitoredItems,
+                new RequestSettings {OperationTimeout = 10000});
+            handle.SetDataChangeHandler(
+                (Subscription ss, DataChangedEventArgs args) =>
+                {
+                    foreach (var dataChange in args.DataChanges)
+                    {
+                        var remoteDataMonitor = (RemoteDataMonitor<T>) dataChange.MonitoredItem.UserData;
+                        remoteDataMonitor?.DataChange(dataChange.Value.WrappedValue);
+                    }
+                });
+
+            return monitoredItems;
         }
     }
 }

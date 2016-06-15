@@ -49,7 +49,7 @@
     <Compile Include="CallObjectsContainer.cs" />
     <Compile Include="ConnectionInfo.cs" />
     <Compile Include="RemoteDataMonitor.cs" />
-    <Compile Include="RemoteInvoker.cs" />
+    <Compile Include="RemoteHelper.cs" />
     <Compile Include="OpcUaSession.cs" />
     <Compile Include="OpcUaSessionHandle.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />

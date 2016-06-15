@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Linq;
 using UaclUtils;
 using UnifiedAutomation.UaBase;
@@ -18,6 +19,8 @@ namespace UaclClient
 
         public string Name { get; }
 
+        public List<MonitoredItem> MonitoredItems { get; set; }
+
         public void Monitor<T>(string name, Action<T> action)
         {
             try
@@ -29,7 +32,9 @@ namespace UaclClient
                     Callback = action
                 };
 
-                monitor.Subscribe(SessionHandler.Instance.GetSession(this), this);
+                var handle = SessionHandler.Instance.GetSession(this);
+                var remoteHelper = new RemoteHelper(handle.Session, Name);
+                MonitoredItems.AddRange(remoteHelper.MonitorDataChange(monitor, handle, this));
             }
             catch (Exception e)
             {

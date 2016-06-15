@@ -16,7 +16,7 @@ namespace UaclClient
         {
             return remoteObject.Execute(() =>
             {
-                var invoker = new RemoteInvoker(session, remoteObject.Name);
+                var invoker = new RemoteHelper(session, remoteObject.Name);
                 return invoker.CallMethod(this);
             }, session);
         }

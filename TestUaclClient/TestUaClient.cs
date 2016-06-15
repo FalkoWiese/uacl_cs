@@ -71,15 +71,15 @@ namespace TestUaclClient
             const string path = "ServerConsole.BusinessLogic.JobStates";
 
             string firstElement;
-            var restOfPath = RemoteInvoker.RestOfPath(path, out firstElement);
+            var restOfPath = RemoteHelper.RestOfPath(path, out firstElement);
             Assert.IsTrue(firstElement == "ServerConsole");
             Assert.IsTrue(restOfPath == "BusinessLogic.JobStates");
 
-            restOfPath = RemoteInvoker.RestOfPath(restOfPath, out firstElement);
+            restOfPath = RemoteHelper.RestOfPath(restOfPath, out firstElement);
             Assert.IsTrue(firstElement == "BusinessLogic");
             Assert.IsTrue(restOfPath == "JobStates");
 
-            restOfPath = RemoteInvoker.RestOfPath(restOfPath, out firstElement);
+            restOfPath = RemoteHelper.RestOfPath(restOfPath, out firstElement);
             Assert.IsTrue(firstElement == "JobStates");
             Assert.IsTrue(restOfPath == "");
         }

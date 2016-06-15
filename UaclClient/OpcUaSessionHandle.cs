@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Threading;
 using UaclUtils;
 using UnifiedAutomation.UaClient;
@@ -35,6 +36,8 @@ namespace UaclClient
                 };
 
                 ClientSubscription.Create(new RequestSettings { OperationTimeout = 10000 });
+
+                DataChangeHandlerAvailable = false;
             }
             catch (Exception e)
             {
@@ -42,9 +45,19 @@ namespace UaclClient
             }
         }
 
+        public void SetDataChangeHandler(DataChangedEventHandler eventHandler)
+        {
+            if (DataChangeHandlerAvailable) return;
+            ClientSubscription.DataChanged += eventHandler;
+            DataChangeHandlerAvailable = true;
+        }
+
+        private bool DataChangeHandlerAvailable { get; set; }
+
         public Subscription ClientSubscription { get; set; }
 
         public Thread Handler { get; set; }
+
         public OpcUaSession Session { get; set; }
     }
 }
