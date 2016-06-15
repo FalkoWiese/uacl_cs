@@ -40,20 +40,6 @@
   <ItemGroup>
     <Reference Include="System" />
     <Reference Include="System.Core" />
-    <Reference Include="System.Xml.Linq" />
-    <Reference Include="System.Data.DataSetExtensions" />
-    <Reference Include="Microsoft.CSharp" />
-    <Reference Include="System.Data" />
-    <Reference Include="System.Net.Http" />
-    <Reference Include="System.Xml" />
-    <Reference Include="UnifiedAutomation.UaBase, Version=2.0.0.0, Culture=neutral, PublicKeyToken=90c158e6f23d82c1, processorArchitecture=MSIL">
-      <SpecificVersion>False</SpecificVersion>
-      <HintPath>..\..\..\..\..\..\..\..\Program Files (x86)\UnifiedAutomation\UaSdkNetBundleEval\assemblies\NET_4.5\UnifiedAutomation.UaBase.dll</HintPath>
-    </Reference>
-    <Reference Include="UnifiedAutomation.UaServer, Version=2.0.0.0, Culture=neutral, PublicKeyToken=90c158e6f23d82c1, processorArchitecture=MSIL">
-      <SpecificVersion>False</SpecificVersion>
-      <HintPath>..\..\..\..\..\..\..\..\Program Files (x86)\UnifiedAutomation\UaSdkNetBundleEval\assemblies\NET_4.5\UnifiedAutomation.UaServer.dll</HintPath>
-    </Reference>
   </ItemGroup>
   <ItemGroup>
     <Compile Include="BoProxy.cs" />

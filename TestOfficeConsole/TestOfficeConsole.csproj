@@ -35,14 +35,6 @@
   <ItemGroup>
     <Reference Include="nunit.framework, Version=3.0.5797.27534, Culture=neutral, PublicKeyToken=2638cd05610744eb, processorArchitecture=MSIL" />
     <Reference Include="System" />
-    <Reference Include="UnifiedAutomation.UaBase, Version=2.0.0.0, Culture=neutral, PublicKeyToken=90c158e6f23d82c1, processorArchitecture=MSIL">
-      <SpecificVersion>False</SpecificVersion>
-      <HintPath>..\..\..\Program Files (x86)\UnifiedAutomation\UaSdkNetBundleEval\bin\UnifiedAutomation.UaBase.dll</HintPath>
-    </Reference>
-    <Reference Include="UnifiedAutomation.UaServer, Version=2.0.0.0, Culture=neutral, PublicKeyToken=90c158e6f23d82c1, processorArchitecture=MSIL">
-      <SpecificVersion>False</SpecificVersion>
-      <HintPath>..\..\..\Program Files (x86)\UnifiedAutomation\UaSdkNetBundleEval\bin\UnifiedAutomation.UaServer.dll</HintPath>
-    </Reference>
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Properties\AssemblyInfo.cs" />

@@ -1,12 +1,9 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Linq;
 using System.Threading;
 using NUnit.Framework;
 using UaclClient;
 using UaclUtils;
-using UnifiedAutomation.UaBase;
-using UnifiedAutomation.UaClient;
 
 namespace TestUaclClient
 {
