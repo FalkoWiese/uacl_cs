@@ -336,15 +336,12 @@ namespace UaclServer
             string indexRange,
             QualifiedName dataEncoding)
         {
-            if (nodeHandle.AttributeId != 13) return base.Read(context, nodeHandle, indexRange, dataEncoding);
+            DataValue baseValue = base.Read(context, nodeHandle, indexRange, dataEncoding);
+            if (nodeHandle.AttributeId != 13) return baseValue;
 
             var processVariable = nodeHandle?.UserData as VariableNode;
-
-            if (processVariable == null) return base.Read(context, nodeHandle, indexRange, dataEncoding);
-
             var processVariableData = processVariable?.UserData as VariableNodeData;
-
-            if (processVariableData == null) return base.Read(context, nodeHandle, indexRange, dataEncoding);
+            if (processVariableData == null) return baseValue;
 
             var v = new DataValue(processVariableData.ReadValue());
 
@@ -357,16 +354,15 @@ namespace UaclServer
             string indexRange,
             DataValue value)
         {
-            if (value == null) return base.Write(context, nodeHandle, indexRange, null);
-            if (nodeHandle == null) return base.Write(context, null, indexRange, value);
+            StatusCode? statusCode = base.Write(context, nodeHandle, indexRange, value);
 
-            var processVariable = nodeHandle.UserData as VariableNode;
+            var processVariable = nodeHandle?.UserData as VariableNode;
             var processVariableData = processVariable?.UserData as VariableNodeData;
-            if (processVariableData == null) return base.Write(context, nodeHandle, indexRange, value);
+            if (processVariableData == null) return statusCode;
 
-            return processVariableData.WriteValue(value.Value)
+            return processVariableData.WriteValue(value.Value) && (statusCode != null && StatusCode.IsGood((StatusCode)statusCode)) 
                 ? StatusCodes.Good
-                : base.Write(context, nodeHandle, indexRange, value);
+                : StatusCodes.Bad;
         }
 
         public override void Shutdown()
