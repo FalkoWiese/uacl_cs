@@ -51,6 +51,19 @@ namespace TestUaclClient
         }
 
         [Test]
+        public void CallMethodSometimes()
+        {
+            using (var obj = new RemoteObject("localhost", 48030, "ServerConsole.BusinessLogic"))
+            {
+                for (int i = 0; i < 50; i++)
+                {
+                    var value = obj.Invoke<string>("JobStates");
+                    Assert.IsFalse(string.IsNullOrEmpty(value));
+                }
+            }
+        }
+
+        [Test]
         public void AddMonitoredItem()
         {
             var obj = new RemoteObject("localhost", 48030, "ServerConsole.BusinessLogic");
