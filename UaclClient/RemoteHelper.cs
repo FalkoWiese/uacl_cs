@@ -268,7 +268,6 @@ namespace UaclClient
                 {
                     UserData = monitor,
                     DataChangeTrigger = DataChangeTrigger.StatusValue,
-                    MonitoringMode = MonitoringMode.Reporting
                 }
             };
 
