@@ -67,21 +67,7 @@ namespace UaclServer
                     new SecurityProfile() {ProfileUri = SecurityProfiles.None, Enabled = true}
                 }
             };
-            // extended configuration options
-            // trace settings
-            var trace = new TraceSettings
-            {
-                MasterTraceEnabled = true,
-                DefaultTraceLevel = UnifiedAutomation.UaSchema.TraceLevel.Info,
-                TraceFile = @"%CommonApplicationData%\unifiedautomation\logs\ConfigurationServer.log.txt",
-                MaxLogFileBackups = 3,
-                ModuleSettings = new[]
-                {
-                    new ModuleTraceSettings() {ModuleName = "UnifiedAutomation.Stack", TraceEnabled = true},
-                    new ModuleTraceSettings() {ModuleName = "UnifiedAutomation.Server", TraceEnabled = true},
-                }
-            };
-            application.Set(trace);
+
             // Installation settings
             var installation = new InstallationSettings
             {
@@ -89,6 +75,7 @@ namespace UaclServer
                 DeleteCertificateOnUninstall = true
             };
             application.Set(installation);
+
             // set the configuration for the application (must be called before start to have any effect).
             // these settings are discarded if the /configFile flag is specified on the command line.
             instance.SetApplicationSettings(application);
@@ -124,7 +111,8 @@ namespace UaclServer
             if (Manager.IsRunning) return false;
 
             ApplicationLicenseManager.AddProcessLicenses(System.Reflection.Assembly.GetExecutingAssembly(), "License.lic");
-            var application = new ApplicationInstance();
+            var application = new ApplicationInstance {ConfigurationFilePath = "ServerConfig.xml"};
+            application.LoadConfiguration(false, true);
             ConfigureOpcUaApplicationFromCode(application, Ip, Port);
             application.Start(Manager, o => { }, Manager);
             if (Manager.SessionManager != null)
