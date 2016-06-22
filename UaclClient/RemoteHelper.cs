@@ -264,7 +264,12 @@ namespace UaclClient
         {
             var monitoredItems = new List<MonitoredItem>
             {
-                new DataMonitoredItem(BrowseNodeId(_parentNode, monitor.Name)) {UserData = monitor}
+                new DataMonitoredItem(BrowseNodeId(_parentNode, monitor.Name))
+                {
+                    UserData = monitor,
+                    DataChangeTrigger = DataChangeTrigger.StatusValue,
+                    MonitoringMode = MonitoringMode.Reporting
+                }
             };
 
             remoteObject.SessionHandle.ClientSubscription().CreateMonitoredItems(monitoredItems,
@@ -272,12 +277,18 @@ namespace UaclClient
             remoteObject.SessionHandle.SetDataChangeHandler(
                 (Subscription ss, DataChangedEventArgs args) =>
                 {
+                    Logger.Info("Received DATA CHANGE ...");
                     foreach (var dataChange in args.DataChanges)
                     {
                         var remoteDataMonitor = (RemoteDataMonitor<T>) dataChange.MonitoredItem.UserData;
                         remoteDataMonitor?.DataChange(dataChange.Value.WrappedValue);
                     }
                 });
+
+//            remoteObject.SessionHandle.ClientSubscription().NewEvents += (Subscription ss, NewEventsEventArgs a) =>
+//            {
+//                Logger.Info("Received NEW EVENT ...");
+//            };
 
             remoteObject.SessionHandle.MonitoredItems.AddRange(monitoredItems);
         }
