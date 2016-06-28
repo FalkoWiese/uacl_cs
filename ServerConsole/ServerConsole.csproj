@@ -56,6 +56,10 @@
     <Service Include="{82A7F48D-3B50-4B1E-B82E-3ADA8210C358}" />
   </ItemGroup>
   <ItemGroup>
+    <ProjectReference Include="..\UaclClient\UaclClient.csproj">
+      <Project>{DD33AE1B-1A85-4A66-B22B-8A4D0A22D254}</Project>
+      <Name>UaclClient</Name>
+    </ProjectReference>
     <ProjectReference Include="..\UaclServer\UaclServer.csproj">
       <Project>{6650e264-d095-40be-893e-442294651d29}</Project>
       <Name>UaclServer</Name>

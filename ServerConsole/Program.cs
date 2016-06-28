@@ -1,4 +1,5 @@
 ﻿using System;
+using UaclClient;
 using UaclServer;
 using UaclUtils;
 
@@ -22,8 +23,15 @@ namespace ServerConsole
 
                 server.Start();
 
+                RemoteObject ro = new RemoteObject("localhost", 48030, "ServerConsole.BusinessLogic");
+		        Action<int> changeStateCount = (int c) =>
+		        {
+		            ro.Write("BoState", $"{c}");
+		        };
+		        var count = 0;
 		        while (true)
 		        {
+		            changeStateCount(count++);
 		            System.Threading.Thread.Sleep(100);
 		        }
             }
