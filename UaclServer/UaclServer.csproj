@@ -47,7 +47,7 @@
     </Reference>
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="LocalDataChange.cs" />
+    <Compile Include="GlobalNotfier.cs" />
     <Compile Include="LocalProxy.cs" />
     <Compile Include="UaclInsertState.cs" />
     <Compile Include="InternalNodeManager.cs" />
