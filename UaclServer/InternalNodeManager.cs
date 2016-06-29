@@ -28,9 +28,16 @@ namespace UaclServer
             InstanceNamespaceIndex = AddNamespaceUri($"{CompanyUri}/{ApplicationUri}/instances");
             TypeNamespaceIndex = AddNamespaceUri($"{CompanyUri}/{ApplicationUri}/types");
             _counter = 0;
-        }
 
-        private string ApplicationUri { get; set; }
+            LocalDataChangeEvent += (object sender, LocalDataChange.LcdEventArgs args) =>
+            {
+                var nodeName = args.NodeName;
+                var value = args.Value;
+            };
+
+    }
+
+    private string ApplicationUri { get; set; }
         private string CompanyUri { get; set; }
         private ushort InstanceNamespaceIndex { get; set; }
         private ushort TypeNamespaceIndex { get; set; }
@@ -176,6 +183,8 @@ namespace UaclServer
             methodNode.UserData = new MethodNodeData {BusinessObject = businessObject, Method = method};
             Logger.Info($"Created method ... {methodNode.NodeId.Identifier}.");
         }
+
+        private LocalDataChange.LcdEvent LocalDataChangeEvent { get; set; }
 
         private void AddVariable(object businessObject, PropertyInfo property, ObjectNode parentNode,
             ObjectTypeNode parentTypeNode)

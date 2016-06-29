@@ -1,12 +1,19 @@
 ﻿using System;
+using UaclClient;
 using UaclServer;
 using UaclUtils;
 
 namespace ServerConsole
 {
     [UaObject]
-    public class BusinessLogic
+    public class BusinessLogic : LocalProxy
     {
+        public BusinessLogic()
+        { }
+
+        public BusinessLogic(ConnectionInfo info) : base(info, typeof(BusinessLogic).Name)
+        { }
+
         private enum JobState
         {
             None = 0,
@@ -72,5 +79,10 @@ namespace ServerConsole
         }
 
         private string _boState;
+
+        public void ChangeState(string newState)
+        {
+            Call("BoState", newState);
+        }
     }
 }

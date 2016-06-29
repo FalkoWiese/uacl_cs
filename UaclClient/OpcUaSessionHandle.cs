@@ -6,7 +6,7 @@ using UnifiedAutomation.UaClient;
 
 namespace UaclClient
 {
-    public class OpcUaSessionHandle : IDisposable
+    public sealed class OpcUaSessionHandle : IDisposable
     {
         public OpcUaSessionHandle(OpcUaSession session)
         {

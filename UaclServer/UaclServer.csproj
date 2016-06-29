@@ -47,6 +47,8 @@
     </Reference>
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="LocalDataChange.cs" />
+    <Compile Include="LocalProxy.cs" />
     <Compile Include="UaclInsertState.cs" />
     <Compile Include="InternalNodeManager.cs" />
     <Compile Include="InternalServerManager.cs" />
@@ -75,6 +77,10 @@
     </EmbeddedResource>
   </ItemGroup>
   <ItemGroup>
+    <ProjectReference Include="..\UaclClient\UaclClient.csproj">
+      <Project>{DD33AE1B-1A85-4A66-B22B-8A4D0A22D254}</Project>
+      <Name>UaclClient</Name>
+    </ProjectReference>
     <ProjectReference Include="..\UaclUtils\UaclUtils.csproj">
       <Project>{0749e410-6901-49a3-b74c-859a6515a92a}</Project>
       <Name>UaclUtils</Name>

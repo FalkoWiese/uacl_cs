@@ -11,7 +11,7 @@ namespace UaclClient
     {
         public RemoteObject(string ip, int port, string name)
         {
-            Connection = new ConnectionInfo(ip, port);
+            Connection = new ConnectionInfo(ip, port, name);
             Name = name;
             SessionLock = new object();
             SessionHandle = new OpcUaSessionHandle(OpcUaSession.Create(Connection));
@@ -19,9 +19,18 @@ namespace UaclClient
 
         public void Dispose()
         {
-            if (SessionHandle.Session.ConnectionStatus == ServerConnectionStatus.Connected)
+            Dispose(true);
+            GC.SuppressFinalize(this);
+        }
+
+        protected virtual void Dispose(bool really)
+        {
+            if (really)
             {
-                SessionHandle.Dispose();
+                if (SessionHandle.Session.ConnectionStatus == ServerConnectionStatus.Connected)
+                {
+                    SessionHandle.Dispose();
+                }
             }
         }
 

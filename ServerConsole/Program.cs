@@ -12,26 +12,23 @@ namespace ServerConsole
 		    InternalServer server = null;
 		    try
 		    {
-                var bo = new BusinessLogic();
+                ConnectionInfo connection = new ConnectionInfo("localhost", 48030, "ServerConsole");
+
+                var bo = new BusinessLogic(connection);
 		        bo.CalculateJob("", 2);
-		        server = new InternalServer("localhost", 48030, "ServerConsole");
+		        server = new InternalServer(connection.Ip, connection.Port, connection.Application);
                 server.RegisterObject(bo);
 
                 var bo1 = new BoProxy();
-                bo1.Items.Add(new BusinessLogic());
+                bo1.Items.Add(new BusinessLogic(connection));
                 server.RegisterObject(bo1);
 
                 server.Start();
 
-                RemoteObject ro = new RemoteObject("localhost", 48030, "ServerConsole.BusinessLogic");
-		        Action<int> changeStateCount = (int c) =>
-		        {
-		            ro.Write("BoState", $"{c}");
-		        };
 		        var count = 0;
 		        while (true)
 		        {
-		            changeStateCount(count++);
+		            bo.ChangeState($"{count++}");
 		            System.Threading.Thread.Sleep(100);
 		        }
             }
