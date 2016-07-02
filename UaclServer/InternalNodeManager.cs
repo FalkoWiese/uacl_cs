@@ -64,18 +64,7 @@ namespace UaclServer
 
         private void CreateUaServerInterface()
         {
-            // The root folder, named by the specific application, e.g. 'ServerConsole'.
-//            var applicationTypeRoot = CreateObjectTypeNode(Server.DefaultRequestContext, new CreateObjectTypeSettings()
-//            {
-//                ParentNodeId = ObjectTypeIds.BaseObjectType,
-//                ReferenceTypeId = ReferenceTypeIds.HasSubtype,
-//                RequestedNodeId = new NodeId(ApplicationUri, TypeNamespaceIndex),
-//                BrowseName = new QualifiedName(ApplicationUri, TypeNamespaceIndex),
-//                DisplayName = ApplicationUri
-//            });
-//            AddReference(Server.DefaultRequestContext, ObjectTypeIds.BaseObjectType, ReferenceTypeIds.Organizes, false,
-//                applicationTypeRoot.NodeId, true);
-
+            // The root folder, named by the specific application.
             var applicationRoot = CreateObject(Server.DefaultRequestContext, new CreateObjectSettings()
             {
                 ParentNodeId = ObjectIds.ObjectsFolder,
@@ -89,26 +78,15 @@ namespace UaclServer
             // Here we add the registered objects. Unless, they aren't correctly annotated.
             foreach (var model in GetManager().BusinessModel)
             {
-                AddNode(model, applicationRoot, null); //, applicationTypeRoot);
+                AddNode(model, applicationRoot);
             }
         }
 
-        private void AddNode(object businessObject, ObjectNode rootNode, ObjectTypeNode typeRootNode)
+        private void AddNode(object businessObject, ObjectNode rootNode)
         {
             var uaObject = businessObject.GetType().GetCustomAttribute<UaObject>();
             var uaObjectName = uaObject.Name ?? businessObject.GetType().Name;
             var nodeIdName = $"{uaObjectName}_{incrementCounter()}";
-
-//            var typeNode = CreateObjectTypeNode(Server.DefaultRequestContext, new CreateObjectTypeSettings()
-//            {
-//                ParentNodeId = ObjectTypeIds.BaseObjectType,
-//                ReferenceTypeId = ReferenceTypeIds.HasSubtype,
-//                RequestedNodeId = new NodeId(nodeIdName, TypeNamespaceIndex),
-//                BrowseName = new QualifiedName(uaObjectName, TypeNamespaceIndex),
-//                DisplayName = uaObjectName
-//            });
-//            AddReference(Server.DefaultRequestContext, typeRootNode.NodeId, ReferenceTypeIds.Organizes, false,
-//                typeNode.NodeId, true);
 
             var node = CreateObject(Server.DefaultRequestContext, new CreateObjectSettings()
             {
@@ -122,8 +100,8 @@ namespace UaclServer
 
             foreach (var property in businessObject.GetType().GetProperties())
             {
-                AddVariable(businessObject, property, node, null); // typeNode);
-                AddUaNodes(businessObject, property, node, null); // typeNode);
+                AddVariable(businessObject, property, node);
+                AddUaNodes(businessObject, property, node);
             }
 
             foreach (var method in businessObject.GetType().GetMethods())
@@ -185,25 +163,11 @@ namespace UaclServer
 
         private Dictionary<string, NodeId> PathIdMap { get; set; } 
 
-        private void AddVariable(object businessObject, PropertyInfo property, ObjectNode parentNode,
-            ObjectTypeNode parentTypeNode)
+        private void AddVariable(object businessObject, PropertyInfo property, ObjectNode parentNode)
         {
             var uaVariableAttribute = property.GetCustomAttribute<UaVariable>();
             if (uaVariableAttribute == null) return;
             var variableName = uaVariableAttribute.Name ?? property.Name;
-
-//            var variableTypeNode = CreateVariableTypeNode(Server.DefaultRequestContext,
-//                new CreateVariableTypeSettings()
-//                {
-//                    ParentNodeId = parentTypeNode.NodeId,
-//                    ReferenceTypeId = ReferenceTypeIds.HasSubtype,
-//                    RequestedNodeId =
-//                        new NodeId($"{parentTypeNode.NodeId.Identifier}.{variableName}", TypeNamespaceIndex),
-//                    BrowseName = new QualifiedName(variableName, TypeNamespaceIndex),
-//                    DataType = TypeMapping.Instance.MapDataTypeId(property.PropertyType),
-//                });
-//            AddReference(Server.DefaultRequestContext, parentTypeNode.NodeId, ReferenceTypeIds.Organizes, false,
-//                variableTypeNode.NodeId, true);
 
             var requestedNodeId = new NodeId($"{parentNode.NodeId.Identifier}.{variableName}", InstanceNamespaceIndex);
             PathIdMap[$"{parentNode.DisplayName}.{variableName}"] = requestedNodeId;
@@ -220,13 +184,11 @@ namespace UaclServer
                     Value = new Variant("None"),
                 });
             variableNode.UserData = new VariableNodeData {BusinessObject = businessObject, Property = property};
-//            SetVariableConfiguration(variableNode.NodeId, variableNode.BrowseName, NodeHandleType.ExternalPolled,
-//                variableNode.Value);
 
             Logger.Info($"Created variable ... {variableNode.NodeId.Identifier}.");
         }
 
-        private void AddUaNodes(object businessObject, PropertyInfo property, ObjectNode parentNode, ObjectTypeNode parentTypeNode)
+        private void AddUaNodes(object businessObject, PropertyInfo property, ObjectNode parentNode)
         {
             var uaObjectListAttribute = property.GetCustomAttribute<UaObjectList>();
             if (uaObjectListAttribute == null) return;
@@ -236,7 +198,7 @@ namespace UaclServer
 
             foreach (var o in uaNodeItems)
             {
-                AddNode(o, parentNode, parentTypeNode);
+                AddNode(o, parentNode);
             }
         }
 
