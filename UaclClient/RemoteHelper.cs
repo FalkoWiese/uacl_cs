@@ -163,7 +163,8 @@ namespace UaclClient
             // call the method on the server.
             var result = _session.Call(
                 _parentNode,
-                CreateNodeIdByName(_parentNode, methodName),
+//                CreateNodeIdByName(_parentNode, methodName),
+                BrowseNodeId(_parentNode, methodName),
                 remoteMethod.InputArguments,
                 out inputArgumentErrors,
                 out outputArguments);
