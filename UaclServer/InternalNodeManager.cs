@@ -26,7 +26,7 @@ namespace UaclServer
             TypeNamespaceIndex = AddNamespaceUri($"{CompanyUri}/{ApplicationUri}/types");
             _counter = 0;
             PathIdMap = new Dictionary<string, NodeId>();
-            GlobalNotfier.LocalDataChangeEvent += (string path, string variableName, object value) =>
+            GlobalNotifier.LocalDataChangeEvent += (string path, string variableName, object value) =>
             {
                 Logger.Trace($"LocalDataChangeEvent fired for varible {path}={value}");
                 var fullPath = $"{path}.{variableName}";
@@ -327,6 +327,18 @@ namespace UaclServer
         {
             StatusCode? statusCode = base.Write(context, nodeHandle, indexRange, value);
 
+/*
+            try
+            {
+                throw new Exception("Stacktrace ...");
+            }
+            catch (Exception e)
+            {
+                Console.WriteLine(e.StackTrace);
+                Console.WriteLine($"context:{context}\nnodeHandle:{nodeHandle}\nindexRange:{indexRange}\nvalue:{value}\n");
+            }
+
+*/
             var processVariable = nodeHandle?.UserData as VariableNode;
             var processVariableData = processVariable?.UserData as VariableNodeData;
             if (processVariableData == null) return statusCode;
