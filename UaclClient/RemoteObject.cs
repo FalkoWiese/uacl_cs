@@ -1,6 +1,8 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Linq;
+using System.Security.Cryptography.X509Certificates;
 using UaclUtils;
 using UnifiedAutomation.UaBase;
 using UnifiedAutomation.UaClient;
@@ -144,9 +146,15 @@ namespace UaclClient
         {
             lock (SessionLock)
             {
+                if (SessionHandle.Timeout)
+                {
+                    return Variant.Null;
+                }
+
                 var session = SessionHandle.Session;
                 if (SessionHandle.Session.ConnectionStatus != ServerConnectionStatus.Connected)
                 {
+                    var stopWatch = Stopwatch.StartNew();
                     do
                     {
                         try
@@ -154,6 +162,12 @@ namespace UaclClient
                             Logger.Info($"Try to connect to:{session.SessionUri.Uri.AbsoluteUri}");
                             session.Connect(session.SessionUri.Uri.AbsoluteUri, SecuritySelection.None);
                             Logger.Info($"Connection to {session.SessionUri.Uri.AbsoluteUri} established.");
+                            stopWatch.Stop();
+                            if (stopWatch.Elapsed.Seconds > 5)
+                            {
+                                break;
+                            }
+                            stopWatch.Start();
                         }
                         catch (Exception e)
                         {
@@ -161,6 +175,12 @@ namespace UaclClient
                                 $"An error occurred while try to connect to server: {session.SessionUri.Uri.AbsoluteUri}.");
                         }
                     } while (session.NotConnected());
+
+                    if (session.NotConnected())
+                    {
+                        SessionHandle.Timeout = true;
+                        return Variant.Null;
+                    }
                 }
 
                 try

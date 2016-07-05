@@ -12,7 +12,10 @@ namespace UaclClient
         {
             Session = session;
             MonitoredItems = new List<MonitoredItem>();
+            Timeout = false;
         }
+
+        public bool Timeout { get; set; }
 
         private Subscription CreateSubscription()
         {
