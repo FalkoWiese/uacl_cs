@@ -327,18 +327,6 @@ namespace UaclServer
         {
             StatusCode? statusCode = base.Write(context, nodeHandle, indexRange, value);
 
-/*
-            try
-            {
-                throw new Exception("Stacktrace ...");
-            }
-            catch (Exception e)
-            {
-                Console.WriteLine(e.StackTrace);
-                Console.WriteLine($"context:{context}\nnodeHandle:{nodeHandle}\nindexRange:{indexRange}\nvalue:{value}\n");
-            }
-
-*/
             var processVariable = nodeHandle?.UserData as VariableNode;
             var processVariableData = processVariable?.UserData as VariableNodeData;
             if (processVariableData == null) return statusCode;
