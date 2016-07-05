@@ -55,7 +55,7 @@ namespace UaclClient
             {
                 //If the Session was disconnected from Server try to reconnect.
                 Logger.Error("The ConnectionStatus of the Session has changed to Disconnected.");
-                _session.Reconnect();
+//                _session.Reconnect();
             }
             Logger.Trace($"Connection status has changed to {sender.ConnectionStatus}");
         }
