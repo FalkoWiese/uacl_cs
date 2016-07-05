@@ -11,7 +11,7 @@ namespace ServerConsole
         public BusinessLogic()
         { }
 
-        public BusinessLogic(ConnectionInfo info) : base(info, typeof(BusinessLogic).Name)
+        public BusinessLogic(ConnectionInfo info) : base(typeof(BusinessLogic).Name)
         { }
 
         private enum JobState
