@@ -50,13 +50,6 @@ namespace UaclClient
         private void SessionOnConnectionStatusUpdate(Session sender,
             ServerConnectionStatusUpdateEventArgs serverConnectionStatusUpdateEventArgs)
         {
-            //Log.InfoFormat("Connections Status has changed to {0}", sender.ConnectionStatus);
-            if (sender.ConnectionStatus == ServerConnectionStatus.Disconnected)
-            {
-                //If the Session was disconnected from Server try to reconnect.
-                Logger.Error("The ConnectionStatus of the Session has changed to Disconnected.");
-//                _session.Reconnect();
-            }
             Logger.Trace($"Connection status has changed to {sender.ConnectionStatus}");
         }
 
