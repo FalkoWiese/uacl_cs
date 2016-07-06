@@ -83,7 +83,7 @@ namespace UaclClient
 
         public NodeId BrowseNodeId(NodeId parentNode, string name, bool recursive = true)
         {
-            if (parentNode == null) return BrowseNodeIdByName(null, name);
+            if (parentNode == null) return BrowseNodeIdByName(null, name, recursive);
 
             return ContainsSeparator(name)
                 ? BrowseNodeIdByPath(parentNode, name)
@@ -95,7 +95,7 @@ namespace UaclClient
             string firstElement;
             var restOfPath = RestOfPath(path, out firstElement);
 
-            var resultNode = BrowseNodeIdByName(parentNode, firstElement);
+            var resultNode = BrowseNodeIdByName(parentNode, firstElement, false);
             if (resultNode == null)
             {
                 throw new Exception($"Cannot find node for path: '{path}'!");
@@ -106,7 +106,7 @@ namespace UaclClient
                 : BrowseNodeIdByPath(resultNode, restOfPath);
         }
 
-        public NodeId BrowseNodeIdByName(NodeId parentNode, string nodeName)
+        public NodeId BrowseNodeIdByName(NodeId parentNode, string nodeName, bool recursive = true)
         {
             NodeId resultNode = null;
             if (parentNode == null)
@@ -133,7 +133,12 @@ namespace UaclClient
 
                     resultNode = reference.DisplayName.Text == nodeName
                         ? n
-                        : BrowseNodeIdByName(n, nodeName);
+                        : null;
+
+                    if (resultNode == null && recursive)
+                    {
+                        resultNode = BrowseNodeIdByName(n, nodeName);
+                    }
 
                     if (resultNode == null) continue;
 
