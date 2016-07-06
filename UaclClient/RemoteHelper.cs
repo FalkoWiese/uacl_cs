@@ -17,6 +17,7 @@ namespace UaclClient
         private readonly NodeId _parentNode;
         private readonly BrowseContext _browseContext;
         private const int OpcUaIdRootFolder = 84;
+        private const int OpcUaIdObjectsFolder = 85;
         private readonly Dictionary<string, NodeId> _nodeIds;
 
         private RemoteHelper(OpcUaSession session)
@@ -83,8 +84,6 @@ namespace UaclClient
 
         public NodeId BrowseNodeId(NodeId parentNode, string name, bool recursive = true)
         {
-            if (parentNode == null) return BrowseNodeIdByName(null, name, recursive);
-
             return ContainsSeparator(name)
                 ? BrowseNodeIdByPath(parentNode, name)
                 : BrowseNodeIdByName(parentNode, name, recursive);
