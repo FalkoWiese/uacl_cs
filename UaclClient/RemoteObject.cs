@@ -155,6 +155,7 @@ namespace UaclClient
                 if (SessionHandle.Session.ConnectionStatus != ServerConnectionStatus.Connected)
                 {
                     var stopWatch = Stopwatch.StartNew();
+
                     do
                     {
                         try
@@ -162,18 +163,21 @@ namespace UaclClient
                             Logger.Info($"Try to connect to:{session.SessionUri.Uri.AbsoluteUri}");
                             session.Connect(session.SessionUri.Uri.AbsoluteUri, SecuritySelection.None);
                             Logger.Info($"Connection to {session.SessionUri.Uri.AbsoluteUri} established.");
-                            stopWatch.Stop();
-                            if (stopWatch.Elapsed.Seconds > 5)
-                            {
-                                break;
-                            }
-                            stopWatch.Start();
                         }
                         catch (Exception e)
                         {
                             ExceptionHandler.Log(e,
                                 $"An error occurred while try to connect to server: {session.SessionUri.Uri.AbsoluteUri}.");
                         }
+
+                        stopWatch.Stop();
+                        if (stopWatch.Elapsed.Seconds > 5)
+                        {
+                            break;
+                        }
+
+                        stopWatch.Start();
+
                     } while (session.NotConnected());
 
                     if (session.NotConnected())
