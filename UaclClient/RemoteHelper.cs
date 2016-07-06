@@ -76,11 +76,11 @@ namespace UaclClient
             return resultNode;
         }
 
-        public NodeId BrowseNodeId(NodeId parentNode, string name)
+        public NodeId BrowseNodeId(NodeId parentNode, string name, bool recursive = true)
         {
             return name.Contains('.')
                 ? BrowseNodeIdByPath(null, name)
-                : BrowseNodeIdByName(null, name);
+                : BrowseNodeIdByName(null, name, recursive);
         }
 
         public NodeId BrowseNodeIdByPath(NodeId parentNode, string path)
@@ -164,7 +164,7 @@ namespace UaclClient
             var result = _session.Call(
                 _parentNode,
 //                CreateNodeIdByName(_parentNode, methodName),
-                BrowseNodeId(_parentNode, methodName),
+                BrowseNodeId(_parentNode, methodName, false),
                 remoteMethod.InputArguments,
                 out inputArgumentErrors,
                 out outputArguments);
