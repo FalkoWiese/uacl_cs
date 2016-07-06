@@ -76,6 +76,11 @@ namespace UaclClient
             return resultNode;
         }
 
+        public static bool ContainsSeparator(string name)
+        {
+            return PathSeparators().Any(name.Contains);
+        }
+
         public NodeId BrowseNodeId(NodeId parentNode, string name)
         {
             if (parentNode == null) return BrowseNodeIdByName(null, name);
@@ -240,9 +245,14 @@ namespace UaclClient
             return remoteVariable.Value;
         }
 
+        public static char[] PathSeparators()
+        {
+            return new[] {'.', ':'};
+        }
+
         public static string RestOfPath(string path, out string firstElement)
         {
-            var pathElements = path.Split('.').ToList();
+            var pathElements = path.Split(PathSeparators(), StringSplitOptions.RemoveEmptyEntries).ToList();
 
             if (pathElements.Count <= 0)
             {
@@ -251,9 +261,18 @@ namespace UaclClient
 
             firstElement = pathElements[0];
 
-            return pathElements.Count == 1
-                ? ""
-                : path.Substring(path.IndexOf('.') + 1, path.Length - pathElements[0].Length - 1);
+            if (pathElements.Count == 1) return "";
+
+            var splitPosition = path.Length-1;
+            foreach (var sep in PathSeparators())
+            {
+                if (path.Contains(sep))
+                {
+                    splitPosition = Math.Min(path.IndexOf(sep), splitPosition);
+                }
+            }
+
+            return path.Substring(splitPosition + 1, path.Length - pathElements[0].Length - 1);
         }
 
         public void MonitorDataChange<T>(RemoteDataMonitor<T> monitor, RemoteObject remoteObject)

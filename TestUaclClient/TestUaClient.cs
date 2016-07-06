@@ -68,7 +68,7 @@ namespace TestUaclClient
         {
             var obj = new RemoteObject("localhost", 48030, "ServerConsole.BusinessLogic");
             obj.Monitor(
-                "BoState", 
+                "BoState",
                 (string v) => { Logger.Info($"Received value from {obj.Name}.BoState ... '{v}'."); });
         }
 
@@ -96,6 +96,41 @@ namespace TestUaclClient
 
             restOfPath = RemoteHelper.RestOfPath(restOfPath, out firstElement);
             Assert.IsTrue(firstElement == "JobStates");
+            Assert.IsTrue(restOfPath == "");
+        }
+
+        [Test]
+        public void AdvancedPathSplitting()
+        {
+            const string path = "PLC.Modules.<Default>.OPCua_Axis:opc_Axis.StatusX.Homing";
+
+            string firstElement;
+            var restOfPath = RemoteHelper.RestOfPath(path, out firstElement);
+            Assert.IsTrue(firstElement == "PLC");
+            Assert.IsTrue(restOfPath == "Modules.<Default>.OPCua_Axis:opc_Axis.StatusX.Homing");
+
+            restOfPath = RemoteHelper.RestOfPath(restOfPath, out firstElement);
+            Assert.IsTrue(firstElement == "Modules");
+            Assert.IsTrue(restOfPath == "<Default>.OPCua_Axis:opc_Axis.StatusX.Homing");
+
+            restOfPath = RemoteHelper.RestOfPath(restOfPath, out firstElement);
+            Assert.IsTrue(firstElement == "<Default>");
+            Assert.IsTrue(restOfPath == "OPCua_Axis:opc_Axis.StatusX.Homing");
+
+            restOfPath = RemoteHelper.RestOfPath(restOfPath, out firstElement);
+            Assert.IsTrue(firstElement == "OPCua_Axis");
+            Assert.IsTrue(restOfPath == "opc_Axis.StatusX.Homing");
+
+            restOfPath = RemoteHelper.RestOfPath(restOfPath, out firstElement);
+            Assert.IsTrue(firstElement == "opc_Axis");
+            Assert.IsTrue(restOfPath == "StatusX.Homing");
+
+            restOfPath = RemoteHelper.RestOfPath(restOfPath, out firstElement);
+            Assert.IsTrue(firstElement == "StatusX");
+            Assert.IsTrue(restOfPath == "Homing");
+
+            restOfPath = RemoteHelper.RestOfPath(restOfPath, out firstElement);
+            Assert.IsTrue(firstElement == "Homing");
             Assert.IsTrue(restOfPath == "");
         }
     }
