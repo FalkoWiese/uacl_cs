@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Dynamic;
 using System.Text;
 using System.Threading.Tasks;
 using UaclServer;
@@ -8,7 +9,7 @@ using UaclUtils;
 namespace ServerConsole
 {
     [UaObject]
-    public class BoProxy
+    public class BoProxy : LocalProxy
     {
         public BoProxy()
         {
