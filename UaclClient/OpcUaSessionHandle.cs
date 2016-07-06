@@ -69,19 +69,25 @@ namespace UaclClient
         {
             try
             {
-                ClientSubscription().DeleteMonitoredItems(MonitoredItems);
-                ClientSubscription().Delete(new RequestSettings { OperationTimeout = 5000 });
-                _clientSubscription = null;
-                if (Session.ConnectionStatus == ServerConnectionStatus.Connected)
+                if (MonitoredItems.Count > 0)
                 {
-                    Session.Disconnect();
+                    ClientSubscription().DeleteMonitoredItems(MonitoredItems);
                 }
-                Session.Dispose();
-                Session = null;
+                ClientSubscription().Delete(new RequestSettings {OperationTimeout = 5000});
+                _clientSubscription = null;
             }
             catch (Exception e)
             {
                 ExceptionHandler.Log(e, "Error while session is disposing.");
+            }
+            finally 
+            {
+                if (Session != null)
+                {
+                    Session.Disconnect();
+                    Session.Dispose();
+                    Session = null;
+                }
             }
         }
     }
