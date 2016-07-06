@@ -14,13 +14,13 @@ namespace ServerConsole
 		    {
                 ConnectionInfo connection = new ConnectionInfo("localhost", 48030, "ServerConsole");
 
-                var bo = new BusinessLogic(connection);
+                var bo = new BusinessLogic();
 		        bo.CalculateJob("", 2);
 		        server = new InternalServer(connection.Ip, connection.Port, connection.Application);
                 server.RegisterObject(bo);
 
                 var bo1 = new BoProxy();
-                bo1.Items.Add(new BusinessLogic(connection));
+                bo1.Items.Add(new BusinessLogic());
                 server.RegisterObject(bo1);
 
                 server.Start();

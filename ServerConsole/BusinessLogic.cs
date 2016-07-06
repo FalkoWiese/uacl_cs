@@ -1,4 +1,6 @@
 ﻿using System;
+using System.Linq;
+using System.Reflection;
 using UaclClient;
 using UaclServer;
 using UaclUtils;
@@ -8,10 +10,7 @@ namespace ServerConsole
     [UaObject]
     public class BusinessLogic : LocalProxy
     {
-        public BusinessLogic()
-        { }
-
-        public BusinessLogic(ConnectionInfo info) : base(typeof(BusinessLogic).Name)
+        public BusinessLogic() : base(typeof(BusinessLogic).Name)
         { }
 
         private enum JobState
