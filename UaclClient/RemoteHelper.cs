@@ -78,9 +78,11 @@ namespace UaclClient
 
         public NodeId BrowseNodeId(NodeId parentNode, string name)
         {
-            return name.Contains('.')
-                ? BrowseNodeIdByPath(null, name)
-                : BrowseNodeIdByName(null, name);
+            if (parentNode == null) return BrowseNodeIdByName(null, name);
+
+            return ContainsSeparator(name)
+                ? BrowseNodeIdByPath(parentNode, name)
+                : BrowseNodeIdByName(parentNode, name);
         }
 
         public NodeId BrowseNodeIdByPath(NodeId parentNode, string path)
