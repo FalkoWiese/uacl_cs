@@ -81,13 +81,13 @@ namespace UaclClient
             return PathSeparators().Any(name.Contains);
         }
 
-        public NodeId BrowseNodeId(NodeId parentNode, string name)
+        public NodeId BrowseNodeId(NodeId parentNode, string name, bool recursive = true)
         {
             if (parentNode == null) return BrowseNodeIdByName(null, name);
 
             return ContainsSeparator(name)
                 ? BrowseNodeIdByPath(parentNode, name)
-                : BrowseNodeIdByName(parentNode, name);
+                : BrowseNodeIdByName(parentNode, name, recursive);
         }
 
         public NodeId BrowseNodeIdByPath(NodeId parentNode, string path)
@@ -171,7 +171,7 @@ namespace UaclClient
             var result = _session.Call(
                 _parentNode,
 //                CreateNodeIdByName(_parentNode, methodName),
-                BrowseNodeId(_parentNode, methodName),
+                BrowseNodeId(_parentNode, methodName, false),
                 remoteMethod.InputArguments,
                 out inputArgumentErrors,
                 out outputArguments);
