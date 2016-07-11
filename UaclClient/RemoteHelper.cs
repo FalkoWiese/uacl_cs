@@ -293,7 +293,7 @@ namespace UaclClient
             remoteObject.SessionHandle.ClientSubscription().CreateMonitoredItems(monitoredItems,
                 new RequestSettings {OperationTimeout = 10000});
             remoteObject.SessionHandle.SetDataChangeHandler(
-                (Subscription ss, DataChangedEventArgs args) =>
+                (ss, args) =>
                 {
                     Logger.Info("Received DATA CHANGE ...");
                     foreach (var dataChange in args.DataChanges)
