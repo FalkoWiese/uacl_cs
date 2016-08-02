@@ -50,7 +50,7 @@ namespace UaclServer
             return _sessionContext ?? (_sessionContext = new Dictionary<Session, object>());
         }
 
-        public bool RegisterObject(object modelObject)
+        public bool RegisterObject(object modelObject, object parentObject=null)
 	    {
             try
             {

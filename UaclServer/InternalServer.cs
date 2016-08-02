@@ -91,9 +91,9 @@ namespace UaclServer
 
         private InternalServerManager Manager { get; set; }
 
-        public bool RegisterObject(object modelObject)
+        public bool RegisterObject(object modelObject, object parentObject=null)
         {
-            return Manager != null && Manager.RegisterObject(modelObject);
+            return Manager?.RegisterObject(modelObject, parentObject) ?? false;
         }
 
         public void SetConnectCallback(Func<object, object, object> callback, object handlerContext)
