@@ -8,7 +8,7 @@ using UaclUtils;
 namespace ServerConsole
 {
     [UaObject]
-    public class BusinessLogic : LocalProxy
+    public class BusinessLogic : ServerSideUaProxy
     {
         public BusinessLogic() : base(typeof(BusinessLogic).Name)
         { }

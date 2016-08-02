@@ -8,11 +8,11 @@ using UaclUtils;
 
 namespace UaclServer
 {
-    public class LocalProxy
+    public class ServerSideUaProxy
     {
-        public LocalProxy() { }
+        protected ServerSideUaProxy() { }
 
-        public LocalProxy(string path)
+        protected ServerSideUaProxy(string path)
         {
             Path = path;
         }
@@ -20,6 +20,11 @@ namespace UaclServer
         protected void Call<T>(string propertyName, T value)
         {
             GlobalNotifier.FireLdcEvent(Path, propertyName, value);
+        }
+
+        public void AddUaNode(ICollection<object> uaObjects, object uaItem)
+        {
+            uaObjects.Add(uaItem);
         }
 
         private string Path { get; set; }

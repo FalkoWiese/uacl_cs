@@ -9,7 +9,7 @@ using UaclUtils;
 namespace ServerConsole
 {
     [UaObject]
-    public class BoProxy : LocalProxy
+    public class BoProxy : ServerSideUaProxy
     {
         public BoProxy()
         {

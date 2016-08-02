@@ -48,7 +48,7 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="GlobalNotifier.cs" />
-    <Compile Include="LocalProxy.cs" />
+    <Compile Include="ServerSideUaProxy.cs" />
     <Compile Include="UaclInsertState.cs" />
     <Compile Include="InternalNodeManager.cs" />
     <Compile Include="InternalServerManager.cs" />
