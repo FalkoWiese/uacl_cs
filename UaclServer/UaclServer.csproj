@@ -60,6 +60,7 @@
       <DesignTime>True</DesignTime>
       <DependentUpon>Resources.resx</DependentUpon>
     </Compile>
+    <Compile Include="UaFactory.cs" />
     <Compile Include="UaMethod.cs" />
     <Compile Include="UaObject.cs" />
     <Compile Include="UaObjectList.cs" />

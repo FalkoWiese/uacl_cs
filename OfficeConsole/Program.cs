@@ -12,9 +12,12 @@ namespace OfficeConsole
             try
             {
                 server = new OfficeConsoleServer();
-                server.RegisterObject(new BusinessLogic());
-                server.RegisterObject(new RemoteBusinessLogic());
-                server.RegisterObject(new RemoteBoProxy());
+                var factory = new UaFactory(server);
+
+                factory.CreateUaObject<BusinessLogic>();
+                factory.CreateUaObject<RemoteBusinessLogic>();
+                factory.CreateUaObject<RemoteBoProxy>();
+
                 server.Start();
 
                 while (true)

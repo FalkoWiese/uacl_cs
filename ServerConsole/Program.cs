@@ -15,17 +15,15 @@ namespace ServerConsole
                 ConnectionInfo connection = new ConnectionInfo("localhost", 48030, "ServerConsole");
                 server = new InternalServer(connection.Ip, connection.Port, connection.Application);
 
-                var bo = new BusinessLogic();
-		        bo.CalculateJob("", 2);
-                server.RegisterObject(bo);
-
-//                var bo1 = new BoProxy();
-//                bo1.Items.Add(new BusinessLogic());
-//                server.RegisterObject(bo1);
+                UaFactory factory = new UaFactory(server);
+                var bo = factory.CreateUaObject<BusinessLogic>();
+                var bo1 = factory.CreateUaObject<BoProxy>();
+                var bo2 = factory.CreateUaObject<BusinessLogic>(bo1);
 
                 server.Start();
 
-		        var count = 0;
+                bo.CalculateJob("", 2);
+                var count = 0;
 		        while (true)
 		        {
 		            bo.ChangeState($"{count++}");
