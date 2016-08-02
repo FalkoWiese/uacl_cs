@@ -10,7 +10,7 @@ namespace ServerConsole
     [UaObject]
     public class BusinessLogic : ServerSideUaProxy
     {
-        public BusinessLogic() : base(typeof(BusinessLogic).Name)
+        public BusinessLogic()
         { }
 
         private enum JobState

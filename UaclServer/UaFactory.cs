@@ -33,10 +33,18 @@ namespace UaclServer
 
             if (uaObjectList != null)
             {
-                Type pot = parentObject.GetType();
-                MethodInfo addUaNode = pot.GetMethod("AddUaNode");
-                addUaNode.Invoke(parentObject, new[] { uaObjectList.GetValue(parentObject), uaObject });
-                Logger.Info($"Added {uaObject} to {parentObject}.{uaObjectList.Name}");
+                var pot = parentObject.GetType();
+                var addUaNode = pot.GetMethod("AddUaNode");
+                if (addUaNode != null)
+                {
+                    addUaNode.Invoke(parentObject, new[] { uaObjectList.GetValue(parentObject), uaObject });
+                    Logger.Info($"Added {uaObject} to {parentObject}.{uaObjectList.Name}");
+
+                }
+                else
+                {
+                    Logger.Warn($"Cannot add {uaObject} automatically to {parentObject}. Your business classes have to inherit from {typeof(ServerSideUaProxy).Name}!");
+                }
             }
             else
             {

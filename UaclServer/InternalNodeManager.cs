@@ -25,13 +25,9 @@ namespace UaclServer
             InstanceNamespaceIndex = AddNamespaceUri($"{CompanyUri}/{ApplicationUri}/instances");
             TypeNamespaceIndex = AddNamespaceUri($"{CompanyUri}/{ApplicationUri}/types");
             _counter = 0;
-            PathIdMap = new Dictionary<string, NodeId>();
-            GlobalNotifier.LocalDataChangeEvent += (string path, string variableName, object value) =>
+            GlobalNotifier.LocalDataChangeEvent += (nodeId, variableName, value) =>
             {
-                Logger.Trace($"LocalDataChangeEvent fired for varible {path}={value}");
-                var fullPath = $"{path}.{variableName}";
-                if (!PathIdMap.ContainsKey(fullPath)) return;
-                var nodeId = PathIdMap[fullPath];
+                Logger.Trace($"LocalDataChangeEvent fired for varible {nodeId}={value}");
                 server.InternalClient.WriteAttribute(server.DefaultRequestContext, nodeId, 13, TypeMapping.Instance.ToVariant(value));
             };
         }
@@ -161,8 +157,6 @@ namespace UaclServer
             Logger.Info($"Created method ... {methodNode.NodeId.Identifier}.");
         }
 
-        private Dictionary<string, NodeId> PathIdMap { get; set; } 
-
         private void AddVariable(object businessObject, PropertyInfo property, ObjectNode parentNode)
         {
             var uaVariableAttribute = property.GetCustomAttribute<UaVariable>();
@@ -170,7 +164,6 @@ namespace UaclServer
             var variableName = uaVariableAttribute.Name ?? property.Name;
 
             var requestedNodeId = new NodeId($"{parentNode.NodeId.Identifier}.{variableName}", InstanceNamespaceIndex);
-            PathIdMap[$"{parentNode.DisplayName}.{variableName}"] = requestedNodeId;
             var variableNode = CreateVariable(Server.DefaultRequestContext,
                 new CreateVariableSettings()
                 {
@@ -183,6 +176,13 @@ namespace UaclServer
                     TypeDefinitionId = VariableTypeIds.BaseVariableType,
                     Value = new Variant("None"),
                 });
+
+            var bo = businessObject as ServerSideUaProxy;
+            if (bo != null)
+            {
+                bo.UniqueId[variableName] = requestedNodeId;
+            }
+
             variableNode.UserData = new VariableNodeData {BusinessObject = businessObject, Property = property};
 
             Logger.Info($"Created variable ... {variableNode.NodeId.Identifier}.");
