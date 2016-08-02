@@ -84,7 +84,10 @@ namespace UaclClient
             {
                 if (Session != null)
                 {
-                    Session.Disconnect();
+                    if (Session.ConnectionStatus == ServerConnectionStatus.Connected)
+                    {
+                        Session.Disconnect();
+                    }
                     Session.Dispose();
                     Session = null;
                 }

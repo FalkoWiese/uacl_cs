@@ -29,10 +29,76 @@ namespace UaclClient
         {
             if (really)
             {
-                if (SessionHandle.Session.ConnectionStatus == ServerConnectionStatus.Connected)
+                SessionHandle.Dispose();
+            }
+        }
+
+        public bool Connected()
+        {
+            lock (SessionLock)
+            {
+                return SessionHandle.Session.ConnectionStatus == ServerConnectionStatus.Connected;
+            }
+        }
+
+        public bool Connect()
+        {
+            if (Connected())
+            {
+                return true;
+            }
+
+            lock (SessionLock)
+            {
+                if (SessionHandle.Timeout)
                 {
-                    SessionHandle.Dispose();
+                    return false;
                 }
+
+                var session = SessionHandle.Session;
+                var stopWatch = Stopwatch.StartNew();
+
+                do
+                {
+                    try
+                    {
+                        Logger.Info($"Try to connect to:{session.SessionUri.Uri.AbsoluteUri}");
+                        session.Connect(session.SessionUri.Uri.AbsoluteUri, SecuritySelection.None);
+                        Logger.Info($"Connection to {session.SessionUri.Uri.AbsoluteUri} established.");
+                    }
+                    catch (Exception e)
+                    {
+                        ExceptionHandler.Log(e,
+                            $"An error occurred while try to connect to server: {session.SessionUri.Uri.AbsoluteUri}.");
+                    }
+
+                    stopWatch.Stop();
+                    if (stopWatch.Elapsed.Seconds > 5)
+                    {
+                        break;
+                    }
+
+                    stopWatch.Start();
+
+                } while (session.NotConnected());
+
+                if (session.NotConnected())
+                {
+                    SessionHandle.Timeout = true;
+                    return false;
+                }
+            }
+
+            return false;
+        }
+
+        public void Disconnect()
+        {
+            if (!Connected()) return;
+
+            lock (SessionLock)
+            {
+                SessionHandle.Session.Disconnect();
             }
         }
 
@@ -144,58 +210,19 @@ namespace UaclClient
 
         public Variant Execute(Func<Variant> action)
         {
-            lock (SessionLock)
+            if (!Connected())
             {
-                if (SessionHandle.Timeout)
-                {
-                    return Variant.Null;
-                }
+                throw new Exception("Cannot execute given client action, due to an unavailable connection!");
+            }
 
-                var session = SessionHandle.Session;
-                if (SessionHandle.Session.ConnectionStatus != ServerConnectionStatus.Connected)
-                {
-                    var stopWatch = Stopwatch.StartNew();
-
-                    do
-                    {
-                        try
-                        {
-                            Logger.Info($"Try to connect to:{session.SessionUri.Uri.AbsoluteUri}");
-                            session.Connect(session.SessionUri.Uri.AbsoluteUri, SecuritySelection.None);
-                            Logger.Info($"Connection to {session.SessionUri.Uri.AbsoluteUri} established.");
-                        }
-                        catch (Exception e)
-                        {
-                            ExceptionHandler.Log(e,
-                                $"An error occurred while try to connect to server: {session.SessionUri.Uri.AbsoluteUri}.");
-                        }
-
-                        stopWatch.Stop();
-                        if (stopWatch.Elapsed.Seconds > 5)
-                        {
-                            break;
-                        }
-
-                        stopWatch.Start();
-
-                    } while (session.NotConnected());
-
-                    if (session.NotConnected())
-                    {
-                        SessionHandle.Timeout = true;
-                        return Variant.Null;
-                    }
-                }
-
-                try
-                {
-                    return action();
-                }
-                catch (Exception e)
-                {
-                    ExceptionHandler.Log(e, $"Error while invoke something on '{Name}'.");
-                    throw;
-                }
+            try
+            {
+                return action();
+            }
+            catch (Exception e)
+            {
+                ExceptionHandler.Log(e, $"Error while invoke something on '{Name}'.");
+                throw;
             }
         }
 
