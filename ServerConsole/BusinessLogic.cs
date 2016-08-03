@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Linq;
 using System.Reflection;
+using System.Threading;
 using UaclClient;
 using UaclServer;
 using UaclUtils;
@@ -10,8 +11,11 @@ namespace ServerConsole
     [UaObject]
     public class BusinessLogic : ServerSideUaProxy
     {
+        private Thread WorkerThread { get; set; }
+
         public BusinessLogic()
-        { }
+        {
+        }
 
         private enum JobState
         {
@@ -20,6 +24,36 @@ namespace ServerConsole
             Running = 2,
             Finished = 3,
             Error = 4,
+        }
+
+        [UaMethod]
+        public void ToggleValueChangeThread()
+        {
+            if (WorkerThread == null)
+            {
+                WorkerThread = new Thread(() =>
+                {
+                    try
+                    {
+                        int count = 0;
+                        while (true)
+                        {
+                            ChangeState($"{count++}");
+                            Thread.Sleep(100);
+                        }
+                    }
+                    catch (Exception e)
+                    {
+                        Console.WriteLine(e);
+                    }
+                });
+                WorkerThread.Start();
+            }
+            else
+            {
+                WorkerThread.Interrupt();
+                WorkerThread = null;
+            }
         }
 
         [UaclInsertState]
@@ -38,16 +72,16 @@ namespace ServerConsole
 
             switch (state)
             {
-                case (int)JobState.None:
+                case (int) JobState.None:
                     BoState = $"Job {name} not exists!";
                     break;
-                case (int)JobState.Initialized:
+                case (int) JobState.Initialized:
                     BoState = $"Job {name} is Initialized!";
                     break;
-                case (int)JobState.Running:
+                case (int) JobState.Running:
                     BoState = $"Job {name} is Running!";
                     break;
-                case (int)JobState.Finished:
+                case (int) JobState.Finished:
                     BoState = $"Job {name} is Finished!";
                     break;
                 default:
