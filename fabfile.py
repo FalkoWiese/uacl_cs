@@ -44,6 +44,11 @@ def start_sc():
 
 
 @task
+def start_oc():
+    local("tools\start_application.bat OfficeConsole")
+
+
+@task
 def stop():
     local("tools\stop.bat")
 
@@ -81,9 +86,12 @@ def clean():
 @task
 def test():
     start_sc()
-    for t in test_projects:
-        path_to_test_lib = os.path.join('.', t, 'bin', 'Debug')
-        test_impl(path_to_dll=os.path.join(path_to_test_lib, t))
+    try:
+        for t in test_projects:
+            path_to_test_lib = os.path.join('.', t, 'bin', 'Debug')
+            test_impl(path_to_dll=os.path.join(path_to_test_lib, t))
+    except:
+        pass
     stop()
 
 
