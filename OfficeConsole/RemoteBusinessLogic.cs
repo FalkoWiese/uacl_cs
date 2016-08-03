@@ -9,6 +9,7 @@ namespace OfficeConsole
     {
         private RemoteBusinessLogic(string ip, int port, string name) : base(ip, port, name)
         {
+            Connect();
             Monitor<string>("BoState", (string v) => { Logger.Info($"Received value from {Name}.BoState ... '{v}'."); });
         }
 
@@ -19,18 +20,21 @@ namespace OfficeConsole
         [UaMethod]
         public bool CalculateJob(string name, int state)
         {
+            Connect();
             return Invoke<bool>("CalculateJob", name, state);
         }
 
         [UaMethod]
         public string ReadState()
         {
+            Connect();
             return Read<string>("BoState");
         }
 
         [UaMethod]
         public void WriteState(string jobState)
         {
+            Connect();
             Write("BoState", jobState);
         }
     }
