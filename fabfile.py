@@ -21,7 +21,7 @@ nuget_path = r'C:\Program Files (x86)\NuGet'
 
 # project path settings
 impl_projects = ['ServerConsole', 'OfficeConsole', 'UaclServer', 'UaclClient', 'UaclUtils']
-test_projects = ['Test{p}'.format(p=p) for p in impl_projects]
+test_projects = ['TestServerConsole', 'TestOfficeConsole', 'TestUaclClient', 'TestUaclUtils']
 projects = impl_projects + test_projects
 solution = "ServerConsole"
 
@@ -36,6 +36,11 @@ def restart():
 @task
 def start():
     local("tools\start.bat")
+
+
+@task
+def start_sc():
+    local("tools\start_application.bat ServerConsole")
 
 
 @task
@@ -75,9 +80,11 @@ def clean():
 
 @task
 def test():
+    start_sc()
     for t in test_projects:
         path_to_test_lib = os.path.join('.', t, 'bin', 'Debug')
         test_impl(path_to_dll=os.path.join(path_to_test_lib, t))
+    stop()
 
 
 def test_impl(path_to_dll):
