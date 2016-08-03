@@ -22,24 +22,23 @@ namespace UaclServer
             var c = t.GetConstructor(new Type[] {});
             var uaObject = (T) c?.Invoke(null);
 
-            UaServer.RegisterObject(uaObject, parentObject);
-
-            if (parentObject == null) return uaObject;
-
-            var uaObjectList = (from pi in parentObject.GetType().GetProperties()
-                let uaolAttribute = pi.GetCustomAttribute<UaObjectList>()
-                where uaolAttribute != null
-                select pi).FirstOrDefault();
+            PropertyInfo uaObjectList = null;
+            if (parentObject != null)
+            {
+                uaObjectList = (from pi in parentObject.GetType().GetProperties()
+                                let uaolAttribute = pi.GetCustomAttribute<UaObjectList>()
+                                where uaolAttribute != null
+                                select pi).FirstOrDefault();
+            }
 
             if (uaObjectList != null)
             {
-                var pot = parentObject.GetType();
-                var addUaNode = pot.GetMethod("AddUaNode");
+                var pot = parentObject?.GetType();
+                var addUaNode = pot?.GetMethod("AddUaNode");
                 if (addUaNode != null)
                 {
                     addUaNode.Invoke(parentObject, new[] { uaObjectList.GetValue(parentObject), uaObject });
                     Logger.Info($"Added {uaObject} to {parentObject}.{uaObjectList.Name}");
-
                 }
                 else
                 {
@@ -48,6 +47,7 @@ namespace UaclServer
             }
             else
             {
+                UaServer.RegisterObject(uaObject);
                 Logger.Warn($"The parentObject for {uaObject} is not NULL, but cannot find a property on it what is annotated with <UaObjectList>!");
             }
 
