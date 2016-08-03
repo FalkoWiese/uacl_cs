@@ -73,7 +73,7 @@ namespace UaclClient
                 {
                     ClientSubscription().DeleteMonitoredItems(MonitoredItems);
                 }
-                ClientSubscription().Delete(new RequestSettings {OperationTimeout = 5000});
+                ClientSubscription().Delete(new RequestSettings { OperationTimeout = 5000 });
                 _clientSubscription = null;
             }
             catch (Exception e)
