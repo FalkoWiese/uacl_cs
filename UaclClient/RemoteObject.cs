@@ -25,7 +25,7 @@ namespace UaclClient
             GC.SuppressFinalize(this);
         }
 
-        protected virtual void Dispose(bool really)
+        private void Dispose(bool really)
         {
             if (really)
             {
