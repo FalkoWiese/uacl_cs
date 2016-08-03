@@ -26,7 +26,7 @@ namespace UaclClient
             Callback(ConvertedValue);
         }
 
-        public void Announce(RemoteObject remoteObject)
+        public void Monitor(RemoteObject remoteObject)
         {
             remoteObject.Execute(() =>
             {

@@ -82,9 +82,15 @@ namespace TestUaclClient
             {
                 Assert.That(() => obj.Connect(), "Is TRUE!");
 
+                obj.Invoke("ToggleValueChangeThread");
+
+                Thread.Sleep(1000);
+
                 obj.Monitor(
                     "BoState",
                     (string v) => { Logger.Info($"Received value from {obj.Name}.BoState ... '{v}'."); });
+
+                obj.Invoke("ToggleValueChangeThread");
             }
         }
 

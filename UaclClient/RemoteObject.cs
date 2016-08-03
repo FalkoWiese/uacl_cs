@@ -119,7 +119,7 @@ namespace UaclClient
                     Callback = action
                 };
 
-                monitor.Announce(this);
+                monitor.Monitor(this);
             }
             catch (Exception e)
             {
@@ -127,7 +127,7 @@ namespace UaclClient
             }
         }
 
-        protected void Invoke(string name, params object[] parameters)
+        public void Invoke(string name, params object[] parameters)
         {
             var method = new RemoteMethod
             {
