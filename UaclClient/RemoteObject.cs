@@ -89,7 +89,7 @@ namespace UaclClient
                 }
             }
 
-            return false;
+            return Connected();
         }
 
         public void Disconnect()
@@ -215,14 +215,17 @@ namespace UaclClient
                 throw new Exception("Cannot execute given client action, due to an unavailable connection!");
             }
 
-            try
+            lock (SessionLock)
             {
-                return action();
-            }
-            catch (Exception e)
-            {
-                ExceptionHandler.Log(e, $"Error while invoke something on '{Name}'.");
-                throw;
+                try
+                {
+                    return action();
+                }
+                catch (Exception e)
+                {
+                    ExceptionHandler.Log(e, $"Error while invoke something on '{Name}'.");
+                    throw;
+                }
             }
         }
 
