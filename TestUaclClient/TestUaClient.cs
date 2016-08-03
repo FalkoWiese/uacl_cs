@@ -13,48 +13,60 @@ namespace TestUaclClient
         [Test]
         public void InvokeViaRemoteMethod()
         {
-            RemoteObject obj = new RemoteObject("localhost", 48030, "ServerConsole.BusinessLogic");
+            using (RemoteObject obj = new RemoteObject("localhost", 48030, "BusinessLogic"))
+            {
+                Assert.That(() => obj.Connect(), "Is TRUE!");
 
-            var r1 = obj.Invoke<bool>("CalculateJob", (string) "BIG JOB", (int) 2);
-            Assert.That(() => r1, $"Return value is {true}");
+                var r1 = obj.Invoke<bool>("CalculateJob", (string) "BIG JOB", (int) 2);
+                Assert.That(() => r1, $"Return value is {true}");
 
-            var r2 = obj.Invoke<bool>("CalculateJob", (string) "small job", (int) -1);
-            Assert.That(() => !r2, $"Return value is {false}");
+                var r2 = obj.Invoke<bool>("CalculateJob", (string) "small job", (int) -1);
+                Assert.That(() => !r2, $"Return value is {false}");
 
-            var r3 = obj.Invoke<bool>("CalculateJob", (string) "small job", (int) -1);
-            Assert.That(() => !r2, $"Return value is {false}");
+                var r3 = obj.Invoke<bool>("CalculateJob", (string) "small job", (int) -1);
+                Assert.That(() => !r2, $"Return value is {false}");
+            }
         }
 
         [Test]
         public void InvokeGetBytes()
         {
-            RemoteObject obj = new RemoteObject("localhost", 48030, "ServerConsole.BoProxy");
-            string value = "Falko und Anke Wiese";
-            var bytes = obj.Invoke<byte[]>("GetBytes", value);
-            Assert.NotNull(bytes);
+            using (RemoteObject obj = new RemoteObject("localhost", 48030, "BusinessLogic"))
+            {
+                Assert.That(() => obj.Connect(), "Is TRUE!");
+
+                string value = "Falko und Anke Wiese";
+                var bytes = obj.Invoke<byte[]>("GetBytes", value);
+                Assert.NotNull(bytes);
+            }
         }
 
         [Test]
         public void WriteAndReadVariable()
         {
-            RemoteObject obj = new RemoteObject("localhost", 48030, "ServerConsole.BusinessLogic");
+            using (RemoteObject obj = new RemoteObject("localhost", 48030, "BusinessLogic"))
+            {
+                Assert.That(() => obj.Connect(), "Is TRUE!");
 
-            var s0 = obj.Read<string>("BoState");
-            var s1 = "THE NEW JOB STATE!";
-            Assert.That(() => s0 != s1, $"'{s0}' != '{s1}'");
+                var s0 = obj.Read<string>("BoState");
+                var s1 = "THE NEW JOB STATE!";
+                Assert.That(() => s0 != s1, $"'{s0}' != '{s1}'");
 
-            obj.Write("BoState", s1);
-            var s2 = obj.Read<string>("BoState");
-            Assert.That(() => s1 == s2, $"'{s1}' == '{s2}'");
+                obj.Write("BoState", s1);
+                var s2 = obj.Read<string>("BoState");
+                Assert.That(() => s1 == s2, $"'{s1}' == '{s2}'");
 
-            obj.Write("BoState", s0);
+                obj.Write("BoState", s0);
+            }
         }
 
         [Test]
         public void CallMethodSometimes()
         {
-            using (var obj = new RemoteObject("localhost", 48030, "ServerConsole.BusinessLogic"))
+            using (var obj = new RemoteObject("localhost", 48030, "BusinessLogic"))
             {
+                Assert.That(() => obj.Connect(), "Is TRUE!");
+
                 for (int i = 0; i < 50; i++)
                 {
                     var value = obj.Invoke<string>("JobStates");
@@ -66,18 +78,26 @@ namespace TestUaclClient
         [Test]
         public void AddMonitoredItem()
         {
-            var obj = new RemoteObject("localhost", 48030, "ServerConsole.BusinessLogic");
-            obj.Monitor(
-                "BoState",
-                (string v) => { Logger.Info($"Received value from {obj.Name}.BoState ... '{v}'."); });
+            using (RemoteObject obj = new RemoteObject("localhost", 48030, "BusinessLogic"))
+            {
+                Assert.That(() => obj.Connect(), "Is TRUE!");
+
+                obj.Monitor(
+                    "BoState",
+                    (string v) => { Logger.Info($"Received value from {obj.Name}.BoState ... '{v}'."); });
+            }
         }
 
         [Test]
-        public void BrowseServerTree()
+        public void InvokeJobStates()
         {
-            RemoteObject obj = new RemoteObject("localhost", 48030, "ServerConsole.BusinessLogic");
-            var value = obj.Invoke<string>("JobStates");
-            Assert.IsFalse(string.IsNullOrEmpty(value));
+            using (RemoteObject obj = new RemoteObject("localhost", 48030, "BusinessLogic"))
+            {
+                Assert.That(() => obj.Connect(), "Is TRUE!");
+
+                var value = obj.Invoke<string>("JobStates");
+                Assert.IsFalse(string.IsNullOrEmpty(value));
+            }
         }
 
         [Test]
