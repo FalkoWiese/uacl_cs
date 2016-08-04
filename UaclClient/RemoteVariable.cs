@@ -25,14 +25,5 @@ namespace UaclClient
                 return invoker.WriteVariable(this);
             });
         }
-
-        public void Monitor(RemoteObject remoteObject)
-        {
-            remoteObject.Execute(() =>
-            {
-                var invoker = new RemoteHelper(remoteObject);
-                return invoker.WriteVariable(this);
-            });
-        }
     }
 }
