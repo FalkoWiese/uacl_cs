@@ -34,6 +34,7 @@ namespace UaclClient
                 s.Create(new RequestSettings {OperationTimeout = 10000});
 
                 DataChangeHandlerAvailable = false;
+                EventHandlerAvailable = false;
 
                 return s;
             }
@@ -45,6 +46,13 @@ namespace UaclClient
             return null;
         }
 
+        public void SetEventHandler(NewEventsEventHandler eventHandler)
+        {
+            if (EventHandlerAvailable) return;
+            ClientSubscription().NewEvents += eventHandler;
+            EventHandlerAvailable = true;
+        }
+
         public void SetDataChangeHandler(DataChangedEventHandler eventHandler)
         {
             if (DataChangeHandlerAvailable) return;
@@ -53,6 +61,7 @@ namespace UaclClient
         }
 
         private bool DataChangeHandlerAvailable { get; set; }
+        private bool EventHandlerAvailable { get; set; }
 
         public Subscription ClientSubscription()
         {

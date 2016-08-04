@@ -1,11 +1,6 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using UaclUtils;
 using UnifiedAutomation.UaBase;
-using UnifiedAutomation.UaClient;
 
 namespace UaclClient
 {
@@ -15,14 +10,14 @@ namespace UaclClient
 
         public Variant Value { get; set; }
 
-        public T ConvertedValue { get; set; }
+        private T ConvertedValue { get; set; }
 
-        public Action<T> Callback { get; set; }
+        public Action<T> Callback { private get; set; }
 
         public void DataChange(Variant value)
         {
             Value = value;
-            ConvertedValue = (T) TypeMapping.Instance.ToObject(value);
+            ConvertedValue = (T) TypeMapping.Instance.ToObject(Value);
             Callback(ConvertedValue);
         }
 

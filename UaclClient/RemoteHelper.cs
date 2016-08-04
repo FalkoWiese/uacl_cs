@@ -279,6 +279,33 @@ namespace UaclClient
             return path.Substring(splitPosition + 1, path.Length - pathElements[0].Length - 1);
         }
 
+        public void SubscribeEvent(RemoteEventSubscription subscription, RemoteObject remoteObject)
+        {
+            var monitoredItems = new List<MonitoredItem>
+            {
+                new DataMonitoredItem(BrowseNodeId(_parentNode, subscription.Name))
+                {
+                    UserData = subscription,
+                    DataChangeTrigger = DataChangeTrigger.StatusValue,
+                }
+            };
+
+            remoteObject.SessionHandle.ClientSubscription().CreateMonitoredItems(monitoredItems,
+                new RequestSettings { OperationTimeout = 10000 });
+            remoteObject.SessionHandle.SetEventHandler(
+                (ss, eventArgs) =>
+                {
+                    Logger.Info("Received NEW EVENT ...");
+                    foreach (var newEvent in eventArgs.Events)
+                    {
+                        var remoteDataMonitor = (RemoteEventSubscription) newEvent.MonitoredItem.UserData;
+                        remoteDataMonitor?.FireEvent(newEvent.Event.EventFields.ToList());
+                    }
+                });
+
+            remoteObject.SessionHandle.MonitoredItems.AddRange(monitoredItems);
+        }
+
         public void MonitorDataChange<T>(RemoteDataMonitor<T> monitor, RemoteObject remoteObject)
         {
             var monitoredItems = new List<MonitoredItem>
@@ -302,11 +329,6 @@ namespace UaclClient
                         remoteDataMonitor?.DataChange(dataChange.Value.WrappedValue);
                     }
                 });
-
-//            remoteObject.SessionHandle.ClientSubscription().NewEvents += (Subscription ss, NewEventsEventArgs a) =>
-//            {
-//                Logger.Info("Received NEW EVENT ...");
-//            };
 
             remoteObject.SessionHandle.MonitoredItems.AddRange(monitoredItems);
         }
