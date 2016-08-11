@@ -1,6 +1,9 @@
-﻿using UaclClient;
+﻿using System.Collections.Generic;
+using System.Runtime.InteropServices;
+using UaclClient;
 using UaclServer;
 using UaclUtils;
+using UnifiedAutomation.UaBase;
 
 namespace OfficeConsole
 {
@@ -15,6 +18,19 @@ namespace OfficeConsole
 
         public RemoteBusinessLogic() : this("localhost", 48030, "BusinessLogic")
         {
+        }
+
+        [UaMethod]
+        public void FireSimpleEvent()
+        {
+            Connect();
+            Subscribe("FireSimpleEvent",
+                (result) =>
+                {
+                    Logger.Trace($"{result}");
+                });
+
+            Invoke("FireSimpleEvent");
         }
 
         [UaMethod]

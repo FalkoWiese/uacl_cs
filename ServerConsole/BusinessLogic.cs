@@ -1,8 +1,5 @@
 ﻿using System;
-using System.Linq;
-using System.Reflection;
 using System.Threading;
-using UaclClient;
 using UaclServer;
 using UaclUtils;
 
@@ -54,6 +51,13 @@ namespace ServerConsole
                 WorkerThread.Interrupt();
                 WorkerThread = null;
             }
+        }
+
+        [UaMethod]
+        public void FireSimpleEvent()
+        {
+            Guid id = Guid.NewGuid();
+            FireEvent("FireSimpleEvent", id);
         }
 
         [UaclInsertState]

@@ -95,6 +95,23 @@ namespace TestUaclClient
         }
 
         [Test]
+        public void AddEventSubscription()
+        {
+            using (RemoteObject obj = new RemoteObject("localhost", 48030, "BusinessLogic"))
+            {
+                Assert.That(() => obj.Connect(), "Is TRUE!");
+
+                //                obj.Subscribe(
+                //                    "BoState",
+                //                    (string v) => { Logger.Info($"Received value from {obj.Name}.BoState ... '{v}'."); });
+                //                Thread.Sleep(1000);
+
+                obj.Invoke("FireSimpleEvent");
+                Thread.Sleep(1000);
+            }
+        }
+
+        [Test]
         public void InvokeJobStates()
         {
             using (RemoteObject obj = new RemoteObject("localhost", 48030, "BusinessLogic"))

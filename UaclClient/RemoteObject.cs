@@ -2,7 +2,6 @@
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
-using System.Security.Cryptography.X509Certificates;
 using UaclUtils;
 using UnifiedAutomation.UaBase;
 using UnifiedAutomation.UaClient;
@@ -108,6 +107,23 @@ namespace UaclClient
 
         public string Name { get; }
 
+        public void Subscribe(string name, Action<List<Variant>> action)
+        {
+            try
+            {
+                var subscription = new RemoteEventSubscription()
+                {
+                    Name = name,
+                    Callback = action
+                };
+
+                subscription.Subscribe(this);
+            }
+            catch (Exception e)
+            {
+                ExceptionHandler.Log(e, $"Cannot subscribe MONITORED ITEM '{this.Name}.{name}'.");
+            }
+        }
         public void Monitor<T>(string name, Action<T> action)
         {
             try

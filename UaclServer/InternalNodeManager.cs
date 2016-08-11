@@ -1,5 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.ComponentModel;
+using System.Diagnostics;
 using System.Linq;
 using System.Reflection;
 using System.Threading;
@@ -28,7 +30,34 @@ namespace UaclServer
             GlobalNotifier.LocalDataChangeEvent += (nodeId, variableName, value) =>
             {
                 Logger.Trace($"LocalDataChangeEvent fired for varible {nodeId}={value}");
-                server.InternalClient.WriteAttribute(server.DefaultRequestContext, nodeId, 13, TypeMapping.Instance.ToVariant(value));
+
+                server.InternalClient.WriteAttribute(
+                    server.DefaultRequestContext, 
+                    nodeId, 
+                    13, 
+                    TypeMapping.Instance.ToVariant(value));
+            };
+
+            GlobalNotifier.LocalNewEvent += (nodeId, eventName, value) =>
+            {
+                var uniqueEventName = $"{eventName}.{value.ToString()}";
+
+                Logger.Trace($"LocalNewEvent {uniqueEventName} fired for a server.");
+
+                GenericEvent e = new GenericEvent(Server.FilterManager);
+                e.Initialize(
+                    null, // EventId created by SDK if null
+                    ObjectTypeIds.BaseEventType, // EventType
+                    nodeId, // SourceNode
+                    uniqueEventName, // SourceName
+                    EventSeverity.Medium, // Severity
+                    $"Event {uniqueEventName} raised.");
+
+                e.Set("Name", eventName);
+                e.Set("Value", value.ToString());
+
+                // report the event.
+                ReportEvent(e.SourceNode, e);
             };
         }
 
@@ -82,17 +111,19 @@ namespace UaclServer
         {
             var uaObject = businessObject.GetType().GetCustomAttribute<UaObject>();
             var uaObjectName = uaObject.Name ?? businessObject.GetType().Name;
-            var nodeIdName = $"{uaObjectName}_{incrementCounter()}";
+            NodeId uaNodeId = new NodeId($"{uaObjectName}_{incrementCounter()}", InstanceNamespaceIndex);
 
             var node = CreateObject(Server.DefaultRequestContext, new CreateObjectSettings()
             {
                 ParentNodeId = rootNode.NodeId,
                 ReferenceTypeId = ReferenceTypeIds.Organizes,
-                RequestedNodeId = new NodeId(nodeIdName, InstanceNamespaceIndex),
+                RequestedNodeId = uaNodeId,
                 BrowseName = new QualifiedName(uaObjectName, InstanceNamespaceIndex),
                 TypeDefinitionId = ObjectTypeIds.BaseObjectType
             });
             Logger.Info($"Created node ... {node.NodeId.Identifier}.");
+
+            AddUniqueId(businessObject, uaNodeId);
 
             foreach (var property in businessObject.GetType().GetProperties())
             {
@@ -177,15 +208,24 @@ namespace UaclServer
                     Value = new Variant("None"),
                 });
 
-            var bo = businessObject as ServerSideUaProxy;
-            if (bo != null)
-            {
-                bo.UniqueId[variableName] = requestedNodeId;
-            }
+            AddUniqueId(businessObject, requestedNodeId, variableName);
 
             variableNode.UserData = new VariableNodeData {BusinessObject = businessObject, Property = property};
 
             Logger.Info($"Created variable ... {variableNode.NodeId.Identifier}.");
+        }
+
+        private void AddUniqueId(object businessObject, NodeId nodeId, string keyValue=null)
+        {
+            var bo = businessObject as ServerSideUaProxy;
+            if (bo == null) return;
+
+            if (keyValue == null)
+            {
+                keyValue = typeof(ServerSideUaProxy).Name;
+            }
+
+            bo.UniqueId[keyValue] = nodeId;
         }
 
         private void AddUaNodes(object businessObject, PropertyInfo property, ObjectNode parentNode)
