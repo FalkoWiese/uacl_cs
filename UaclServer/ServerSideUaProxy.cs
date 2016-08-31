@@ -1,6 +1,5 @@
 ﻿using System.Collections.Generic;
 using UnifiedAutomation.UaBase;
-using UnifiedAutomation.UaServer;
 
 namespace UaclServer
 {
