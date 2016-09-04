@@ -20,7 +20,7 @@ nunit_path = r'C:\Program Files (x86)\NUnit.org\nunit-console'
 nuget_path = r'C:\Program Files (x86)\NuGet'
 
 # project path settings
-impl_projects = ['ServerConsole', 'OfficeConsole', 'UaclServer', 'UaclClient', 'UaclUtils']
+impl_projects = ['MultiClientConsole', 'ServerConsole', 'OfficeConsole', 'UaclServer', 'UaclClient', 'UaclUtils']
 test_projects = ['TestServerConsole', 'TestOfficeConsole', 'TestUaclClient', 'TestUaclUtils']
 projects = impl_projects + test_projects
 solution = "ServerConsole"

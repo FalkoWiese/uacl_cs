@@ -1,6 +1,7 @@
 ﻿using UaclClient;
 using UaclServer;
 using UaclUtils;
+using UnifiedAutomation.UaClient;
 
 namespace MultiClientConsole
 {
@@ -10,6 +11,16 @@ namespace MultiClientConsole
         private ClientConsoleClient(string ip, int port, string name) : base(ip, port, name)
         {
             MonitoringStarted = false;
+            AnnounceSessionNotConnectedHandler(DisconnectCallback);
+        }
+
+        private void DisconnectCallback(Session s, ServerConnectionStatusUpdateEventArgs args)
+        {
+            if (s.ConnectionStatus != ServerConnectionStatus.Connected)
+            {
+                // Disconnect();
+                Logger.Warn($"The connection {s} is maybe disconnected, the reason is perhaps to find in {args}.");
+            }
         }
 
         public ClientConsoleClient() : this("localhost", 48040, "BusinessLogic")

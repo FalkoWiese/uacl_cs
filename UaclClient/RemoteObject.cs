@@ -1,14 +1,13 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
-using System.Security.Cryptography.X509Certificates;
 using UaclUtils;
 using UnifiedAutomation.UaBase;
 using UnifiedAutomation.UaClient;
 
 namespace UaclClient
 {
+
     public class RemoteObject : IDisposable
     {
         public RemoteObject(string ip, int port, string name)
@@ -17,6 +16,35 @@ namespace UaclClient
             Name = name;
             SessionLock = new object();
             SessionHandle = new OpcUaSessionHandle(OpcUaSession.Create(Connection));
+        }
+
+        private Action<Session, ServerConnectionStatusUpdateEventArgs> NotConnectedCallback { get; set; }
+
+        protected bool AnnounceSessionNotConnectedHandler(Action<Session, ServerConnectionStatusUpdateEventArgs> notConnected)
+        {
+            if (NotConnectedCallback != null)
+            {
+                Logger.Info("There is already a callback registered");
+                return false;
+            }
+
+            NotConnectedCallback = notConnected;
+            return NotConnectedCallback != null;
+        }
+
+        private bool AnnounceToSession()
+        {
+            if (NotConnectedCallback == null) return false;
+
+            SessionHandle.Session.ConnectionStatusUpdate += (Session s, ServerConnectionStatusUpdateEventArgs args) =>
+            {
+                if (s.ConnectionStatus != ServerConnectionStatus.Connected)
+                {
+                    NotConnectedCallback(s, args);
+                }
+            };
+
+            return true;
         }
 
         public void Dispose()
@@ -86,6 +114,11 @@ namespace UaclClient
                 {
                     SessionHandle.Timeout = true;
                     return false;
+                }
+
+                if (!AnnounceToSession())
+                {
+                    Logger.Info("There is no callback registered to get information about e. g. session disconnect!");
                 }
             }
 
