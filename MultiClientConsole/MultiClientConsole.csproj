@@ -71,12 +71,10 @@
   <ItemGroup>
     <Reference Include="System" />
     <Reference Include="System.Core" />
-    <Reference Include="UnifiedAutomation.UaBase, Version=2.0.0.0, Culture=neutral, PublicKeyToken=90c158e6f23d82c1, processorArchitecture=MSIL">
-      <SpecificVersion>False</SpecificVersion>
+    <Reference Include="UnifiedAutomation.UaBase, Version=2.0.0.0, Culture=neutral, PublicKeyToken=90c158e6f23d82c1">
       <HintPath>..\..\..\Program Files (x86)\UnifiedAutomation\UaSdkNetBundleEval\assemblies\NET_4.5\UnifiedAutomation.UaBase.dll</HintPath>
     </Reference>
-    <Reference Include="UnifiedAutomation.UaClient, Version=2.0.0.0, Culture=neutral, PublicKeyToken=90c158e6f23d82c1, processorArchitecture=MSIL">
-      <SpecificVersion>False</SpecificVersion>
+    <Reference Include="UnifiedAutomation.UaClient, Version=2.0.0.0, Culture=neutral, PublicKeyToken=90c158e6f23d82c1">
       <HintPath>..\..\..\Program Files (x86)\UnifiedAutomation\UaSdkNetBundleEval\assemblies\NET_4.5\UnifiedAutomation.UaClient.dll</HintPath>
     </Reference>
   </ItemGroup>
