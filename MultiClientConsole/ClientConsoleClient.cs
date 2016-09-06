@@ -18,8 +18,10 @@ namespace MultiClientConsole
         {
             if (s.ConnectionStatus != ServerConnectionStatus.Connected)
             {
-                // Disconnect();
-                Logger.Warn($"The connection {s} is maybe disconnected, the reason is perhaps to find in {args}.");
+                // Here, you can execute some useful stuff to handle the connection, maybe you can call s.Disconnect()
+                // or something else. Test it, and give me maybe some feedback.
+                Logger.Warn(
+                    $"The connection {s} is disconnected, you can find the reason maybe at the arguments ... {args}.");
             }
         }
 
