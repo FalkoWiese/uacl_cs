@@ -34,13 +34,26 @@ namespace UaclClient
 
         private bool AnnounceToSession()
         {
-            if (NotConnectedCallback == null) return false;
-
             SessionHandle.Session.ConnectionStatusUpdate += (Session s, ServerConnectionStatusUpdateEventArgs args) =>
             {
-                if (s.ConnectionStatus != ServerConnectionStatus.Connected)
+                switch (s.ConnectionStatus)
                 {
-                    NotConnectedCallback(s, args);
+                    case ServerConnectionStatus.ConnectionErrorClientReconnect:
+                    case ServerConnectionStatus.Disconnected:
+                    case ServerConnectionStatus.LicenseExpired:
+                    case ServerConnectionStatus.ServerShutdown:
+                    case ServerConnectionStatus.ServerShutdownInProgress:
+                        NotConnectedCallback?.Invoke(s, args);
+                        // Dispose(); // My idea was, to call Dispose() here, but I think, we should do it from outside the RemoteObject context ...
+                        return;
+                    default:
+                        /*
+                            case ServerConnectionStatus.Connected:
+                            case ServerConnectionStatus.Connecting:
+                            case ServerConnectionStatus.SessionAutomaticallyRecreated:
+                            case ServerConnectionStatus.ConnectionWarningWatchdogTimeout:
+                        */
+                        return;
                 }
             };
 
@@ -96,8 +109,7 @@ namespace UaclClient
                     }
                     catch (Exception e)
                     {
-                        ExceptionHandler.Log(e,
-                            $"An error occurred while try to connect to server: {session.SessionUri.Uri.AbsoluteUri}.");
+                        ExceptionHandler.Log(e, $"An error occurred while try to connect to server: {session.SessionUri.Uri.AbsoluteUri}.");
                     }
 
                     stopWatch.Stop();
@@ -107,7 +119,6 @@ namespace UaclClient
                     }
 
                     stopWatch.Start();
-
                 } while (session.NotConnected());
 
                 if (session.NotConnected())
@@ -147,9 +158,7 @@ namespace UaclClient
             {
                 var monitor = new RemoteDataMonitor<T>
                 {
-                    Name = name,
-                    Value = TypeMapping.Instance.MapType<T>(),
-                    Callback = action
+                    Name = name, Value = TypeMapping.Instance.MapType<T>(), Callback = action
                 };
 
                 monitor.Announce(this);
@@ -164,9 +173,7 @@ namespace UaclClient
         {
             var method = new RemoteMethod
             {
-                Name = name,
-                InputArguments = parameters.Select(iA => TypeMapping.Instance.ToVariant(iA)).ToList(),
-                ReturnValue = Variant.Null
+                Name = name, InputArguments = parameters.Select(iA => TypeMapping.Instance.ToVariant(iA)).ToList(), ReturnValue = Variant.Null
             };
 
             Invoke(method);
@@ -176,9 +183,7 @@ namespace UaclClient
         {
             var method = new RemoteMethod
             {
-                Name = name,
-                InputArguments = parameters.Select(iA => TypeMapping.Instance.ToVariant(iA)).ToList(),
-                ReturnValue = TypeMapping.Instance.MapType<T>()
+                Name = name, InputArguments = parameters.Select(iA => TypeMapping.Instance.ToVariant(iA)).ToList(), ReturnValue = TypeMapping.Instance.MapType<T>()
             };
 
             var returnValue = Invoke(method);
@@ -191,8 +196,7 @@ namespace UaclClient
             {
                 var variable = new RemoteVariable
                 {
-                    Name = name,
-                    Value = TypeMapping.Instance.ToVariant(parameter)
+                    Name = name, Value = TypeMapping.Instance.ToVariant(parameter)
                 };
 
                 variable.Write(this);
@@ -209,8 +213,7 @@ namespace UaclClient
             {
                 var variable = new RemoteVariable
                 {
-                    Name = name,
-                    Value = TypeMapping.Instance.MapType<T>()
+                    Name = name, Value = TypeMapping.Instance.MapType<T>()
                 };
 
                 var result = variable.Read(this);
@@ -261,6 +264,5 @@ namespace UaclClient
                 }
             }
         }
-
     }
 }
