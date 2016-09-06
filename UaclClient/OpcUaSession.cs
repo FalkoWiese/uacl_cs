@@ -12,47 +12,6 @@ namespace UaclClient
     /// </summary>
     public sealed class OpcUaSession : Session
     {
-        // Delegate for the SessionIsConnectedEvent.
-        public delegate void SessionIsConnectedHandler(object sender, EventArgs e);
-
-        // Declare the event 
-        public event SessionIsConnectedHandler SessionIsConnectedEvent;
-
-        // Wrap the event in a protected virtual method
-        // to enable derived classes to raise the event.
-        private void RaiseSessionIsConnectedEvent(OpcUaSession opcUaSession)
-        {
-            Logger.Trace("SessionIsConnectedEvent raised!");
-            SessionIsConnectedEvent?.Invoke(opcUaSession, new EventArgs());
-            SessionIsConnectedEvent = null;
-        }
-
-        /// <summary>
-        /// Returns an established Connection to the OPC UA Server
-        /// </summary>
-        /// <returns></returns>
-        public void EstablishOpcUaSession()
-        {
-            do
-            {
-                try
-                {
-                    if (ConnectionStatus != ServerConnectionStatus.Connected)
-                    {
-                        Logger.Info($"Try to connect to:{SessionUri.Uri.AbsoluteUri}");
-                        Connect(SessionUri.Uri.AbsoluteUri, SecuritySelection.None);
-                    }
-                    Logger.Info($"Connection to {SessionUri.Uri.AbsoluteUri} established.");
-                    RaiseSessionIsConnectedEvent(this);
-                }
-                catch (Exception e)
-                {
-                    ExceptionHandler.Log(e,
-                        $"An error occurred while try to connect to server: {SessionUri.Uri.AbsoluteUri}.");
-                }
-            } while (ConnectionStatus != ServerConnectionStatus.Connected);
-        }
-
         public UriBuilder SessionUri { get; }
 
         internal static OpcUaSession Create(ConnectionInfo connection)
@@ -73,14 +32,5 @@ namespace UaclClient
             return ConnectionStatus != ServerConnectionStatus.Connected;
         }
 
-        /// <summary>
-        /// This Method will be invoked, if the ServerConnectionStatus changed from Connected to another Status.
-        /// The method will reconnect the Session to the server.
-        /// </summary>
-        public void Reconnect()
-        {
-            Logger.Info($"Trying to reconnect to Server URI: {SessionUri.Uri.AbsoluteUri}");
-            Connect(SessionUri.Uri.AbsoluteUri, SecuritySelection.None);
-        }
     }
 }

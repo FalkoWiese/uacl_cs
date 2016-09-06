@@ -25,3 +25,6 @@ TestUaclClient/obj/
 UaclClient/bin/
 UaclClient/obj/
 TestUaclClient/bin/
+MultiClientConsole/bin
+MultiClientConsole/obj
+MultiClientConsole/MultiClientConsole.csproj.user

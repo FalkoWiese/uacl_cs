@@ -1,5 +1,4 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
 using UaclUtils;
@@ -8,6 +7,7 @@ using UnifiedAutomation.UaClient;
 
 namespace UaclClient
 {
+
     public class RemoteObject : IDisposable
     {
         public RemoteObject(string ip, int port, string name)
@@ -16,6 +16,48 @@ namespace UaclClient
             Name = name;
             SessionLock = new object();
             SessionHandle = new OpcUaSessionHandle(OpcUaSession.Create(Connection));
+        }
+
+        private Action<Session, ServerConnectionStatusUpdateEventArgs> NotConnectedCallback { get; set; }
+
+        protected bool AnnounceSessionNotConnectedHandler(Action<Session, ServerConnectionStatusUpdateEventArgs> notConnected)
+        {
+            if (NotConnectedCallback != null)
+            {
+                Logger.Info("There is already a callback registered");
+                return false;
+            }
+
+            NotConnectedCallback = notConnected;
+            return NotConnectedCallback != null;
+        }
+
+        private bool AnnounceToSession()
+        {
+            SessionHandle.Session.ConnectionStatusUpdate += (Session s, ServerConnectionStatusUpdateEventArgs args) =>
+            {
+                switch (s.ConnectionStatus)
+                {
+                    case ServerConnectionStatus.ConnectionErrorClientReconnect:
+                    case ServerConnectionStatus.Disconnected:
+                    case ServerConnectionStatus.LicenseExpired:
+                    case ServerConnectionStatus.ServerShutdown:
+                    case ServerConnectionStatus.ServerShutdownInProgress:
+                        NotConnectedCallback?.Invoke(s, args);
+                        // Dispose(); // My idea was, to call Dispose() here, but I think, we should do it from outside the RemoteObject context ...
+                        return;
+                    default:
+                        /*
+                            case ServerConnectionStatus.Connected:
+                            case ServerConnectionStatus.Connecting:
+                            case ServerConnectionStatus.SessionAutomaticallyRecreated:
+                            case ServerConnectionStatus.ConnectionWarningWatchdogTimeout:
+                        */
+                        return;
+                }
+            };
+
+            return true;
         }
 
         public void Dispose()
@@ -67,8 +109,7 @@ namespace UaclClient
                     }
                     catch (Exception e)
                     {
-                        ExceptionHandler.Log(e,
-                            $"An error occurred while try to connect to server: {session.SessionUri.Uri.AbsoluteUri}.");
+                        ExceptionHandler.Log(e, $"An error occurred while try to connect to server: {session.SessionUri.Uri.AbsoluteUri}.");
                     }
 
                     stopWatch.Stop();
@@ -78,13 +119,17 @@ namespace UaclClient
                     }
 
                     stopWatch.Start();
-
                 } while (session.NotConnected());
 
                 if (session.NotConnected())
                 {
                     SessionHandle.Timeout = true;
                     return false;
+                }
+
+                if (!AnnounceToSession())
+                {
+                    Logger.Info("There is no callback registered to get information about e. g. session disconnect!");
                 }
             }
 
@@ -130,9 +175,7 @@ namespace UaclClient
             {
                 var monitor = new RemoteDataMonitor<T>
                 {
-                    Name = name,
-                    Value = TypeMapping.Instance.MapType<T>(),
-                    Callback = action
+                    Name = name, Value = TypeMapping.Instance.MapType<T>(), Callback = action
                 };
 
                 monitor.Monitor(this);
@@ -147,9 +190,7 @@ namespace UaclClient
         {
             var method = new RemoteMethod
             {
-                Name = name,
-                InputArguments = parameters.Select(iA => TypeMapping.Instance.ToVariant(iA)).ToList(),
-                ReturnValue = Variant.Null
+                Name = name, InputArguments = parameters.Select(iA => TypeMapping.Instance.ToVariant(iA)).ToList(), ReturnValue = Variant.Null
             };
 
             Invoke(method);
@@ -159,9 +200,7 @@ namespace UaclClient
         {
             var method = new RemoteMethod
             {
-                Name = name,
-                InputArguments = parameters.Select(iA => TypeMapping.Instance.ToVariant(iA)).ToList(),
-                ReturnValue = TypeMapping.Instance.MapType<T>()
+                Name = name, InputArguments = parameters.Select(iA => TypeMapping.Instance.ToVariant(iA)).ToList(), ReturnValue = TypeMapping.Instance.MapType<T>()
             };
 
             var returnValue = Invoke(method);
@@ -174,8 +213,7 @@ namespace UaclClient
             {
                 var variable = new RemoteVariable
                 {
-                    Name = name,
-                    Value = TypeMapping.Instance.ToVariant(parameter)
+                    Name = name, Value = TypeMapping.Instance.ToVariant(parameter)
                 };
 
                 variable.Write(this);
@@ -192,8 +230,7 @@ namespace UaclClient
             {
                 var variable = new RemoteVariable
                 {
-                    Name = name,
-                    Value = TypeMapping.Instance.MapType<T>()
+                    Name = name, Value = TypeMapping.Instance.MapType<T>()
                 };
 
                 var result = variable.Read(this);
@@ -244,6 +281,5 @@ namespace UaclClient
                 }
             }
         }
-
     }
 }
