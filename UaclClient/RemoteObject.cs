@@ -8,34 +8,36 @@ using UnifiedAutomation.UaClient;
 
 namespace UaclClient
 {
-
     public class RemoteObject : IDisposable
     {
         public RemoteObject(string ip, int port, string name)
         {
             Connection = new ConnectionInfo(ip, port, name);
             Name = name;
+            NodeIdCache = new Dictionary<string, NodeId>();
             SessionLock = new object();
             SessionHandle = new OpcUaSessionHandle(OpcUaSession.Create(Connection));
         }
 
         private Action<Session, ServerConnectionStatusUpdateEventArgs> NotConnectedCallback { get; set; }
 
-        protected bool AnnounceSessionNotConnectedHandler(Action<Session, ServerConnectionStatusUpdateEventArgs> notConnected)
+        public Dictionary<string, NodeId> NodeIdCache { get; set; }
+
+        protected void AnnounceSessionNotConnectedHandler(
+            Action<Session, ServerConnectionStatusUpdateEventArgs> notConnected)
         {
             if (NotConnectedCallback != null)
             {
                 Logger.Info("There is already a callback registered");
-                return false;
+                return;
             }
 
             NotConnectedCallback = notConnected;
-            return NotConnectedCallback != null;
         }
 
         private bool AnnounceToSession()
         {
-            SessionHandle.Session.ConnectionStatusUpdate += (Session s, ServerConnectionStatusUpdateEventArgs args) =>
+            SessionHandle.Session.ConnectionStatusUpdate += (s, args) =>
             {
                 switch (s.ConnectionStatus)
                 {
@@ -45,7 +47,8 @@ namespace UaclClient
                     case ServerConnectionStatus.ServerShutdown:
                     case ServerConnectionStatus.ServerShutdownInProgress:
                         NotConnectedCallback?.Invoke(s, args);
-                        // Dispose(); // My idea was, to call Dispose() here, but I think, we should do it from outside the RemoteObject context ...
+                        // My idea was, to call Dispose() here, but I think, we should do it from
+                        // outside the RemoteObject context ...
                         return;
                     default:
                         /*
@@ -110,7 +113,8 @@ namespace UaclClient
                     }
                     catch (Exception e)
                     {
-                        ExceptionHandler.Log(e, $"An error occurred while try to connect to server: {session.SessionUri.Uri.AbsoluteUri}.");
+                        ExceptionHandler.Log(e,
+                            $"An error occurred while try to connect to server: {session.SessionUri.Uri.AbsoluteUri}.");
                     }
 
                     stopWatch.Stop();
@@ -160,7 +164,9 @@ namespace UaclClient
                 var rh = new RemoteHelper(this);
                 rh.MonitorDataChanges(monitors.Keys.Select(name => new RemoteDataMonitor
                 {
-                    Name = name, Value = Variant.Null, Callback = monitors[name]
+                    Name = name,
+                    Value = Variant.Null,
+                    Callback = monitors[name]
                 }).ToList(), this);
                 return Variant.Null;
             });
@@ -189,7 +195,9 @@ namespace UaclClient
         {
             var method = new RemoteMethod
             {
-                Name = name, InputArguments = parameters.Select(iA => TypeMapping.Instance.ToVariant(iA)).ToList(), ReturnValue = Variant.Null
+                Name = name,
+                InputArguments = parameters.Select(iA => TypeMapping.Instance.ToVariant(iA)).ToList(),
+                ReturnValue = Variant.Null
             };
 
             Invoke(method);
@@ -199,7 +207,9 @@ namespace UaclClient
         {
             var method = new RemoteMethod
             {
-                Name = name, InputArguments = parameters.Select(iA => TypeMapping.Instance.ToVariant(iA)).ToList(), ReturnValue = TypeMapping.Instance.MapType<T>()
+                Name = name,
+                InputArguments = parameters.Select(iA => TypeMapping.Instance.ToVariant(iA)).ToList(),
+                ReturnValue = TypeMapping.Instance.MapType<T>()
             };
 
             var returnValue = Invoke(method);
@@ -212,7 +222,8 @@ namespace UaclClient
             {
                 var variable = new RemoteVariable
                 {
-                    Name = name, Value = TypeMapping.Instance.ToVariant(parameter)
+                    Name = name,
+                    Value = TypeMapping.Instance.ToVariant(parameter)
                 };
 
                 variable.Write(this);
@@ -229,7 +240,8 @@ namespace UaclClient
             {
                 var variable = new RemoteVariable
                 {
-                    Name = name, Value = TypeMapping.Instance.MapType<T>()
+                    Name = name,
+                    Value = TypeMapping.Instance.MapType<T>()
                 };
 
                 var result = variable.Read(this);

@@ -19,12 +19,9 @@ namespace UaclClient
         private const int OpcUaIdRootFolder = 84;
         private const int OpcUaIdObjectsFolder = 85;
 
-        private Dictionary<string, NodeId> NodeIdCache { get; set; }
-
         private RemoteHelper(OpcUaSession session)
         {
             _session = session;
-            NodeIdCache = new Dictionary<string, NodeId>();
             _parentNode = null;
             _browseContext = new BrowseContext
             {
@@ -37,7 +34,8 @@ namespace UaclClient
         }
 
         public RemoteHelper(RemoteObject remoteObject) : this(remoteObject.SessionHandle.Session, remoteObject.Name)
-        { }
+        {
+        }
 
         public RemoteHelper(OpcUaSession session, string parentNodeName) : this(session)
         {
@@ -86,50 +84,35 @@ namespace UaclClient
                 parentNode = new NodeId(OpcUaIdRootFolder);
             }
 
-            var nodeKey = nodeName;
+            byte[] continuationPoint;
+            var references = _session.Browse(parentNode, _browseContext,
+                new RequestSettings {OperationTimeout = 10000}, out continuationPoint);
 
-            if (NodeIdCache.ContainsKey(nodeKey))
+            foreach (var reference in references)
             {
-                resultNode = NodeIdCache[nodeKey];
-            }
+                var n = new NodeId(reference.NodeId.IdType, reference.NodeId.Identifier,
+                    reference.NodeId.NamespaceIndex);
 
-            else
-            {
-                byte[] continuationPoint;
-                var references = _session.Browse(parentNode, _browseContext,
-                    new RequestSettings {OperationTimeout = 10000}, out continuationPoint);
+                resultNode = reference.DisplayName.Text == nodeName
+                    ? n
+                    : null;
 
-                foreach (var reference in references)
+                if (resultNode == null && recursive)
                 {
-                    var n = new NodeId(reference.NodeId.IdType, reference.NodeId.Identifier,
-                        reference.NodeId.NamespaceIndex);
-
-                    resultNode = reference.DisplayName.Text == nodeName
-                        ? n
-                        : null;
-
-                    if (resultNode == null && recursive)
-                    {
-                        resultNode = BrowseNodeIdByName(n, nodeName);
-                    }
-
-                    if (resultNode == null) continue;
-
-                    Logger.Info($"Found Node ... {reference.DisplayName.Text}");
-
-                    if (!NodeIdCache.ContainsKey(nodeKey))
-                    {
-                        NodeIdCache.Add(nodeKey, resultNode);
-                    }
-
-                    break;
+                    resultNode = BrowseNodeIdByName(n, nodeName);
                 }
+
+                if (resultNode == null) continue;
+
+                Logger.Info($"Found Node ... {reference.DisplayName.Text}");
+
+                break;
             }
 
             return resultNode;
         }
 
-        public Variant CallMethod(RemoteMethod remoteMethod)
+        public Variant CallMethod(RemoteMethod remoteMethod, ref NodeId methodNodeId)
         {
             var methodName = remoteMethod.Name;
 
@@ -143,12 +126,17 @@ namespace UaclClient
                 throw new Exception($"Parent node is null for method '{methodName}'!");
             }
 
+            if (methodNodeId == NodeId.Null)
+            {
+                methodNodeId = BrowseNodeId(_parentNode, methodName, false);
+            }
+
             List<StatusCode> inputArgumentErrors;
             List<Variant> outputArguments;
             // call the method on the server.
             var result = _session.Call(
                 _parentNode,
-                BrowseNodeId(_parentNode, methodName, false),
+                methodNodeId,
                 remoteMethod.InputArguments,
                 out inputArgumentErrors,
                 out outputArguments);
@@ -240,7 +228,7 @@ namespace UaclClient
 
             if (pathElements.Count == 1) return "";
 
-            var splitPosition = path.Length-1;
+            var splitPosition = path.Length - 1;
             foreach (var sep in PathSeparators())
             {
                 if (path.Contains(sep))
@@ -256,7 +244,8 @@ namespace UaclClient
         {
             var monitoredItems = monitors.Select(m => new DataMonitoredItem(BrowseNodeId(_parentNode, m.Name))
             {
-                UserData = m, DataChangeTrigger = DataChangeTrigger.StatusValue
+                UserData = m,
+                DataChangeTrigger = DataChangeTrigger.StatusValue
             }).Cast<MonitoredItem>().ToList();
 
             remoteObject.SessionHandle.ClientSubscription().CreateMonitoredItems(monitoredItems,

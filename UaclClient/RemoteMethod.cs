@@ -11,11 +11,24 @@ namespace UaclClient
 
         public Variant Invoke(RemoteObject remoteObject)
         {
-            return remoteObject.Execute(() =>
+            var methodNodeId = NodeId.Null;
+            if (remoteObject.NodeIdCache.ContainsKey(Name))
+            {
+                methodNodeId = remoteObject.NodeIdCache[Name];
+            }
+
+            var result = remoteObject.Execute(() =>
             {
                 var invoker = new RemoteHelper(remoteObject);
-                return invoker.CallMethod(this);
+                return invoker.CallMethod(this, ref methodNodeId);
             });
+
+            if (methodNodeId != NodeId.Null && !remoteObject.NodeIdCache.ContainsKey(Name))
+            {
+                remoteObject.NodeIdCache[Name] = methodNodeId;
+            }
+
+            return result;
         }
 
         public bool HasReturnValue()

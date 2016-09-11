@@ -2,7 +2,6 @@
 using UaclServer;
 using UaclUtils;
 using UnifiedAutomation.UaClient;
-using UnifiedAutomation.UaBase;
 
 namespace MultiClientConsole
 {
