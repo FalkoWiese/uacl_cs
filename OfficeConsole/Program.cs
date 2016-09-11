@@ -15,19 +15,13 @@ namespace OfficeConsole
                 var factory = new UaFactory(server);
                 
                 factory.CreateUaObject<BusinessLogic>();
+                factory.CreateUaObject<RemoteBusinessLogic>();
+/*
                 var boParent = factory.CreateUaObject<RemoteBusinessLogic>();
                 factory.CreateUaObject<RemoteBoProxy>(boParent);
-                
-                server.Start();
+*/
 
-                using (var rbl = new RemoteBusinessLogic())
-                {
-                    bool isConnected = rbl.Connect();
-                    Console.Out.WriteLine($"The connection is {isConnected}.");
-                    var v = rbl.ReadState();
-                    Console.Out.WriteLine($"Read value is '{v}'.");
-                    rbl.Disconnect();
-                }
+                server.Start();
 
                 while (true)
                 {

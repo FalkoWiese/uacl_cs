@@ -1,8 +1,5 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Text;
 using System.Threading;
-using System.Threading.Tasks;
 using UaclServer;
 using UaclUtils;
 
@@ -34,6 +31,8 @@ namespace OfficeConsole
                         while (true)
                         {
                             ChangeState($"{count++}");
+                            ChangeIntState(count);
+                            ChangeFloatState((float)count/100);
                             Thread.Sleep(100);
                         }
                     }
@@ -62,11 +61,45 @@ namespace OfficeConsole
             }
         }
 
+        [UaVariable]
+        public int IntBoState
+        {
+            get { return _intBoState; }
+            set
+            {
+                _intBoState = value;
+                Logger.Trace($"Wrote property IntState to '{value}'.");
+            }
+        }
+
+        [UaVariable]
+        public float FloatBoState
+        {
+            get { return _floatBoState; }
+            set
+            {
+                _floatBoState = value;
+                Logger.Trace($"Wrote property IntState to '{value}'.");
+            }
+        }
+
         private string _boState;
+        private int _intBoState;
+        private float _floatBoState;
 
         public void ChangeState(string newState)
         {
             Call("BoState", newState);
+        }
+
+        public void ChangeIntState(int newState)
+        {
+            Call("IntBoState", newState);
+        }
+
+        public void ChangeFloatState(float newState)
+        {
+            Call("FloatBoState", newState);
         }
     }
 }

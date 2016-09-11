@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
 using UaclUtils;
@@ -152,13 +153,28 @@ namespace UaclClient
 
         public string Name { get; }
 
-        public void Monitor<T>(string name, Action<T> action)
+        public void Monitor(Dictionary<string, Action<Variant>> monitors)
+        {
+            Execute(() =>
+            {
+                var rh = new RemoteHelper(this);
+                rh.MonitorDataChanges(monitors.Keys.Select(name => new RemoteDataMonitor
+                {
+                    Name = name, Value = Variant.Null, Callback = monitors[name]
+                }).ToList(), this);
+                return Variant.Null;
+            });
+        }
+
+        public void Monitor(string name, Action<Variant> action)
         {
             try
             {
-                var monitor = new RemoteDataMonitor<T>
+                var monitor = new RemoteDataMonitor
                 {
-                    Name = name, Value = TypeMapping.Instance.MapType<T>(), Callback = action
+                    Name = name,
+                    Value = Variant.Null,
+                    Callback = action
                 };
 
                 monitor.Announce(this);

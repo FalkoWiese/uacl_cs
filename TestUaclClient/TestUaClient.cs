@@ -17,13 +17,13 @@ namespace TestUaclClient
             {
                 Assert.That(() => obj.Connect(), "Is TRUE!");
 
-                var r1 = obj.Invoke<bool>("CalculateJob", (string) "BIG JOB", (int) 2);
+                var r1 = obj.Invoke<bool>("CalculateJob", "BIG JOB", 2);
                 Assert.That(() => r1, $"Return value is {true}");
 
-                var r2 = obj.Invoke<bool>("CalculateJob", (string) "small job", (int) -1);
+                var r2 = obj.Invoke<bool>("CalculateJob", "small job", -1);
                 Assert.That(() => !r2, $"Return value is {false}");
 
-                var r3 = obj.Invoke<bool>("CalculateJob", (string) "small job", (int) -1);
+                var r3 = obj.Invoke<bool>("CalculateJob", "small job", -1);
                 Assert.That(() => !r2, $"Return value is {false}");
             }
         }
@@ -78,13 +78,13 @@ namespace TestUaclClient
         [Test]
         public void AddMonitoredItem()
         {
-            using (RemoteObject obj = new RemoteObject("localhost", 48030, "BusinessLogic"))
+            using (var obj = new RemoteObject("localhost", 48030, "BusinessLogic"))
             {
                 Assert.That(() => obj.Connect(), "Is TRUE!");
 
                 obj.Monitor(
                     "BoState",
-                    (string v) => { Logger.Info($"Received value from {obj.Name}.BoState ... '{v}'."); });
+                    v => { Logger.Info($"Received value from {obj.Name}.BoState ... '{v}'."); });
             }
         }
 

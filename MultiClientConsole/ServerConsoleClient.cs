@@ -22,10 +22,10 @@ namespace MultiClientConsole
             if (MonitoringStarted) return;
 
             Connect();
-            Monitor<string>("BoState", (string v) =>
+            Monitor("BoState", v =>
             {
-                Logger.Info($"Received value from {Name}.BoState ... '{v}'.");
-                ScBoState = v;
+                ScBoState = v.ToString();
+                Logger.Info($"Received value from {Name}.BoState ... '{ScBoState}'.");
             });
             MonitoringStarted = true;
         }

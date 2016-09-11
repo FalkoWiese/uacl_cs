@@ -2,6 +2,7 @@
 using UaclServer;
 using UaclUtils;
 using UnifiedAutomation.UaClient;
+using UnifiedAutomation.UaBase;
 
 namespace MultiClientConsole
 {
@@ -35,16 +36,35 @@ namespace MultiClientConsole
             if (MonitoringStarted) return;
 
             Connect();
-            Monitor<string>("BoState", (string v) =>
+            Monitor("BoState", strValue =>
             {
-                Logger.Info($"Received value from {Name}.BoState ... '{v}'.");
-                CcBoState = v;
+                CcBoState = strValue.ToString();
+                Logger.Info($"Received value from {Name}.BoState ... '{CcBoState}'.");
             });
+
+            Monitor("IntBoState", intValue =>
+            {
+                CcIntBoState = intValue.ToInt32();
+                Logger.Info($"Received value from {Name}.IntBoState ... {CcIntBoState}.");
+            });
+
+            Monitor("FloatBoState", floatValue =>
+            {
+                CcFloatBoState = floatValue.ToFloat();
+                Logger.Info($"Received value from {Name}.FloatBoState ... {CcFloatBoState}.");
+            });
+
             MonitoringStarted = true;
         }
 
         [UaVariable]
         public string CcBoState { get; set; }
+
+        [UaVariable]
+        public int CcIntBoState { get; set; }
+
+        [UaVariable]
+        public float CcFloatBoState { get; set; }
 
         private bool MonitoringStarted { get; set; }
 

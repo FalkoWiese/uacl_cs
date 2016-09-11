@@ -1,6 +1,7 @@
 ﻿using UaclClient;
 using UaclServer;
 using UaclUtils;
+using UnifiedAutomation.UaBase;
 
 namespace OfficeConsole
 {
@@ -9,8 +10,7 @@ namespace OfficeConsole
     {
         private RemoteBusinessLogic(string ip, int port, string name) : base(ip, port, name)
         {
-            Connect();
-            Monitor<string>("BoState", (string v) => { Logger.Info($"Received value from {Name}.BoState ... '{v}'."); });
+            MonitoringStarted = false;
         }
 
         public RemoteBusinessLogic() : this("localhost", 48030, "BusinessLogic")
@@ -37,5 +37,44 @@ namespace OfficeConsole
             Connect();
             Write("BoState", jobState);
         }
+
+        [UaMethod]
+        public void MonitorVariables()
+        {
+            if (MonitoringStarted) return;
+
+            Connect();
+            Monitor("BoState", strValue =>
+            {
+                BoState = strValue.ToString();
+                Logger.Info($"Received value from {Name}.BoState ... '{BoState}'.");
+            });
+
+            Monitor("IntBoState", intValue =>
+            {
+                IntBoState = intValue.ToInt32();
+                Logger.Info($"Received value from {Name}.IntBoState ... '{IntBoState}'.");
+            });
+
+            Monitor("FloatBoState", floatValue =>
+            {
+                FloatBoState = floatValue.ToFloat();
+                Logger.Info($"Received value from {Name}.FloatBoState ... '{FloatBoState}'.");
+            });
+
+            MonitoringStarted = true;
+        }
+
+        [UaVariable]
+        public string BoState { get; set; }
+
+        [UaVariable]
+        public int IntBoState { get; set; }
+
+        [UaVariable]
+        public float FloatBoState { get; set; }
+
+
+        private bool MonitoringStarted { get; set; }
     }
 }

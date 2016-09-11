@@ -1,8 +1,5 @@
 ﻿using System;
-using System.Linq;
-using System.Reflection;
 using System.Threading;
-using UaclClient;
 using UaclServer;
 using UaclUtils;
 
@@ -39,6 +36,8 @@ namespace ServerConsole
                         while (true)
                         {
                             ChangeState($"{count++}");
+                            ChangeState(count);
+                            ChangeState((float)count/100);
                             Thread.Sleep(100);
                         }
                     }
@@ -113,9 +112,45 @@ namespace ServerConsole
 
         private string _boState;
 
+        [UaVariable]
+        public int IntBoState
+        {
+            get { return _intBoState; }
+            set
+            {
+                _intBoState = value;
+                Logger.Trace($"Wrote property IntState to '{value}'.");
+            }
+        }
+
+        private int _intBoState;
+
+        [UaVariable]
+        public float FloatBoState
+        {
+            get { return _floatBoState; }
+            set
+            {
+                _floatBoState = value;
+                Logger.Trace($"Wrote property FloatState to '{value}'.");
+            }
+        }
+
+        private float _floatBoState;
+
         public void ChangeState(string newState)
         {
             Call("BoState", newState);
+        }
+
+        public void ChangeState(int newState)
+        {
+            Call("IntBoState", newState);
+        }
+
+        public void ChangeState(float newState)
+        {
+            Call("FloatBoState", newState);
         }
     }
 }

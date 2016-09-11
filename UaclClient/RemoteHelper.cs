@@ -18,12 +18,13 @@ namespace UaclClient
         private readonly BrowseContext _browseContext;
         private const int OpcUaIdRootFolder = 84;
         private const int OpcUaIdObjectsFolder = 85;
-        private readonly Dictionary<string, NodeId> _nodeIds;
+
+        private Dictionary<string, NodeId> NodeIdCache { get; set; }
 
         private RemoteHelper(OpcUaSession session)
         {
             _session = session;
-            _nodeIds = new Dictionary<string, NodeId>();
+            NodeIdCache = new Dictionary<string, NodeId>();
             _parentNode = null;
             _browseContext = new BrowseContext
             {
@@ -54,37 +55,9 @@ namespace UaclClient
             Logger.Trace($"Connection status has changed to {sender.ConnectionStatus}");
         }
 
-        private string GetNodeKey(NodeId parentNode, string nodeName)
-        {
-            return parentNode.Identifier.ToString() + '/' + nodeName;
-        }
-
-        private NodeId CreateNodeIdByName(NodeId parentNode, string nodeName)
-        {
-            NodeId resultNode;
-            var id = GetNodeKey(parentNode, nodeName);
-            if (_nodeIds.ContainsKey(id))
-            {
-                resultNode = _nodeIds[id];
-            }
-            else
-            {
-                var node = new NodeId($"{parentNode.Identifier}.{nodeName}", parentNode.NamespaceIndex);
-                _nodeIds.Add(id, node);
-                resultNode = node;
-            }
-
-            return resultNode;
-        }
-
-        public static bool ContainsSeparator(string name)
-        {
-            return PathSeparators().Any(name.Contains);
-        }
-
         public NodeId BrowseNodeId(NodeId parentNode, string name, bool recursive = true)
         {
-            return ContainsSeparator(name)
+            return PathSeparators().Any(name.Contains)
                 ? BrowseNodeIdByPath(parentNode, name)
                 : BrowseNodeIdByName(parentNode, name, recursive);
         }
@@ -115,15 +88,16 @@ namespace UaclClient
 
             var nodeKey = nodeName;
 
-            if (_nodeIds.ContainsKey(nodeKey))
+            if (NodeIdCache.ContainsKey(nodeKey))
             {
-                resultNode = _nodeIds[nodeKey];
+                resultNode = NodeIdCache[nodeKey];
             }
+
             else
             {
                 byte[] continuationPoint;
                 var references = _session.Browse(parentNode, _browseContext,
-                    new RequestSettings() {OperationTimeout = 10000}, out continuationPoint);
+                    new RequestSettings {OperationTimeout = 10000}, out continuationPoint);
 
                 foreach (var reference in references)
                 {
@@ -143,9 +117,9 @@ namespace UaclClient
 
                     Logger.Info($"Found Node ... {reference.DisplayName.Text}");
 
-                    if (!_nodeIds.ContainsKey(nodeKey))
+                    if (!NodeIdCache.ContainsKey(nodeKey))
                     {
-                        _nodeIds.Add(nodeKey, resultNode);
+                        NodeIdCache.Add(nodeKey, resultNode);
                     }
 
                     break;
@@ -174,7 +148,6 @@ namespace UaclClient
             // call the method on the server.
             var result = _session.Call(
                 _parentNode,
-//                CreateNodeIdByName(_parentNode, methodName),
                 BrowseNodeId(_parentNode, methodName, false),
                 remoteMethod.InputArguments,
                 out inputArgumentErrors,
@@ -279,34 +252,54 @@ namespace UaclClient
             return path.Substring(splitPosition + 1, path.Length - pathElements[0].Length - 1);
         }
 
-        public void MonitorDataChange<T>(RemoteDataMonitor<T> monitor, RemoteObject remoteObject)
+        public void MonitorDataChanges(List<RemoteDataMonitor> monitors, RemoteObject remoteObject)
         {
-            var monitoredItems = new List<MonitoredItem>
+            var monitoredItems = monitors.Select(m => new DataMonitoredItem(BrowseNodeId(_parentNode, m.Name))
             {
-                new DataMonitoredItem(BrowseNodeId(_parentNode, monitor.Name))
-                {
-                    UserData = monitor,
-                    DataChangeTrigger = DataChangeTrigger.StatusValue,
-                }
-            };
+                UserData = m, DataChangeTrigger = DataChangeTrigger.StatusValue
+            }).Cast<MonitoredItem>().ToList();
 
             remoteObject.SessionHandle.ClientSubscription().CreateMonitoredItems(monitoredItems,
                 new RequestSettings {OperationTimeout = 10000});
+
             remoteObject.SessionHandle.SetDataChangeHandler(
                 (ss, args) =>
                 {
                     Logger.Info("Received DATA CHANGE ...");
                     foreach (var dataChange in args.DataChanges)
                     {
-                        var remoteDataMonitor = (RemoteDataMonitor<T>) dataChange.MonitoredItem.UserData;
+                        var remoteDataMonitor = (RemoteDataMonitor) dataChange.MonitoredItem.UserData;
                         remoteDataMonitor?.DataChange(dataChange.Value.WrappedValue);
                     }
                 });
 
-//            remoteObject.SessionHandle.ClientSubscription().NewEvents += (Subscription ss, NewEventsEventArgs a) =>
-//            {
-//                Logger.Info("Received NEW EVENT ...");
-//            };
+            remoteObject.SessionHandle.MonitoredItems.AddRange(monitoredItems);
+        }
+
+        public void MonitorDataChange(RemoteDataMonitor monitor, RemoteObject remoteObject)
+        {
+            var monitoredItems = new List<MonitoredItem>
+            {
+                new DataMonitoredItem(BrowseNodeId(_parentNode, monitor.Name))
+                {
+                    UserData = monitor,
+                    DataChangeTrigger = DataChangeTrigger.StatusValue
+                }
+            };
+
+            remoteObject.SessionHandle.ClientSubscription().CreateMonitoredItems(monitoredItems,
+                new RequestSettings {OperationTimeout = 10000});
+
+            remoteObject.SessionHandle.SetDataChangeHandler(
+                (ss, args) =>
+                {
+                    Logger.Info("Received DATA CHANGE ...");
+                    foreach (var dataChange in args.DataChanges)
+                    {
+                        var remoteDataMonitor = (RemoteDataMonitor) dataChange.MonitoredItem.UserData;
+                        remoteDataMonitor?.DataChange(dataChange.Value.WrappedValue);
+                    }
+                });
 
             remoteObject.SessionHandle.MonitoredItems.AddRange(monitoredItems);
         }
