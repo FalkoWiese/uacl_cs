@@ -23,13 +23,6 @@ namespace UaclClient
         private const int OpcUaIdRootFolder = 84;
         private const int OpcUaIdObjectsFolder = 85;
 
-        private static Dictionary<string, NodeId> NodeIdCache { get; set; }
-
-        static RemoteHelper()
-        {
-            NodeIdCache = new Dictionary<string, NodeId>();
-        }
-
         private RemoteHelper(OpcUaSession session)
         {
             _session = session;
@@ -44,17 +37,13 @@ namespace UaclClient
             _session.ConnectionStatusUpdate += SessionOnConnectionStatusUpdate;
         }
 
-        public RemoteHelper(RemoteObject remoteObject) : this(remoteObject.SessionHandle.Session, remoteObject.Name)
+        public RemoteHelper(RemoteObject remoteObject) : this(remoteObject.SessionHandle.Session)
         {
-        }
-
-        public RemoteHelper(OpcUaSession session, string parentNodeName) : this(session)
-        {
-            if (!NodeIdCache.ContainsKey(parentNodeName))
+            if (remoteObject.MyNodeId == NodeId.Null)
             {
-                NodeIdCache[parentNodeName] = BrowseNodeId(null, parentNodeName);
+                remoteObject.MyNodeId = BrowseNodeId(null, remoteObject.Name);
             }
-            _parentNode = NodeIdCache[parentNodeName];
+            _parentNode = remoteObject.MyNodeId;
         }
 
         /// <summary>

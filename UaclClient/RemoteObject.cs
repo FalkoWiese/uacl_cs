@@ -14,6 +14,7 @@ namespace UaclClient
         {
             Connection = new ConnectionInfo(ip, port, name);
             Name = name;
+            MyNodeId = NodeId.Null;
             NodeIdCache = new Dictionary<string, NodeId>();
             SessionLock = new object();
             SessionHandle = new OpcUaSessionHandle(OpcUaSession.Create(Connection));
@@ -21,6 +22,7 @@ namespace UaclClient
 
         private Action<Session, ServerConnectionStatusUpdateEventArgs> NotConnectedCallback { get; set; }
 
+        public NodeId MyNodeId { get; set; }
         public Dictionary<string, NodeId> NodeIdCache { get; set; }
 
         protected void AnnounceSessionNotConnectedHandler(
