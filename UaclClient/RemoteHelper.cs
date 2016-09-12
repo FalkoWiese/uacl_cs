@@ -8,8 +8,12 @@ using UnifiedAutomation.UaClient;
 namespace UaclClient
 {
     /// <summary>
-    /// Class to call a Method on a OPC UA Server
-    /// This class can be instanciated with an <see cref="OpcUaSession"/> OpcUaSession, this session is ment to be instantiated and connected to the desired Server.
+    /// Helper Class
+    /// - to call Methods,
+    /// - to write/read Variables, and
+    /// - to monitor Data Changes on a OPC UA Server.
+    /// This class should be instanciated within a <see cref="RemoteObject"/> RemoteObject. The associated session is
+    /// ment to be instantiated and connected to the desired Server.
     /// </summary>
     public class RemoteHelper
     {
@@ -18,6 +22,13 @@ namespace UaclClient
         private readonly BrowseContext _browseContext;
         private const int OpcUaIdRootFolder = 84;
         private const int OpcUaIdObjectsFolder = 85;
+
+        private static Dictionary<string, NodeId> NodeIdCache { get; set; }
+
+        static RemoteHelper()
+        {
+            NodeIdCache = new Dictionary<string, NodeId>();
+        }
 
         private RemoteHelper(OpcUaSession session)
         {
@@ -39,7 +50,11 @@ namespace UaclClient
 
         public RemoteHelper(OpcUaSession session, string parentNodeName) : this(session)
         {
-            _parentNode = BrowseNodeId(null, parentNodeName);
+            if (!NodeIdCache.ContainsKey(parentNodeName))
+            {
+                NodeIdCache[parentNodeName] = BrowseNodeId(null, parentNodeName);
+            }
+            _parentNode = NodeIdCache[parentNodeName];
         }
 
         /// <summary>
