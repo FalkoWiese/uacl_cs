@@ -2,6 +2,9 @@
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
+using System.Runtime.Remoting.Channels;
+using System.Runtime.Remoting.Messaging;
+using System.Threading;
 using UaclUtils;
 using UnifiedAutomation.UaBase;
 using UnifiedAutomation.UaClient;
@@ -17,7 +20,48 @@ namespace UaclClient
             MyNodeId = NodeId.Null;
             NodeIdCache = new Dictionary<string, NodeId>();
             SessionLock = new object();
-            SessionHandle = new OpcUaSessionHandle(OpcUaSession.Create(Connection));
+            StartConnectionEstablishment();
+        }
+
+        private void StartConnectionEstablishment()
+        {
+            ThreadStart threadStart = () =>
+            {
+                while (true)
+                {
+                    try
+                    {
+                        lock (SessionLock)
+                        {
+                            SessionHandle = new OpcUaSessionHandle(OpcUaSession.Create(Connection));
+                        }
+                    }
+                    catch (Exception exc)
+                    {
+                        Logger.Error(exc);
+                        Thread.Sleep(2000);
+                        continue;
+                    }
+
+                    try
+                    {
+                        Connect();
+                    }
+                    catch (Exception exc)
+                    {
+                        Logger.Error(exc);
+                        continue;
+                    }
+
+                    if (Connected())
+                    {
+                        break;
+                    }
+                }
+            };
+
+            var thread = new Thread(threadStart);
+            thread.Start();
         }
 
         private Action<Session, ServerConnectionStatusUpdateEventArgs> NotConnectedCallback { get; set; }
@@ -30,7 +74,7 @@ namespace UaclClient
         {
             if (NotConnectedCallback != null)
             {
-                Logger.Info("There is already a callback registered");
+                Logger.Info("There is already a callback registered.");
                 return;
             }
 
@@ -72,7 +116,7 @@ namespace UaclClient
             GC.SuppressFinalize(this);
         }
 
-        protected virtual void Dispose(bool really)
+        protected void Dispose(bool really)
         {
             if (really)
             {

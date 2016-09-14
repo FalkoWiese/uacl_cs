@@ -31,6 +31,5 @@ namespace UaclClient
         {
             return ConnectionStatus != ServerConnectionStatus.Connected;
         }
-
     }
 }
