@@ -41,6 +41,15 @@ namespace UaclClient
                         continue;
                     }
 
+                    try
+                    {
+                        Connect();
+                    }
+                    catch (Exception exc)
+                    {
+                        Logger.Error(exc);
+                    }
+
                     break;
                 }
             };
@@ -50,6 +59,7 @@ namespace UaclClient
         }
 
         private Action<Session, ServerConnectionStatusUpdateEventArgs> NotConnectedCallback { get; set; }
+        private Action PostConnectionEstablished { get; set; }
 
         public NodeId MyNodeId { get; set; }
         public Dictionary<string, NodeId> NodeIdCache { get; set; }
@@ -66,9 +76,14 @@ namespace UaclClient
             NotConnectedCallback = notConnected;
         }
 
+        protected void AnnouncePostConnectionEstablishedHandler(Action postConnectionEstablished)
+        {
+            PostConnectionEstablished = postConnectionEstablished;
+        }
+
         private bool AnnounceToSession()
         {
-            SessionHandle.Session.ConnectionStatusUpdate += (s, args) =>
+            ServerConnectionStatusUpdateEventHandler statusChangedCallback = (s, args) =>
             {
                 switch (s.ConnectionStatus)
                 {
@@ -81,18 +96,22 @@ namespace UaclClient
                         // My idea was, to call Dispose() here, but I think, we should do it from
                         // outside the RemoteObject context ...
                         return;
+                    case ServerConnectionStatus.Connected:
+                    case ServerConnectionStatus.SessionAutomaticallyRecreated:
+                        PostConnectionEstablished?.Invoke();
+                        // I think, it's a good idea, to have a callback like this. So you can provide e. g. the
+                        // monitoring of some UA variables here.
+                        return;
                     default:
                         /*
-                            case ServerConnectionStatus.Connected:
                             case ServerConnectionStatus.Connecting:
-                            case ServerConnectionStatus.SessionAutomaticallyRecreated:
                             case ServerConnectionStatus.ConnectionWarningWatchdogTimeout:
                         */
                         return;
                 }
             };
 
-            return true;
+            return SessionHandle.AddStatusChangedHandler(statusChangedCallback);
         }
 
         public void Dispose()
@@ -134,6 +153,11 @@ namespace UaclClient
                 var session = SessionHandle.Session;
                 var stopWatch = Stopwatch.StartNew();
 
+                if (AnnounceToSession())
+                {
+                    Logger.Info("ConnectionStatusChanged callback successfull registered!");
+                }
+
                 do
                 {
                     try
@@ -163,10 +187,6 @@ namespace UaclClient
                     return false;
                 }
 
-                if (!AnnounceToSession())
-                {
-                    Logger.Info("There is no callback registered to get information about e. g. session disconnect!");
-                }
             }
 
             return Connected();

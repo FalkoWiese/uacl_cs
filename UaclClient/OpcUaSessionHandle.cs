@@ -88,10 +88,23 @@ namespace UaclClient
                     {
                         Session.Disconnect();
                     }
+                    Session.ConnectionStatusUpdate -= StatusChangedHandler;
+                    StatusChangedHandler = null;
                     Session.Dispose();
                     Session = null;
                 }
             }
+        }
+
+        private ServerConnectionStatusUpdateEventHandler StatusChangedHandler { get; set; }
+
+        public bool AddStatusChangedHandler(ServerConnectionStatusUpdateEventHandler statusChangedCallback)
+        {
+            if (StatusChangedHandler != null) return false;
+
+            StatusChangedHandler = statusChangedCallback;
+            Session.ConnectionStatusUpdate += StatusChangedHandler;
+            return true;
         }
     }
 }
