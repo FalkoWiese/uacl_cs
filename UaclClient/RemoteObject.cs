@@ -2,8 +2,6 @@
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
-using System.Runtime.Remoting.Channels;
-using System.Runtime.Remoting.Messaging;
 using System.Threading;
 using UaclUtils;
 using UnifiedAutomation.UaBase;
@@ -43,20 +41,7 @@ namespace UaclClient
                         continue;
                     }
 
-                    try
-                    {
-                        Connect();
-                    }
-                    catch (Exception exc)
-                    {
-                        Logger.Error(exc);
-                        continue;
-                    }
-
-                    if (Connected())
-                    {
-                        break;
-                    }
+                    break;
                 }
             };
 
