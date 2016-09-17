@@ -6,7 +6,7 @@ namespace MultiClientConsole
 {
     class Program
     {
-        static void Main(string[] args)
+        static void Main()
         {
             InternalServer server = null;
             try
@@ -21,12 +21,12 @@ namespace MultiClientConsole
 
                 while (true)
                 {
-                    System.Threading.Thread.Sleep(100);
+                    System.Threading.Thread.Sleep(1000);
                 }
             }
             catch (Exception e)
             {
-                ExceptionHandler.Log(e, "Error while starting the OfficeServerConsole ...");
+                ExceptionHandler.Log(e, "Error while starting the MultiClientConsole ...");
                 Logger.Info("Press <enter> to exit the program.");
                 Console.ReadLine();
             }
