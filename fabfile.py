@@ -49,6 +49,11 @@ def start_oc():
 
 
 @task
+def start_mcc():
+    local("tools\start_application.bat MultiClientConsole")
+
+
+@task
 def stop():
     local("tools\stop.bat")
 
