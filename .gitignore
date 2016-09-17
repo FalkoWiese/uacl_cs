@@ -28,3 +28,4 @@ TestUaclClient/bin/
 MultiClientConsole/bin
 MultiClientConsole/obj
 MultiClientConsole/MultiClientConsole.csproj.user
+ServerConsole.sln.iml
