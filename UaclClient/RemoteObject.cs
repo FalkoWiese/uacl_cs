@@ -37,20 +37,21 @@ namespace UaclClient
                     catch (Exception exc)
                     {
                         Logger.Error(exc);
-                        Thread.Sleep(2000);
+                        Thread.Sleep(2000); // It's maybe a good idea, not to have a hectic connection establishment.
                         continue;
                     }
 
                     try
                     {
-                        Connect();
+                        if (Connect())
+                        {
+                            break;
+                        }
                     }
                     catch (Exception exc)
                     {
                         Logger.Error(exc);
                     }
-
-                    break;
                 }
             };
 
