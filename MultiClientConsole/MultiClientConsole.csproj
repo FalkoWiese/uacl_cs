@@ -50,6 +50,7 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="ClientConsoleClient.cs" />
+    <Compile Include="MultiClientHost.cs" />
     <Compile Include="MultiClientServer.cs" />
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
