@@ -133,7 +133,7 @@ namespace UaclClient
         {
             lock (SessionLock)
             {
-                return SessionHandle.Session.ConnectionStatus == ServerConnectionStatus.Connected;
+                return SessionHandle != null && SessionHandle.Session.ConnectionStatus == ServerConnectionStatus.Connected;
             }
         }
 
