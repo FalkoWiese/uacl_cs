@@ -14,10 +14,16 @@ namespace MultiClientConsole
                 server = new MultiClientServer();
                 var factory = new UaFactory(server);
 
-                factory.CreateUaObject<ServerConsoleClient>();
-                factory.CreateUaObject<ClientConsoleClient>();
+                var p = factory.CreateUaObject<MultiClientHost>();
+                factory.CreateUaObject<ServerConsoleClient>(p);
+                factory.CreateUaObject<ClientConsoleClient>(p);
 
-                server.Start();
+
+
+                if (!server.Start())
+                {
+                    throw new Exception("Cannot start UA Server without errors!");
+                }
 
                 while (true)
                 {
@@ -35,7 +41,6 @@ namespace MultiClientConsole
                 // Stop the server.
                 server?.Stop();
             }
-
         }
     }
 }
