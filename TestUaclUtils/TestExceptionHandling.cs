@@ -1,7 +1,6 @@
 ﻿using System;
 using System.Threading;
 using NUnit.Framework;
-using NUnit.Framework.Compatibility;
 using UaclUtils;
 using Stopwatch = System.Diagnostics.Stopwatch;
 
@@ -10,6 +9,24 @@ namespace TestUaclUtils
     [TestFixture]
     public class TestExceptionHandling
     {
+        [Test]
+        public void ExecuteReadProperty()
+        {
+            object o = new TestClass1(1);
+            var rf = new ReflectionHelper(o);
+            Assert.IsTrue(rf.ReadProperty<int>("Value1", "Value2", "Value") == 1);
+            Assert.IsFalse(rf.ReadProperty<int>("Value1", "Value2", "Value") == 2);
+            try
+            {
+                rf.ReadProperty<int>("Value1", "Value2");
+                Assert.Fail();
+            }
+            catch (Exception)
+            {
+                Assert.True(true, "Yup, here we expect an exception!");
+            }
+        }
+
         [Test]
         public void StopwatchHandling()
         {
