@@ -1,10 +1,6 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
-using System.Reflection.Emit;
-using System.Text;
-using System.Threading.Tasks;
 using UaclUtils;
 
 namespace UaclServer
@@ -33,8 +29,8 @@ namespace UaclServer
 
             if (uaObjectList != null)
             {
-                var pot = parentObject?.GetType();
-                var addUaNode = pot?.GetMethod("AddUaNode");
+                var pot = parentObject.GetType();
+                var addUaNode = pot.GetMethod("AddUaNode");
                 if (addUaNode != null)
                 {
                     addUaNode.Invoke(parentObject, new[] { uaObjectList.GetValue(parentObject), uaObject });
@@ -54,6 +50,6 @@ namespace UaclServer
             return uaObject;
         }
 
-        private InternalServer UaServer { get; set; }
+        private InternalServer UaServer { get; }
     }
 }
