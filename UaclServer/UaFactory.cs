@@ -18,6 +18,11 @@ namespace UaclServer
             var c = t.GetConstructor(new Type[] {});
             var uaObject = (T) c?.Invoke(null);
 
+            return CreateUaObject(uaObject, parentObject);
+        }
+
+        public T CreateUaObject<T>(T uaObject, object parentObject=null)
+        {
             if (parentObject != null)
             {
                 var uaObjectList = (from pi in parentObject.GetType().GetProperties()
@@ -60,6 +65,13 @@ namespace UaclServer
         public T AddUaObject<T>(object parentObject = null)
         {
             var result = CreateUaObject<T>(parentObject);
+            UaServer.Restart();
+            return result;
+        }
+
+        public T AddUaObject<T>(T uaObject, object parentObject = null)
+        {
+            var result = CreateUaObject(uaObject, parentObject);
             UaServer.Restart();
             return result;
         }
