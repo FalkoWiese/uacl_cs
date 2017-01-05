@@ -6,24 +6,31 @@ using UaclUtils;
 
 namespace UaclServer
 {
-	public class InternalServerManager : ServerManager
-	{
-
+    public class InternalServerManager : ServerManager
+    {
         public InternalServerManager(params string[] uris)
         {
             InternalUris = uris;
-            BusinessModel = new List<object>();
+            BusinessModel = new List<BoCapsule>();
+            INManager = null;
         }
+
+        private InternalNodeManager INManager { get; set; }
 
         private string[] InternalUris { get; set; }
 
-		protected override void OnRootNodeManagerStarted(RootNodeManager nodeManager)
-		{
-			var mngr = new InternalNodeManager(this, InternalUris);
-            mngr.Startup();
-		}
+        protected override void OnRootNodeManagerStarted(RootNodeManager nodeManager)
+        {
+            INManager = new InternalNodeManager(this, InternalUris);
+            INManager.Startup();
+        }
 
-        internal List<object> BusinessModel { get; set; }
+        public void RegisterLaterOnAddedObjects()
+        {
+            INManager.AddUnregisteredNodes();
+        }
+
+        internal List<BoCapsule> BusinessModel { get; set; }
 
         internal CallbackHandler ConnectHandler { get; set; }
         internal CallbackHandler DisconnectHandler { get; set; }
@@ -36,39 +43,41 @@ namespace UaclServer
 
         internal void SetConnectCallback(Func<object, object, object> callback, object handlerContext)
         {
-            ConnectHandler = new CallbackHandler { Callback = callback, HandlerContext = handlerContext };
+            ConnectHandler = new CallbackHandler {Callback = callback, HandlerContext = handlerContext};
         }
 
         internal void SetDisconnectCallback(Func<object, object, object> callback, object handlerContext)
         {
-            DisconnectHandler = new CallbackHandler { Callback = callback, HandlerContext = handlerContext };
+            DisconnectHandler = new CallbackHandler {Callback = callback, HandlerContext = handlerContext};
         }
 
         private Dictionary<Session, object> _sessionContext;
+
         internal Dictionary<Session, object> GetSessionContext()
         {
             return _sessionContext ?? (_sessionContext = new Dictionary<Session, object>());
         }
 
-        public bool RegisterObject(object modelObject, object parentObject=null)
-	    {
+        public bool RegisterObject(object modelObject, object parentObject = null)
+        {
             try
             {
                 var t = modelObject.GetType();
                 var a = t.GetCustomAttribute<UaObject>();
                 if (a == null)
                 {
-                    throw new Exception($"Cannot register UA object for type {t.Name}, it's not annotated with 'UaObject'!");
+                    throw new Exception(
+                        $"Cannot register UA object for type {t.Name}, it's not annotated with 'UaObject'!");
                 }
             }
-	        catch (Exception e)
-	        {
+            catch (Exception e)
+            {
                 ExceptionHandler.Log(e);
                 return false;
-	        }
+            }
 
-            BusinessModel?.Add(modelObject);
-	        return true;
-	    }
-	}
+            BusinessModel?.Add(new BoCapsule(modelObject));
+            return true;
+        }
+    }
 }

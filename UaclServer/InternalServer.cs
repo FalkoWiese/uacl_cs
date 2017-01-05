@@ -141,5 +141,9 @@ namespace UaclServer
             return true;
         }
 
+        public void Restart()
+        {
+            Manager?.RegisterLaterOnAddedObjects();
+        }
     }
 }

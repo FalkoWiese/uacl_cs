@@ -28,7 +28,8 @@ namespace UaclServer
             GlobalNotifier.LocalDataChangeEvent += (nodeId, variableName, value) =>
             {
                 Logger.Trace($"LocalDataChangeEvent fired for varible {nodeId}={value}");
-                server.InternalClient.WriteAttribute(server.DefaultRequestContext, nodeId, 13, TypeMapping.Instance.ToVariant(value));
+                server.InternalClient.WriteAttribute(server.DefaultRequestContext, nodeId, 13,
+                    TypeMapping.Instance.ToVariant(value));
             };
         }
 
@@ -38,7 +39,7 @@ namespace UaclServer
         private ushort TypeNamespaceIndex { get; set; }
 
 
-        private int incrementCounter()
+        private int IncrementCounter()
         {
             return ++_counter;
         }
@@ -58,10 +59,12 @@ namespace UaclServer
             base.Startup();
         }
 
+        private ObjectNode RootNode { get; set; }
+
         private void CreateUaServerInterface()
         {
             // The root folder, named by the specific application.
-            var applicationRoot = CreateObject(Server.DefaultRequestContext, new CreateObjectSettings()
+            RootNode = CreateObject(Server.DefaultRequestContext, new CreateObjectSettings
             {
                 ParentNodeId = ObjectIds.ObjectsFolder,
                 ReferenceTypeId = ReferenceTypeIds.Organizes,
@@ -69,40 +72,56 @@ namespace UaclServer
                 BrowseName = new QualifiedName(ApplicationUri, InstanceNamespaceIndex),
                 TypeDefinitionId = ObjectTypeIds.FolderType
             });
-            Logger.Info($"Created root node ... {applicationRoot.NodeId.Identifier}.");
+            Logger.Info($"Created root node ... {RootNode.NodeId.Identifier}.");
 
             // Here we add the registered objects. Unless, they aren't correctly annotated.
             foreach (var model in GetManager().BusinessModel)
             {
-                AddNode(model, applicationRoot);
+                AddNode(model, RootNode);
             }
         }
 
-        private void AddNode(object businessObject, ObjectNode rootNode)
+        public void AddUnregisteredNodes()
         {
-            var uaObject = businessObject.GetType().GetCustomAttribute<UaObject>();
-            var uaObjectName = uaObject.Name ?? businessObject.GetType().Name;
-            var nodeIdName = $"{uaObjectName}_{incrementCounter()}";
-
-            var node = CreateObject(Server.DefaultRequestContext, new CreateObjectSettings()
+            foreach (var model in GetManager().BusinessModel)
             {
-                ParentNodeId = rootNode.NodeId,
-                ReferenceTypeId = ReferenceTypeIds.Organizes,
-                RequestedNodeId = new NodeId(nodeIdName, InstanceNamespaceIndex),
-                BrowseName = new QualifiedName(uaObjectName, InstanceNamespaceIndex),
-                TypeDefinitionId = ObjectTypeIds.BaseObjectType
-            });
-            Logger.Info($"Created node ... {node.NodeId.Identifier}.");
-
-            foreach (var property in businessObject.GetType().GetProperties())
-            {
-                AddVariable(businessObject, property, node);
-                AddUaNodes(businessObject, property, node);
+                if (model.IsRegistered()) continue;
+                AddNode(model, RootNode);
             }
+        }
 
-            foreach (var method in businessObject.GetType().GetMethods())
+        private void AddNode(BoCapsule capsule, ObjectNode rootNode)
+        {
+            var businessObject = capsule.BoModel;
+
+            var uaObject = businessObject.GetType().GetCustomAttribute<UaObject>();
+
+            if (!capsule.IsRegistered())
             {
-                AddMethod(businessObject, method, node);
+                var uaObjectName = uaObject.Name ?? businessObject.GetType().Name;
+                var nodeIdName = $"{uaObjectName}_{IncrementCounter()}";
+                capsule.BoId = new NodeId(nodeIdName, InstanceNamespaceIndex);
+
+                var node = CreateObject(Server.DefaultRequestContext, new CreateObjectSettings
+                {
+                    ParentNodeId = rootNode.NodeId,
+                    ReferenceTypeId = ReferenceTypeIds.Organizes,
+                    RequestedNodeId = new NodeId(nodeIdName, InstanceNamespaceIndex),
+                    BrowseName = new QualifiedName(uaObjectName, InstanceNamespaceIndex),
+                    TypeDefinitionId = ObjectTypeIds.BaseObjectType
+                });
+                Logger.Info($"Created node ... {node.NodeId.Identifier}.");
+
+                foreach (var property in businessObject.GetType().GetProperties())
+                {
+                    AddVariable(businessObject, property, node);
+                    AddUaNodes(businessObject, property, node);
+                }
+
+                foreach (var method in businessObject.GetType().GetMethods())
+                {
+                    AddMethod(businessObject, method, node);
+                }
             }
         }
 
@@ -141,7 +160,7 @@ namespace UaclServer
                 });
             }
 
-            if (method.ReturnParameter != null && method.ReturnParameter.ParameterType != typeof (void))
+            if (method.ReturnParameter != null && method.ReturnParameter.ParameterType != typeof(void))
             {
                 settings.OutputArguments.Add(new Argument
                 {
@@ -198,7 +217,7 @@ namespace UaclServer
 
             foreach (var o in uaNodeItems)
             {
-                AddNode(o, parentNode);
+                AddNode(new BoCapsule(o), parentNode);
             }
         }
 
@@ -245,13 +264,10 @@ namespace UaclServer
                     parameterArray[i] = parameterList[i];
                 }
 
-                if (data.Method.ReturnType == typeof (void))
+                if (data.Method.ReturnType == typeof(void))
                 {
                     ThreadPool.QueueUserWorkItem(
-                        delegate
-                        {
-                            ExecuteMethodProtected(data, parameterArray);
-                        }, null);
+                        delegate { ExecuteMethodProtected(data, parameterArray); }, null);
 
                     return StatusCodes.Good;
                 }
@@ -310,7 +326,7 @@ namespace UaclServer
             DataValue baseValue = base.Read(context, nodeHandle, indexRange, dataEncoding);
             if (nodeHandle.AttributeId != 13) return baseValue;
 
-            var processVariable = nodeHandle?.UserData as VariableNode;
+            var processVariable = nodeHandle.UserData as VariableNode;
             var processVariableData = processVariable?.UserData as VariableNodeData;
             if (processVariableData == null) return baseValue;
 
@@ -331,7 +347,8 @@ namespace UaclServer
             var processVariableData = processVariable?.UserData as VariableNodeData;
             if (processVariableData == null) return statusCode;
 
-            return processVariableData.WriteValue(value.Value) && (statusCode != null && StatusCode.IsGood((StatusCode)statusCode)) 
+            return processVariableData.WriteValue(value.Value) &&
+                   (statusCode != null && StatusCode.IsGood((StatusCode) statusCode))
                 ? StatusCodes.Good
                 : StatusCodes.Bad;
         }
