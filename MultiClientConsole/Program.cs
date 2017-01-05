@@ -14,10 +14,9 @@ namespace MultiClientConsole
                 server = new MultiClientServer();
                 var factory = new UaFactory(server);
 
-                var p = factory.CreateUaObject<MultiClientHost>();
-                factory.CreateUaObject<ServerConsoleClient>(p);
-                factory.CreateUaObject<ClientConsoleClient>(p);
-
+                var parent = factory.CreateUaObject<MultiClientHost>();
+                factory.CreateUaObject(new ServerConsoleClient("localhost", 48030), parent);
+                factory.CreateUaObject(new ClientConsoleClient("localhost", 48040), parent);
 
 
                 if (!server.Start())
@@ -30,8 +29,11 @@ namespace MultiClientConsole
                 {
                     System.Threading.Thread.Sleep(1000);
                     var runtime = DateTimeHelper.currentTimeMillis() - startTs;
-                    if (5000 < runtime || runtime >= 6000) continue;
-                    factory.AddUaObject<ClientConsoleClient>();
+                    if (15000 < runtime && runtime < 17000)
+                    {
+                        var cl = factory.AddUaObject<ClientConsoleClient>();
+                        Logger.Info($"{cl} added.");
+                    }
                 }
             }
             catch (Exception e)
