@@ -25,9 +25,13 @@ namespace MultiClientConsole
                     throw new Exception("Cannot start UA Server without errors!");
                 }
 
+                var startTs = DateTimeHelper.currentTimeMillis();
                 while (true)
                 {
                     System.Threading.Thread.Sleep(1000);
+                    var runtime = DateTimeHelper.currentTimeMillis() - startTs;
+                    if (5000 < runtime || runtime >= 6000) continue;
+                    factory.AddUaObject<ClientConsoleClient>();
                 }
             }
             catch (Exception e)
