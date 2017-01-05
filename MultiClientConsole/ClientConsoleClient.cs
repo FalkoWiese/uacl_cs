@@ -60,7 +60,11 @@ namespace MultiClientConsole
             });
         }
 
-        public ClientConsoleClient() : this("localhost", 48040, "BusinessLogic")
+        public ClientConsoleClient(string ip, int port) : this(ip, port, "BusinessLogic")
+        {
+        }
+
+        public ClientConsoleClient() : this("localhost", 48040)
         {
         }
 
@@ -74,7 +78,5 @@ namespace MultiClientConsole
         public float CcFloatBoState { get; set; }
 
         private bool MonitoringStarted { get; set; }
-
-
     }
 }

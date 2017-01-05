@@ -31,7 +31,11 @@ namespace MultiClientConsole
             }
         }
 
-        public ServerConsoleClient() : this("localhost", 48030, "BusinessLogic")
+        public ServerConsoleClient(string ip, int port) : this(ip, port, "BusinessLogic")
+        {
+        }
+
+        public ServerConsoleClient() : this("localhost", 48030)
         {
         }
 
