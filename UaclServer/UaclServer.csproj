@@ -47,6 +47,7 @@
     </Reference>
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="BoCapsule.cs" />
     <Compile Include="GlobalNotifier.cs" />
     <Compile Include="ServerSideUaProxy.cs" />
     <Compile Include="UaclInsertState.cs" />
