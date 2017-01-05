@@ -18,33 +18,40 @@ namespace UaclServer
             var c = t.GetConstructor(new Type[] {});
             var uaObject = (T) c?.Invoke(null);
 
-            PropertyInfo uaObjectList = null;
             if (parentObject != null)
             {
-                uaObjectList = (from pi in parentObject.GetType().GetProperties()
-                                let uaolAttribute = pi.GetCustomAttribute<UaObjectList>()
-                                where uaolAttribute != null
-                                select pi).FirstOrDefault();
-            }
+                var uaObjectList = (from pi in parentObject.GetType().GetProperties()
+                    let uaolAttribute = pi.GetCustomAttribute<UaObjectList>()
+                    where uaolAttribute != null
+                    select pi).FirstOrDefault();
 
-            if (uaObjectList != null)
-            {
-                var pot = parentObject.GetType();
-                var addUaNode = pot.GetMethod("AddUaNode");
-                if (addUaNode != null)
+                if (uaObjectList != null)
                 {
-                    addUaNode.Invoke(parentObject, new[] { uaObjectList.GetValue(parentObject), uaObject });
-                    Logger.Info($"Added {uaObject} to {parentObject}.{uaObjectList.Name}");
+                    var pot = parentObject.GetType();
+                    var addUaNode = pot.GetMethod("AddUaNode");
+                    if (addUaNode != null)
+                    {
+                        addUaNode.Invoke(parentObject, new[] {uaObjectList.GetValue(parentObject), uaObject});
+                        Logger.Info($"Added {uaObject} to {parentObject}.{uaObjectList.Name}");
+                    }
+                    else
+                    {
+                        Logger.Warn(
+                            $"Cannot add {uaObject} automatically to {parentObject}. Your business classes have to inherit from {typeof(ServerSideUaProxy).Name}!");
+                    }
                 }
                 else
                 {
-                    Logger.Warn($"Cannot add {uaObject} automatically to {parentObject}. Your business classes have to inherit from {typeof(ServerSideUaProxy).Name}!");
+                    Logger.Warn(
+                        $"The parentObject for {uaObject} is not NULL, but cannot find a property on it what is annotated with <UaObjectList>!");
                 }
             }
             else
             {
-                UaServer.RegisterObject(uaObject);
-                Logger.Warn($"The parentObject for {uaObject} is not NULL, but cannot find a property on it what is annotated with <UaObjectList>!");
+                if (!UaServer.RegisterObject(uaObject))
+                {
+                    Logger.Warn($"Cannot register {uaObject} to the UA Server.");
+                }
             }
 
             return uaObject;
