@@ -31,6 +31,12 @@ namespace UaclClient
                     {
                         lock (SessionLock)
                         {
+                            if (SessionHandle != null)
+                            {
+                                SessionHandle.Dispose();
+                                SessionHandle = null;
+                            }
+
                             SessionHandle = new OpcUaSessionHandle(OpcUaSession.Create(Connection));
                         }
                     }
