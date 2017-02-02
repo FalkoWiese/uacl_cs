@@ -1,4 +1,5 @@
 ﻿using System;
+using UaclClient;
 using UaclServer;
 using UaclUtils;
 
@@ -15,8 +16,14 @@ namespace MultiClientConsole
                 var factory = new UaFactory(server);
 
                 var parent = factory.CreateUaObject<MultiClientHost>();
-                factory.CreateUaObject(new ServerConsoleClient("localhost", 48030), parent);
-                factory.CreateUaObject(new ClientConsoleClient("localhost", 48040), parent);
+
+                foreach (var remoteObject in new RemoteObject[]
+                    {new ServerConsoleClient("localhost", 48030), new ClientConsoleClient("localhost", 48040)})
+                {
+                    factory.CreateUaObject(remoteObject, parent)
+                        .SetDisconnectedHandler(
+                            (session, args) => { remoteObject.StartConnectionEstablishment(); });
+                }
 
 
                 if (!server.Start())

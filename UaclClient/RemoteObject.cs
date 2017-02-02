@@ -9,7 +9,7 @@ using UnifiedAutomation.UaClient;
 
 namespace UaclClient
 {
-    public class RemoteObject : IDisposable
+    public class RemoteObject
     {
         public RemoteObject(string ip, int port, string name)
         {
@@ -18,69 +18,94 @@ namespace UaclClient
             MyNodeId = NodeId.Null;
             NodeIdCache = new Dictionary<string, NodeId>();
             SessionLock = new object();
-            StartConnectionEstablishment();
-        }
-
-        private void StartConnectionEstablishment()
-        {
-            ThreadStart threadStart = () =>
+            ConnectionEstablishmentLock = new object();
+            StartConnectionEstablishmentCallback = () =>
             {
-                while (true)
+                if (ConnectionEstablishmentIsWorking) return;
+
+                try
                 {
-                    try
+                    lock (ConnectionEstablishmentLock)
                     {
-                        lock (SessionLock)
+                        ConnectionEstablishmentIsWorking = true;
+                    }
+
+                    while (true)
+                    {
+                        try
                         {
-                            if (SessionHandle != null)
+                            lock (SessionLock)
                             {
-                                SessionHandle.Dispose();
-                                SessionHandle = null;
+                                if (SessionHandle == null)
+                                {
+                                    SessionHandle = new OpcUaSessionHandle(OpcUaSession.Create(Connection));
+                                }
                             }
-
-                            SessionHandle = new OpcUaSessionHandle(OpcUaSession.Create(Connection));
                         }
-                    }
-                    catch (Exception exc)
-                    {
-                        Logger.Error(exc);
-                        Thread.Sleep(2000); // It's maybe a good idea, not to have a hectic connection establishment.
-                        continue;
-                    }
-
-                    try
-                    {
-                        if (Connect())
+                        catch (Exception exc)
                         {
-                            break;
+                            Logger.Warn(
+                                $"Exception at connection establishment while 'new OpcUaSessionHandle()' ... '{exc.Message}'.");
+                            Thread
+                                .Sleep(1000); // It's maybe a good idea, not to have a hectic connection establishment.
+                            continue;
+                        }
+
+                        try
+                        {
+                            if (Connect())
+                            {
+                                return;
+                            }
+                        }
+                        catch (Exception exc)
+                        {
+                            Logger.Warn(
+                                $"Exception at connection establishment while 'Connect()' ... '{exc.Message}'.");
+                            Thread
+                                .Sleep(1000); // It's maybe a good idea, not to have a hectic connection establishment.
                         }
                     }
-                    catch (Exception exc)
+                }
+                finally
+                {
+                    lock (ConnectionEstablishmentLock)
                     {
-                        Logger.Error(exc);
+                        ConnectionEstablishmentIsWorking = false;
                     }
                 }
             };
 
-            var thread = new Thread(threadStart);
+            StartConnectionEstablishment(); // Yup, we'll call it while RemoteObject creation, directly.
+        }
+
+        private object ConnectionEstablishmentLock { get; set; }
+        private bool ConnectionEstablishmentIsWorking { get; set; }
+        private ThreadStart StartConnectionEstablishmentCallback { get; set; }
+
+        public void StartConnectionEstablishment()
+        {
+            var thread = new Thread(StartConnectionEstablishmentCallback);
+
             thread.Start();
         }
 
-        private Action<Session, ServerConnectionStatusUpdateEventArgs> NotConnectedCallback { get; set; }
+        private event Action<Session, ServerConnectionStatusUpdateEventArgs> NotConnectedCallback;
+
         private Action PostConnectionEstablished { get; set; }
 
         public NodeId MyNodeId { get; set; }
         public Dictionary<string, NodeId> NodeIdCache { get; set; }
 
+        public void SetDisconnectedHandler(Action<Session, ServerConnectionStatusUpdateEventArgs> handler)
+        {
+            AnnounceSessionNotConnectedHandler(handler);
+        }
+
         protected void AnnounceSessionNotConnectedHandler(
             Action<Session, ServerConnectionStatusUpdateEventArgs> notConnected)
         {
-            if (NotConnectedCallback != null)
-            {
-                Logger.Info("There is already a callback registered.");
-                return;
-            }
-
-            NotConnectedCallback = notConnected;
+            NotConnectedCallback += notConnected;
         }
 
         protected void AnnouncePostConnectionEstablishedHandler(Action postConnectionEstablished)
@@ -121,25 +146,12 @@ namespace UaclClient
             return SessionHandle.AddStatusChangedHandler(statusChangedCallback);
         }
 
-        public void Dispose()
-        {
-            Dispose(true);
-            GC.SuppressFinalize(this);
-        }
-
-        protected void Dispose(bool really)
-        {
-            if (really)
-            {
-                SessionHandle.Dispose();
-            }
-        }
-
         public bool Connected()
         {
             lock (SessionLock)
             {
-                return SessionHandle != null && SessionHandle.Session.ConnectionStatus == ServerConnectionStatus.Connected;
+                return SessionHandle != null && SessionHandle.Session.ConnectionStatus ==
+                       ServerConnectionStatus.Connected;
             }
         }
 
@@ -152,7 +164,7 @@ namespace UaclClient
 
             lock (SessionLock)
             {
-                if (SessionHandle.Timeout)
+                if (SessionHandle == null || SessionHandle.Timeout)
                 {
                     return false;
                 }
@@ -193,7 +205,6 @@ namespace UaclClient
                     SessionHandle.Timeout = true;
                     return false;
                 }
-
             }
 
             return Connected();
@@ -205,7 +216,7 @@ namespace UaclClient
 
             lock (SessionLock)
             {
-                SessionHandle.Session.Disconnect();
+                SessionHandle?.Dispose();
             }
         }
 
@@ -221,11 +232,12 @@ namespace UaclClient
             {
                 var rh = new RemoteHelper(this);
                 rh.MonitorDataChanges(monitors.Keys.Select(name => new RemoteDataMonitor
-                {
-                    Name = name,
-                    Value = Variant.Null,
-                    Callback = monitors[name]
-                }).ToList(), this);
+                    {
+                        Name = name,
+                        Value = Variant.Null,
+                        Callback = monitors[name]
+                    })
+                    .ToList(), this);
                 return Variant.Null;
             });
         }
@@ -245,7 +257,7 @@ namespace UaclClient
             }
             catch (Exception e)
             {
-                ExceptionHandler.Log(e, $"Cannot subscribe MONITORED ITEM '{this.Name}.{name}'.");
+                ExceptionHandler.Log(e, $"Cannot subscribe MONITORED ITEM '{Name}.{name}'.");
             }
         }
 

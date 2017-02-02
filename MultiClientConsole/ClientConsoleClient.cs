@@ -25,6 +25,12 @@ namespace MultiClientConsole
                             $"The connection {session} is disconnected, you can find the reason maybe at the arguments ... {args}.");
                         MonitoringStarted = false;
                     }
+                    else
+                    {
+                        StartConnectionEstablishment(); // I would suggest, we should do it on every NotConnectedHandler.
+                        // It's maybe a good idea, to allow more than one such handler. Yep, I did it that way, made the
+                        // the regarded 'Announce...()' method public, and so you can develop a Disconnected Handler
+                    }
                 });
             AnnouncePostConnectionEstablishedHandler(() =>
             {
