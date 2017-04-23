@@ -5,9 +5,8 @@ using UnifiedAutomation.UaSchema;
 
 namespace UaclServer
 {
-
     public class InternalServer
-    { 
+    {
         private int Port { get; set; }
         private string Ip { get; set; }
         private string ApplicationName { get; set; }
@@ -62,9 +61,9 @@ namespace UaclServer
                 BaseAddresses = new ListOfBaseAddresses {$"opc.tcp://{ip}:{port}"},
                 SecurityProfiles = new ListOfSecurityProfiles
                 {
-                    new SecurityProfile() {ProfileUri = SecurityProfiles.Basic256, Enabled = true},
-                    new SecurityProfile() {ProfileUri = SecurityProfiles.Basic128Rsa15, Enabled = true},
-                    new SecurityProfile() {ProfileUri = SecurityProfiles.None, Enabled = true}
+                    new SecurityProfile {ProfileUri = SecurityProfiles.Basic256, Enabled = true},
+                    new SecurityProfile {ProfileUri = SecurityProfiles.Basic128Rsa15, Enabled = true},
+                    new SecurityProfile {ProfileUri = SecurityProfiles.None, Enabled = true}
                 }
             };
 
@@ -91,7 +90,7 @@ namespace UaclServer
 
         private InternalServerManager Manager { get; set; }
 
-        public bool RegisterObject(object modelObject, object parentObject=null)
+        public bool RegisterObject(object modelObject, object parentObject = null)
         {
             return Manager?.RegisterObject(modelObject, parentObject) ?? false;
         }
@@ -110,14 +109,15 @@ namespace UaclServer
         {
             if (Manager.IsRunning) return false;
 
-            ApplicationLicenseManager.AddProcessLicenses(System.Reflection.Assembly.GetExecutingAssembly(), "License.lic");
+            ApplicationLicenseManager.AddProcessLicenses(System.Reflection.Assembly.GetExecutingAssembly(),
+                "License.lic");
             var application = new ApplicationInstance {ConfigurationFilePath = "ServerConfig.xml"};
             application.LoadConfiguration(false, true);
             ConfigureOpcUaApplicationFromCode(application, Ip, Port);
             application.Start(Manager, o => { }, Manager);
             if (Manager.SessionManager != null)
             {
-                Manager.SessionManager.SessionCreated += (session, reason) => 
+                Manager.SessionManager.SessionCreated += (session, reason) =>
                 {
                     Logger.Info($"Client({session.Id.Identifier}) connected.");
                     if (Manager.ConnectHandler?.Callback == null) return;
@@ -134,7 +134,8 @@ namespace UaclServer
             }
             else
             {
-                Logger.Warn("Cannot append events SessionCreated, and SessionClosing to the SessionManager, due to the instance is null!");
+                Logger.Warn(
+                    "Cannot append events SessionCreated, and SessionClosing to the SessionManager, due to available SessionManager reference isn't null!");
             }
 
             Logger.Info("UA Convenience Layer is running ...");
