@@ -144,7 +144,7 @@ namespace UaclServer
             return true;
         }
 
-        public void Restart()
+        public void ReorganizeNodes()
         {
             Manager?.RegisterLaterOnAddedObjects();
         }

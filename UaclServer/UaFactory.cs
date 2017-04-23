@@ -65,7 +65,7 @@ namespace UaclServer
         public T AddUaObject<T>(object parentObject = null)
         {
             var result = CreateUaObject<T>(parentObject);
-            UaServer.Restart();
+            UaServer.ReorganizeNodes();
             return result;
         }
 
