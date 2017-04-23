@@ -15,10 +15,9 @@ namespace ServerConsole
                 ConnectionInfo connection = new ConnectionInfo("localhost", 48030, "ServerConsole");
                 server = new InternalServer(connection.Ip, connection.Port, connection.Application);
 
-                UaFactory factory = new UaFactory(server);
-                factory.CreateUaObject<BusinessLogic>();
-                var bo1 = factory.CreateUaObject<BoProxy>();
-                factory.CreateUaObject<BusinessLogic>(bo1);
+                server.CreateClient<BusinessLogic>();
+                var bo1 = server.CreateClient<BoProxy>();
+                server.CreateClient<BusinessLogic>(bo1);
 
                 server.Start();
 

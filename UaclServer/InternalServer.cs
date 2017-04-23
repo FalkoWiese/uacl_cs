@@ -92,7 +92,7 @@ namespace UaclServer
 
         private InternalServerManager Manager { get; set; }
 
-        public bool RegisterObject(object modelObject, object parentObject = null)
+        internal bool RegisterObject(object modelObject, object parentObject = null)
         {
             return Manager?.RegisterObject(modelObject, parentObject) ?? false;
         }
@@ -144,9 +144,28 @@ namespace UaclServer
             return true;
         }
 
-        public void ReorganizeNodes()
+        internal void ReorganizeNodes()
         {
             Manager?.RegisterLaterOnAddedObjects();
         }
+
+        public T CreateClient<T>(object parentObject=null)
+        {
+            var f = new UaFactory(this);
+            return f.CreateUaObject<T>(parentObject);
+        }
+
+        public T CreateClient<T>(T uaObject, object parentObject=null)
+        {
+            var f = new UaFactory(this);
+            return f.CreateUaObject(uaObject, parentObject);
+        }
+
+        public T AddClient<T>(object parentObject = null)
+        {
+            var f = new UaFactory(this);
+            return f.AddUaObject<T>(parentObject);
+        }
+
     }
 }

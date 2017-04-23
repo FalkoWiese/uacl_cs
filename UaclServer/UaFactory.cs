@@ -5,7 +5,7 @@ using UaclUtils;
 
 namespace UaclServer
 {
-    public class UaFactory
+    internal class UaFactory
     {
         public UaFactory(InternalServer server)
         {
