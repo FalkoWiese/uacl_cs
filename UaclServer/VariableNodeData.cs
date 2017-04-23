@@ -1,7 +1,7 @@
 using System;
 using System.Reflection;
-using UnifiedAutomation.UaBase;
 using UaclUtils;
+using UnifiedAutomation.UaBase;
 
 namespace UaclServer
 {

@@ -1,8 +1,8 @@
 ﻿using System;
+using System.Diagnostics;
 using System.Threading;
 using NUnit.Framework;
 using UaclUtils;
-using Stopwatch = System.Diagnostics.Stopwatch;
 
 namespace TestUaclUtils
 {

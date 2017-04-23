@@ -1,7 +1,9 @@
 ﻿using System;
-using UnifiedAutomation.UaBase;
+using System.Reflection;
 using UaclUtils;
+using UnifiedAutomation.UaBase;
 using UnifiedAutomation.UaSchema;
+using ApplicationType = UnifiedAutomation.UaSchema.ApplicationType;
 
 namespace UaclServer
 {
@@ -35,7 +37,7 @@ namespace UaclServer
                 // configure endpoints
                 ApplicationName = "UnifiedAutomation GettingStartedServer",
                 ApplicationUri = "urn:localhost:UnifiedAutomation:GettingStartedServer",
-                ApplicationType = UnifiedAutomation.UaSchema.ApplicationType.Server_0,
+                ApplicationType = ApplicationType.Server_0,
                 ProductName = "UnifiedAutomation GettingStartedServer",
                 ApplicationCertificate = new CertificateIdentifier
                 {
@@ -109,7 +111,7 @@ namespace UaclServer
         {
             if (Manager.IsRunning) return false;
 
-            ApplicationLicenseManager.AddProcessLicenses(System.Reflection.Assembly.GetExecutingAssembly(),
+            ApplicationLicenseManager.AddProcessLicenses(Assembly.GetExecutingAssembly(),
                 "License.lic");
             var application = new ApplicationInstance {ConfigurationFilePath = "ServerConfig.xml"};
             application.LoadConfiguration(false, true);

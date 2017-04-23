@@ -1,5 +1,5 @@
 ﻿using System;
-using UaclClient;
+using System.Threading;
 using UaclServer;
 using UaclUtils;
 
@@ -24,7 +24,7 @@ namespace ServerConsole
 
                 while (true)
                 {
-                    System.Threading.Thread.Sleep(100);
+                    Thread.Sleep(100);
                 }
             }
             catch (Exception e)

@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Threading;
 using UaclClient;
 using UaclServer;
 using UaclUtils;
@@ -34,7 +35,7 @@ namespace MultiClientConsole
                 var startTs = DateTimeHelper.currentTimeMillis();
                 while (true)
                 {
-                    System.Threading.Thread.Sleep(1000);
+                    Thread.Sleep(1000);
                     var runtime = DateTimeHelper.currentTimeMillis() - startTs;
                     if (15000 < runtime && runtime < 17000)
                     {

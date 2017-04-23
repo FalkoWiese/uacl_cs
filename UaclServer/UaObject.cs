@@ -1,7 +1,9 @@
-﻿namespace UaclServer
+﻿using System;
+
+namespace UaclServer
 {
-    [System.AttributeUsage(System.AttributeTargets.Class)]
-    public class UaObject : System.Attribute
+    [AttributeUsage(AttributeTargets.Class)]
+    public class UaObject : Attribute
     {
         public string Name { get; private set; }
 

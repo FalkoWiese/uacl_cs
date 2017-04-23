@@ -1,7 +1,9 @@
-﻿namespace UaclServer
+﻿using System;
+
+namespace UaclServer
 {
-    [System.AttributeUsage(System.AttributeTargets.Property)]
-    public class UaObjectList : System.Attribute
+    [AttributeUsage(AttributeTargets.Property)]
+    public class UaObjectList : Attribute
     {
          
     }

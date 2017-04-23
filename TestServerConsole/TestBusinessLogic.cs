@@ -1,6 +1,5 @@
 ﻿using NUnit.Framework;
 
-
 namespace ServerConsole
 {
     [TestFixture]

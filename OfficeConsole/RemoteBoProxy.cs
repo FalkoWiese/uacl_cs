@@ -1,10 +1,5 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Text;
-using System.Threading.Tasks;
-using UaclClient;
+﻿using UaclClient;
 using UaclServer;
-using UaclUtils;
 
 namespace OfficeConsole
 {

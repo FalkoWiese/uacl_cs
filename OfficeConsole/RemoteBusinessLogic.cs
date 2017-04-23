@@ -1,7 +1,6 @@
 ﻿using UaclClient;
 using UaclServer;
 using UaclUtils;
-using UnifiedAutomation.UaBase;
 
 namespace OfficeConsole
 {

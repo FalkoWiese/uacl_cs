@@ -1,7 +1,9 @@
-﻿namespace UaclServer
+﻿using System;
+
+namespace UaclServer
 {
-    [System.AttributeUsage(System.AttributeTargets.Method)]
-    public class UaMethod : System.Attribute
+    [AttributeUsage(AttributeTargets.Method)]
+    public class UaMethod : Attribute
     {
         public string Name { get; private set; }
 
