@@ -69,13 +69,6 @@ namespace UaclServer
             return result;
         }
 
-        public T AddUaObject<T>(T uaObject, object parentObject = null)
-        {
-            var result = CreateUaObject(uaObject, parentObject);
-            UaServer.Restart();
-            return result;
-        }
-
         private InternalServer UaServer { get; }
     }
 }
