@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Linq;
 using System.Threading;
 using UaclClient;
 using UaclServer;
@@ -36,10 +37,20 @@ namespace MultiClientConsole
                 {
                     Thread.Sleep(1000);
                     var runtime = DateTimeHelper.currentTimeMillis() - startTs;
-                    if (15000 >= runtime || runtime >= 17000) continue;
-                    var cl = server.AddClient<ClientConsoleClient>();
-                    Logger.Info($"{cl} added.");
+                    if (15000 < runtime && runtime < 17000)
+                    {
+                        var cl = server.AddClient<ClientConsoleClient>();
+                        Logger.Info($"{cl} added.");
+                    }
+                    else if (runtime > 17000)
+                    {
+                        var registeredClients = server.RegisteredClients();
+                        Console.Out.WriteLine($"Registered Business Object count == {registeredClients.Count}");
+                        var lbo = registeredClients.Last();
+                        server.RemoveClient(lbo.BoId);
+                    }
                 }
+
             }
             catch (Exception e)
             {
