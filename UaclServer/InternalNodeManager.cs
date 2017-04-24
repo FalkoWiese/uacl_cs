@@ -70,7 +70,8 @@ namespace UaclServer
                 ReferenceTypeId = ReferenceTypeIds.Organizes,
                 RequestedNodeId = new NodeId(ApplicationUri, InstanceNamespaceIndex),
                 BrowseName = new QualifiedName(ApplicationUri, InstanceNamespaceIndex),
-                TypeDefinitionId = ObjectTypeIds.FolderType
+                TypeDefinitionId = ObjectTypeIds.FolderType,
+                ParentAsOwner = true
             });
             Logger.Info($"Created root node ... {RootNode.NodeId.Identifier}.");
 
@@ -108,7 +109,8 @@ namespace UaclServer
                     ReferenceTypeId = ReferenceTypeIds.Organizes,
                     RequestedNodeId = new NodeId(nodeIdName, InstanceNamespaceIndex),
                     BrowseName = new QualifiedName(uaObjectName, InstanceNamespaceIndex),
-                    TypeDefinitionId = ObjectTypeIds.BaseObjectType
+                    TypeDefinitionId = ObjectTypeIds.BaseObjectType,
+                    ParentAsOwner = true
                 });
                 Logger.Info($"Created node ... {node.NodeId.Identifier}.");
 
@@ -140,7 +142,8 @@ namespace UaclServer
                 DisplayName = uaMethodName,
                 Executable = true,
                 InputArguments = new List<Argument>(),
-                OutputArguments = new List<Argument>()
+                OutputArguments = new List<Argument>(),
+                ParentAsOwner = true
             };
 
             var parameterList = method.GetParameters().Select(p => p).ToList();
@@ -184,7 +187,7 @@ namespace UaclServer
 
             var requestedNodeId = new NodeId($"{parentNode.NodeId.Identifier}.{variableName}", InstanceNamespaceIndex);
             var variableNode = CreateVariable(Server.DefaultRequestContext,
-                new CreateVariableSettings()
+                new CreateVariableSettings
                 {
                     ParentNodeId = parentNode.NodeId,
                     ReferenceTypeId = ReferenceTypeIds.HasComponent,
@@ -194,6 +197,7 @@ namespace UaclServer
                     Description = new LocalizedText("en", variableName),
                     TypeDefinitionId = VariableTypeIds.BaseVariableType,
                     Value = new Variant("None"),
+                    ParentAsOwner = true
                 });
 
             var bo = businessObject as ServerSideUaProxy;
@@ -348,7 +352,7 @@ namespace UaclServer
             if (processVariableData == null) return statusCode;
 
             return processVariableData.WriteValue(value.Value) &&
-                   (statusCode != null && StatusCode.IsGood((StatusCode) statusCode))
+                   statusCode != null && StatusCode.IsGood((StatusCode) statusCode)
                 ? StatusCodes.Good
                 : StatusCodes.Bad;
         }
@@ -357,6 +361,12 @@ namespace UaclServer
         {
             base.Shutdown();
             Logger.Info(@"InternalNodeManager: Shutdown()");
+        }
+
+        public bool DeleteUaNode(NodeId id)
+        {
+            var sc = DeleteNode(Server.DefaultRequestContext, id, true);
+            return sc.IsGood();
         }
     }
 }
