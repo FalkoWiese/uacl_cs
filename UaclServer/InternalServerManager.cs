@@ -86,25 +86,14 @@ namespace UaclServer
         {
             if (id == null) return false;
 
-            var nodesToRemove = new List<BoCapsule>();
-            foreach (var bc in BusinessModel)
-            {
-                if (bc.BoId != id) continue;
-                CollectAllNodesFromRoot(bc, ref nodesToRemove);
-                break;
-            }
+            if (!BusinessModel.Select(x => x.BoId).Contains(id)) return false;
 
-            var idColl = new DeleteNodesItemCollection();
-            idColl.AddRange(nodesToRemove.Select(node => new DeleteNodesItem{NodeId = node.BoId}));
+            if (!(bool) INManager?.DeleteUaNode(id)) return false;
 
-            var results = new StatusCodeCollection();
-            var diagnosticInfos = new DiagnosticInfoCollection();
-            DeleteNodes(new RequestHeader(), idColl, out results, out diagnosticInfos);
-
-            foreach (var node in nodesToRemove)
-            {
-                BusinessModel.Remove(node);
-            }
+            var nodesToDelete = new List<BoCapsule>();
+            var root = BusinessModel.Select(x => x).Where(y => y.BoId == id).ToList().First();
+            CollectAllNodesFromRoot(root, ref nodesToDelete);
+            BusinessModel.RemoveAll(x => nodesToDelete.Contains(x));
 
             return true;
         }
