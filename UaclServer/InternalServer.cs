@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Reflection;
 using UaclUtils;
 using UnifiedAutomation.UaBase;
@@ -149,13 +150,13 @@ namespace UaclServer
             Manager?.RegisterLaterOnAddedObjects();
         }
 
-        public T CreateClient<T>(object parentObject=null)
+        public T CreateClient<T>(object parentObject = null)
         {
             var f = new UaFactory(this);
             return f.CreateUaObject<T>(parentObject);
         }
 
-        public T CreateClient<T>(T uaObject, object parentObject=null)
+        public T CreateClient<T>(T uaObject, object parentObject = null)
         {
             var f = new UaFactory(this);
             return f.CreateUaObject(uaObject, parentObject);
@@ -167,5 +168,14 @@ namespace UaclServer
             return f.AddUaObject<T>(parentObject);
         }
 
+        public List<BoCapsule> RegisteredClients()
+        {
+            return Manager?.BusinessModel;
+        }
+
+        public bool RemoveClient(NodeId id)
+        {
+            return (bool) Manager?.RemoveUaObject(id);
+        }
     }
 }

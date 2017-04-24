@@ -1,7 +1,9 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Reflection;
 using UaclUtils;
+using UnifiedAutomation.UaBase;
 using UnifiedAutomation.UaServer;
 
 namespace UaclServer
@@ -78,6 +80,50 @@ namespace UaclServer
 
             BusinessModel?.Add(new BoCapsule(modelObject));
             return true;
+        }
+
+        public bool RemoveUaObject(NodeId id)
+        {
+            if (id == null) return false;
+
+            var nodesToRemove = new List<BoCapsule>();
+            foreach (var bc in BusinessModel)
+            {
+                if (bc.BoId != id) continue;
+                CollectAllNodesFromRoot(bc, ref nodesToRemove);
+                break;
+            }
+
+            var idColl = new DeleteNodesItemCollection();
+            idColl.AddRange(nodesToRemove.Select(node => new DeleteNodesItem{NodeId = node.BoId}));
+
+            var results = new StatusCodeCollection();
+            var diagnosticInfos = new DiagnosticInfoCollection();
+            DeleteNodes(new RequestHeader(), idColl, out results, out diagnosticInfos);
+
+            foreach (var node in nodesToRemove)
+            {
+                BusinessModel.Remove(node);
+            }
+
+            return true;
+        }
+
+        internal void CollectAllNodesFromRoot(BoCapsule item, ref List<BoCapsule> allSubNodeIds)
+        {
+            allSubNodeIds.Add(item);
+
+            ICollection<object> uaNodeItems = null;
+            if (!UaReflectionHelper.ContainsUaNodes(item, ref uaNodeItems)) return;
+
+            foreach (var subItem in uaNodeItems)
+            {
+                foreach (var bo in BusinessModel)
+                {
+                    if (subItem != bo.BoModel) continue;
+                    CollectAllNodesFromRoot(bo, ref allSubNodeIds);
+                }
+            }
         }
     }
 }
