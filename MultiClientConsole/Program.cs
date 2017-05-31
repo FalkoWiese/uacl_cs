@@ -45,6 +45,7 @@ namespace MultiClientConsole
                     else if (runtime > 17000)
                     {
                         var registeredClients = server.RegisteredClients();
+                        if (registeredClients.Count <= 1) continue;
                         Console.Out.WriteLine($"Registered Business Object count == {registeredClients.Count}");
                         var lbo = registeredClients.Last();
                         server.RemoveClient(lbo.BoId);
