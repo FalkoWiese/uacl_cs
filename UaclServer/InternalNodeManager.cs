@@ -29,7 +29,7 @@ namespace UaclServer
             {
                 Logger.Trace($"LocalDataChangeEvent fired for varible {nodeId}={value}");
                 server.InternalClient.WriteAttribute(server.DefaultRequestContext, nodeId, 13,
-                    TypeMapping.Instance.ToVariant(value));
+                    TypeMapping.ToVariant(value));
             };
         }
 
@@ -156,7 +156,7 @@ namespace UaclServer
             {
                 settings.InputArguments.Add(new Argument
                 {
-                    DataType = TypeMapping.Instance.MapDataTypeId(parameterInfo.ParameterType),
+                    DataType = TypeMapping.MapDataTypeId(parameterInfo.ParameterType),
                     Name = parameterInfo.Name,
                     Description = new LocalizedText("en", parameterInfo.Name),
                     ValueRank = ValueRanks.Scalar,
@@ -167,7 +167,7 @@ namespace UaclServer
             {
                 settings.OutputArguments.Add(new Argument
                 {
-                    DataType = TypeMapping.Instance.MapDataTypeId(method.ReturnParameter.ParameterType),
+                    DataType = TypeMapping.MapDataTypeId(method.ReturnParameter.ParameterType),
                     Name = "Result",
                     Description = new LocalizedText("en", "Result"),
                     ValueRank = ValueRanks.Scalar
@@ -260,7 +260,7 @@ namespace UaclServer
                     }
                     parameterList.Add(handler);
                 }
-                parameterList.AddRange(inputArguments.Select(o => TypeMapping.Instance.ToObject(o)));
+                parameterList.AddRange(inputArguments.Select(o => TypeMapping.ToObject(o)));
 
                 var parameterArray = new object[parameterList.Count];
                 for (var i = 0; i < parameterArray.Length; i++)
@@ -286,7 +286,7 @@ namespace UaclServer
                     outputArguments[0] = returnValueDesc;
                 }
 
-                outputArguments[0] = TypeMapping.Instance.ToVariant(returnValue, outputArguments[0]);
+                outputArguments[0] = TypeMapping.ToVariant(returnValue, outputArguments[0]);
 
                 return StatusCodes.Good;
             }

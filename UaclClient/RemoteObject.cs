@@ -266,7 +266,7 @@ namespace UaclClient
             var method = new RemoteMethod
             {
                 Name = name,
-                InputArguments = parameters.Select(iA => TypeMapping.Instance.ToVariant(iA)).ToList(),
+                InputArguments = parameters.Select(iA => TypeMapping.ToVariant(iA)).ToList(),
                 ReturnValue = Variant.Null
             };
 
@@ -278,12 +278,12 @@ namespace UaclClient
             var method = new RemoteMethod
             {
                 Name = name,
-                InputArguments = parameters.Select(iA => TypeMapping.Instance.ToVariant(iA)).ToList(),
-                ReturnValue = TypeMapping.Instance.MapType<T>()
+                InputArguments = parameters.Select(iA => TypeMapping.ToVariant(iA)).ToList(),
+                ReturnValue = TypeMapping.MapType<T>()
             };
 
             var returnValue = Invoke(method);
-            return (T) TypeMapping.Instance.ToObject(returnValue);
+            return (T) TypeMapping.ToObject(returnValue);
         }
 
         public void Write(string name, object parameter)
@@ -293,7 +293,7 @@ namespace UaclClient
                 var variable = new RemoteVariable
                 {
                     Name = name,
-                    Value = TypeMapping.Instance.ToVariant(parameter)
+                    Value = TypeMapping.ToVariant(parameter)
                 };
 
                 variable.Write(this);
@@ -311,18 +311,18 @@ namespace UaclClient
                 var variable = new RemoteVariable
                 {
                     Name = name,
-                    Value = TypeMapping.Instance.MapType<T>()
+                    Value = TypeMapping.MapType<T>()
                 };
 
                 var result = variable.Read(this);
-                return (T) TypeMapping.Instance.ToObject(result);
+                return (T) TypeMapping.ToObject(result);
             }
             catch (Exception e)
             {
                 ExceptionHandler.Log(e, $"Cannot read {Name}.{name} without errors!");
             }
 
-            return (T) TypeMapping.Instance.ToObject(TypeMapping.Instance.MapType<T>());
+            return (T) TypeMapping.ToObject(TypeMapping.MapType<T>());
         }
 
         private Variant Invoke(RemoteMethod method)

@@ -5,11 +5,7 @@ namespace UaclUtils
 {
     public sealed class TypeMapping
     {
-        private TypeMapping()
-        {
-        }
-
-        public Variant MapType<T>()
+        public static Variant MapType<T>()
         {
             var dataType = typeof (T);
 
@@ -29,7 +25,7 @@ namespace UaclUtils
             throw new Exception($"Cannot find type {dataType.Name} in mapping table!");
         }
 
-        public NodeId MapDataTypeId(Type type)
+        public static NodeId MapDataTypeId(Type type)
         {
             if (type == typeof(bool)) return DataTypeIds.Boolean;
             if (type == typeof(byte)) return DataTypeIds.Byte;
@@ -47,7 +43,7 @@ namespace UaclUtils
             throw new Exception($"Cannot find type {type.Name} in mapping table!");
         }
 
-        public object ToObject(Variant item)
+        public static object ToObject(Variant item)
         {
             if (item.DataType == BuiltInType.Boolean) return item.ToBoolean();
             if (item.DataType == BuiltInType.Byte) return item.ToByte();
@@ -59,17 +55,13 @@ namespace UaclUtils
             if (item.DataType == BuiltInType.UInt64) return item.ToUInt64();
             if (item.DataType == BuiltInType.Float) return item.ToFloat();
             if (item.DataType == BuiltInType.Double) return item.ToDouble();
-            if (item.DataType == BuiltInType.String) return item.ToString();
-            if (item.DataType == BuiltInType.ByteString) return item.ToByteString();
             if (item.DataType == BuiltInType.String) return item.IsNull? null : item.ToString();
             if (item.DataType == BuiltInType.ByteString) return item.IsNull? null : item.ToByteString();
 
             throw new Exception($"Cannot find type {item.DataType} in mapping table!");
         }
 
-        public static TypeMapping Instance { get; } = new TypeMapping();
-
-        public Variant ToVariant(object value)
+        public static Variant ToVariant(object value)
         {
             Type objectType = value.GetType();
 
@@ -89,7 +81,7 @@ namespace UaclUtils
             throw new Exception($"Cannot find type {objectType} in mapping table!");
         }
 
-        public Variant ToVariant(object value, Variant item)
+        public static Variant ToVariant(object value, Variant item)
         {
             if (item.DataType == BuiltInType.Boolean) return new Variant((bool)value);
             if (item.DataType == BuiltInType.Byte) return new Variant((byte)value);
