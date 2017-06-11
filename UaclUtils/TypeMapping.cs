@@ -61,6 +61,8 @@ namespace UaclUtils
             if (item.DataType == BuiltInType.Double) return item.ToDouble();
             if (item.DataType == BuiltInType.String) return item.ToString();
             if (item.DataType == BuiltInType.ByteString) return item.ToByteString();
+            if (item.DataType == BuiltInType.String) return item.IsNull? null : item.ToString();
+            if (item.DataType == BuiltInType.ByteString) return item.IsNull? null : item.ToByteString();
 
             throw new Exception($"Cannot find type {item.DataType} in mapping table!");
         }
