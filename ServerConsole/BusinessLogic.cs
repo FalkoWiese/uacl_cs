@@ -64,11 +64,11 @@ namespace ServerConsole
             return val;
         }
 
-        [UaMethod]
-        public int? GetNullInteger()
-        {
-            return null;
-        }
+//        [UaMethod]
+//        public int? GetNullInteger()
+//        {
+//            return null;
+//        }
 
         [UaMethod]
         public bool CalculateJob(string name, int state)

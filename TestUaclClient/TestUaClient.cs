@@ -105,17 +105,17 @@ namespace TestUaclClient
             obj.Disconnect();
         }
 
-        [Test]
-        public void InvokeNullInteger()
-        {
-            var obj = new RemoteObject("localhost", 48030, "BusinessLogic");
-
-            Assert.That(() => obj.Connect(), "Is TRUE!");
-            var value = obj.Invoke<int?>("GetNullInteger");
-            Assert.IsTrue(value == null);
-
-            obj.Disconnect();
-        }
+//        [Test]
+//        public void InvokeNullInteger()
+//        {
+//            var obj = new RemoteObject("localhost", 48030, "BusinessLogic");
+//
+//            Assert.That(() => obj.Connect(), "Is TRUE!");
+//            var value = obj.Invoke<int?>("GetNullInteger");
+//            Assert.IsTrue(value == null);
+//
+//            obj.Disconnect();
+//        }
 
         [Test]
         public void PathSplitting()
