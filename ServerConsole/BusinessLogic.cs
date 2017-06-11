@@ -65,6 +65,12 @@ namespace ServerConsole
         }
 
         [UaMethod]
+        public int? GetNullInteger()
+        {
+            return null;
+        }
+
+        [UaMethod]
         public bool CalculateJob(string name, int state)
         {
             var result = true;
