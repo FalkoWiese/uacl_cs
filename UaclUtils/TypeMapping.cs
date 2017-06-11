@@ -45,6 +45,7 @@ namespace UaclUtils
 
         public static object ToObject(Variant item)
         {
+            if (item.IsNull || item.DataType == BuiltInType.Null) return null;
             if (item.DataType == BuiltInType.Boolean) return item.ToBoolean();
             if (item.DataType == BuiltInType.Byte) return item.ToByte();
             if (item.DataType == BuiltInType.Int16) return item.ToInt16();
@@ -55,8 +56,8 @@ namespace UaclUtils
             if (item.DataType == BuiltInType.UInt64) return item.ToUInt64();
             if (item.DataType == BuiltInType.Float) return item.ToFloat();
             if (item.DataType == BuiltInType.Double) return item.ToDouble();
-            if (item.DataType == BuiltInType.String) return item.IsNull? null : item.ToString();
-            if (item.DataType == BuiltInType.ByteString) return item.IsNull? null : item.ToByteString();
+            if (item.DataType == BuiltInType.String) return item.ToString();
+            if (item.DataType == BuiltInType.ByteString) return item.ToByteString();
 
             throw new Exception($"Cannot find type {item.DataType} in mapping table!");
         }

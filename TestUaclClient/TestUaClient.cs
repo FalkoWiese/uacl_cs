@@ -94,6 +94,18 @@ namespace TestUaclClient
         }
 
         [Test]
+        public void InvokeNullString()
+        {
+            var obj = new RemoteObject("localhost", 48030, "BusinessLogic");
+
+            Assert.That(() => obj.Connect(), "Is TRUE!");
+            var value = obj.Invoke<string>("GetNullString");
+            Assert.IsTrue(value == null);
+
+            obj.Disconnect();
+        }
+
+        [Test]
         public void PathSplitting()
         {
             const string path = "ServerConsole.BusinessLogic.JobStates";

@@ -99,6 +99,12 @@ namespace ServerConsole
             return @"{""states"": [""None"",""Initialized"",""Running"",""Finished"",""Error""]}";
         }
 
+        [UaMethod]
+        public string GetNullString()
+        {
+            return null;
+        }
+
         [UaVariable]
         public string BoState
         {
