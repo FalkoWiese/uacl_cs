@@ -12,25 +12,31 @@ namespace MultiClientConsole
         {
             MonitoringStarted = false;
             AnnounceSessionNotConnectedHandler(DisconnectCallback);
-            AnnouncePostConnectionEstablishedHandler(() =>
-            {
-                Logger.Info("Connection to ServerConsole established ...");
-                StartMonitoringImpl();
-            });
+            AnnouncePostConnectionEstablishedHandler(ReconnectCallback);
         }
 
-        private void DisconnectCallback(Session s, ServerConnectionStatusUpdateEventArgs args)
+        private void DisconnectCallback(Session session, ServerConnectionStatusUpdateEventArgs args)
         {
-            if (s.ConnectionStatus != ServerConnectionStatus.Connected)
-            {
-                // Here, you can execute some useful stuff to handle the connection, maybe you can call s.Disconnect()
-                // or something else. Test it, and give me maybe some feedback.
-                Logger.Warn(
-                    $"The connection {s} is disconnected, you can find the reason maybe at the arguments ... {args}.");
-                MonitoringStarted = false;
-            }
+            Logger.Info($"NotConnectedHandler called for {session} with status {session.ConnectionStatus.ToString()}.");
+            
+            if (session.ConnectionStatus != ServerConnectionStatus.Disconnected) return;
+
+            Logger.Info($"The connection {session} is disconnected.");
+            MonitoringStarted = false;
+            StartConnectionEstablishment();
         }
 
+        private void ReconnectCallback(Session session, ServerConnectionStatusUpdateEventArgs args)
+        {
+            Logger.Info($"PostConnectionHandler called for {session} with status {session.ConnectionStatus.ToString()}.");
+            
+            if (session.ConnectionStatus != ServerConnectionStatus.Connected) return;
+
+            Logger.Info($"Connection {session} to ServerConsole established.");
+
+            StartMonitoringImpl();
+        }
+        
         public ServerConsoleClient(string ip, int port) : this(ip, port, "BusinessLogic")
         {
         }
@@ -42,13 +48,13 @@ namespace MultiClientConsole
         private void StartMonitoringImpl()
         {
             if (MonitoringStarted) return;
-
+            MonitoringStarted = true;
+            
             Monitor("BoState", v =>
             {
                 ScBoState = v.ToString();
                 Logger.Info($"Received value from {Name}.BoState ... '{ScBoState}'.");
             });
-            MonitoringStarted = true;
         }
 
         [UaMethod]

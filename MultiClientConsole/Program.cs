@@ -21,8 +21,7 @@ namespace MultiClientConsole
                 foreach (var remoteObject in new RemoteObject[]
                     {new ServerConsoleClient("localhost", 48030), new ClientConsoleClient("localhost", 48040)})
                 {
-                    server.CreateClient(remoteObject, parent)
-                        .SetDisconnectedHandler(
+                    server.CreateClient(remoteObject, parent).SetDisconnectedHandler(
                             (session, args) => { remoteObject.StartConnectionEstablishment(); });
                 }
 

@@ -17,53 +17,52 @@ namespace MultiClientConsole
             AnnounceSessionNotConnectedHandler(
                 (session, args) =>
                 {
-                    if (session.ConnectionStatus != ServerConnectionStatus.Connected)
-                    {
-                        // Here, you can execute some useful stuff to handle the connection, maybe you can call s.Disconnect()
-                        // or something else. Test it, and give me maybe some feedback.
-                        Logger.Warn(
-                            $"The connection {session} is disconnected, you can find the reason maybe at the arguments ... {args}.");
-                        MonitoringStarted = false;
-                    }
-                    else
-                    {
-                        StartConnectionEstablishment(); // I would suggest, we should do it on every NotConnectedHandler.
-                        // It's maybe a good idea, to allow more than one such handler. Yep, I did it that way, made the
-                        // the regarded 'Announce...()' method public, and so you can develop a Disconnected Handler
-                    }
-                });
-            AnnouncePostConnectionEstablishedHandler(() =>
-            {
-                Logger.Info("Connection to ClientConsole established ...");
+                    Logger.Info($"NotConnectedHandler called for {session} with status {session.ConnectionStatus.ToString()}.");
+            
+                    if (session.ConnectionStatus != ServerConnectionStatus.Disconnected) return;
 
-                if (MonitoringStarted) return;
-                Monitor(new Dictionary<string, Action<Variant>>
+                    Logger.Info($"The connection {session} is disconnected.");
+                    MonitoringStarted = false;
+                    StartConnectionEstablishment();
+                });
+
+            AnnouncePostConnectionEstablishedHandler(
+                (session, args) =>
                 {
+                    Logger.Info($"PostConnectionHandler called for {session} with status {session.ConnectionStatus.ToString()}.");
+            
+                    if (session.ConnectionStatus != ServerConnectionStatus.Connected) return;
+                    
+                    Logger.Info($"Connection {session} to ClientConsole established.");
+                    
+                    if (MonitoringStarted) return;
+                    MonitoringStarted = true;
+                    
+                    Monitor(new Dictionary<string, Action<Variant>>
                     {
-                        "BoState", strValue =>
                         {
-                            CcBoState = strValue.ToString();
-                            Logger.Info($"Received value from {Name}.BoState ... '{CcBoState}'.");
-                        }
-                    },
-                    {
-                        "IntBoState", intValue =>
+                            "BoState", strValue =>
+                            {
+                                CcBoState = strValue.ToString();
+                                Logger.Info($"Received value from {Name}.BoState ... '{CcBoState}'.");
+                            }
+                        },
                         {
-                            CcIntBoState = intValue.ToInt32();
-                            Logger.Info($"Received value from {Name}.IntBoState ... {CcIntBoState}.");
-                        }
-                    },
-                    {
-                        "FloatBoState", floatValue =>
+                            "IntBoState", intValue =>
+                            {
+                                CcIntBoState = intValue.ToInt32();
+                                Logger.Info($"Received value from {Name}.IntBoState ... {CcIntBoState}.");
+                            }
+                        },
                         {
-                            CcFloatBoState = floatValue.ToFloat();
-                            Logger.Info($"Received value from {Name}.FloatBoState ... {CcFloatBoState}.");
+                            "FloatBoState", floatValue =>
+                            {
+                                CcFloatBoState = floatValue.ToFloat();
+                                Logger.Info($"Received value from {Name}.FloatBoState ... {CcFloatBoState}.");
+                            }
                         }
-                    }
+                    });
                 });
-
-                MonitoringStarted = true;
-            });
         }
 
         public ClientConsoleClient(string ip, int port) : this(ip, port, "BusinessLogic")

@@ -18,6 +18,7 @@ namespace UaclClient
             MyNodeId = NodeId.Null;
             NodeIdCache = new Dictionary<string, NodeId>();
             SessionLock = new object();
+            ConnectionEstablishmentIsWorking = false;
             ConnectionEstablishmentLock = new object();
             StartConnectionEstablishmentCallback = () =>
             {
@@ -85,14 +86,14 @@ namespace UaclClient
 
         public void StartConnectionEstablishment()
         {
+            if (ConnectionEstablishmentIsWorking) return;
             var thread = new Thread(StartConnectionEstablishmentCallback);
-
             thread.Start();
         }
 
-        private event Action<Session, ServerConnectionStatusUpdateEventArgs> NotConnectedCallback;
+        private Action<Session, ServerConnectionStatusUpdateEventArgs> NotConnectedCallback { get; set; }
 
-        private Action PostConnectionEstablished { get; set; }
+        private Action<Session, ServerConnectionStatusUpdateEventArgs> PostConnectionEstablished { get; set; }
 
         public NodeId MyNodeId { get; set; }
         public Dictionary<string, NodeId> NodeIdCache { get; set; }
@@ -102,13 +103,12 @@ namespace UaclClient
             AnnounceSessionNotConnectedHandler(handler);
         }
 
-        protected void AnnounceSessionNotConnectedHandler(
-            Action<Session, ServerConnectionStatusUpdateEventArgs> notConnected)
+        protected void AnnounceSessionNotConnectedHandler(Action<Session, ServerConnectionStatusUpdateEventArgs> notConnected)
         {
-            NotConnectedCallback += notConnected;
+            NotConnectedCallback = notConnected;
         }
 
-        protected void AnnouncePostConnectionEstablishedHandler(Action postConnectionEstablished)
+        protected void AnnouncePostConnectionEstablishedHandler(Action<Session, ServerConnectionStatusUpdateEventArgs> postConnectionEstablished)
         {
             PostConnectionEstablished = postConnectionEstablished;
         }
@@ -130,7 +130,7 @@ namespace UaclClient
                         return;
                     case ServerConnectionStatus.Connected:
                     case ServerConnectionStatus.SessionAutomaticallyRecreated:
-                        PostConnectionEstablished?.Invoke();
+                        PostConnectionEstablished?.Invoke(s, args);
                         // I think, it's a good idea, to have a callback like this. So you can provide e. g. the
                         // monitoring of some UA variables here.
                         return;
