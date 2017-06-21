@@ -36,7 +36,16 @@ namespace UaclServer
                     var addUaNode = pot.GetMethod("AddUaNode");
                     if (addUaNode != null)
                     {
-                        addUaNode.Invoke(parentObject, new[] {uaObjectList.GetValue(parentObject), uaObject});
+                        try
+                        {
+                            addUaNode.Invoke(parentObject, new[] {uaObjectList.GetValue(parentObject), uaObject});
+                        }
+                        catch (Exception e)
+                        {
+                            Logger.Error(
+                                $"Cannot add {uaObject} automatically to {parentObject}. Your business classes have to inherit from {typeof(ServerSideUaProxy).Name}!");
+                            throw;
+                        }
                         Logger.Info($"Added {uaObject} to {parentObject}.{uaObjectList.Name}");
                     }
                     else

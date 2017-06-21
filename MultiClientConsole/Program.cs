@@ -35,6 +35,7 @@ namespace MultiClientConsole
                 while (true)
                 {
                     Thread.Sleep(1000);
+/*
                     var runtime = DateTimeHelper.currentTimeMillis() - startTs;
                     if (15000 < runtime && runtime < 17000)
                     {
@@ -49,6 +50,7 @@ namespace MultiClientConsole
                         var lbo = registeredClients.Last();
                         server.RemoveClient(lbo.BoId);
                     }
+*/
                 }
 
             }

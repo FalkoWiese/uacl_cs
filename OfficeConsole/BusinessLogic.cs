@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Threading;
 using UaclServer;
 using UaclUtils;
@@ -8,6 +9,11 @@ namespace OfficeConsole
     [UaObject]
     public class BusinessLogic : ServerSideUaProxy
     {
+        public BusinessLogic()
+        {
+            Items = new List<object>();
+        }
+        
         private Thread WorkerThread { get; set; }
 
         [UaMethod]
@@ -101,6 +107,9 @@ namespace OfficeConsole
         {
             Call("FloatBoState", newState);
         }
+        
+        [UaObjectList]
+        public List<object> Items { get; set; } 
     }
 }
 
