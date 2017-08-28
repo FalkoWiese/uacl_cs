@@ -155,24 +155,28 @@ namespace UaclClient
         {
             lock (SessionLock)
             {
-                return SessionHandle != null && SessionHandle.Session.ConnectionStatus ==
-                       ServerConnectionStatus.Connected;
+                return ConnectedNonSync();
             }
+        }
+
+        private bool ConnectedNonSync()
+        {
+            return SessionHandle != null &&
+                SessionHandle.Session.ConnectionStatus == ServerConnectionStatus.Connected;
         }
 
         public bool Connect()
         {
-            if (Connected())
+            while(SessionHandle == null)
             {
-                return true;
+                Thread.Sleep(50);
             }
 
             lock (SessionLock)
             {
-                if (SessionHandle == null || SessionHandle.Timeout)
-                {
-                    return false;
-                }
+                if (ConnectedNonSync()) return true;
+
+                if (SessionHandle == null || SessionHandle.Timeout) return false;
 
                 var session = SessionHandle.Session;
                 var stopWatch = Stopwatch.StartNew();
@@ -197,12 +201,11 @@ namespace UaclClient
                     }
 
                     stopWatch.Stop();
-                    if (stopWatch.Elapsed.Seconds > 5)
-                    {
-                        break;
-                    }
+
+                    if (stopWatch.Elapsed.Seconds > 5) break;
 
                     stopWatch.Start();
+
                 } while (session.NotConnected());
 
                 if (session.NotConnected())
