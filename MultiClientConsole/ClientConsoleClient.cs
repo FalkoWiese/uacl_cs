@@ -9,12 +9,16 @@ using UnifiedAutomation.UaClient;
 namespace MultiClientConsole
 {
     [UaObject]
-    class ClientConsoleClient : RemoteObject
+    class ClientConsoleClient : ServerSideUaProxy
     {
-        private ClientConsoleClient(string ip, int port, string name) : base(ip, port, name)
+        private RemoteObject RemoteCccBo { get; set; }
+        private ClientConsoleClient(string ip, int port, string name)
         {
+            Items = new List<object>();
+            RemoteCccBo = new RemoteObject(ip, port, name);
+            RemoteCccBo.Connect();
             MonitoringStarted = false;
-            AnnounceSessionNotConnectedHandler(
+            RemoteCccBo.SetDisconnectedHandler(
                 (session, args) =>
                 {
                     Logger.Info($"NotConnectedHandler called for {session} with status {session.ConnectionStatus.ToString()}.");
@@ -23,10 +27,10 @@ namespace MultiClientConsole
 
                     Logger.Info($"The connection {session} is disconnected.");
                     MonitoringStarted = false;
-                    StartConnectionEstablishment();
+                    RemoteCccBo.StartConnectionEstablishment();
                 });
 
-            AnnouncePostConnectionEstablishedHandler(
+            RemoteCccBo.SetConnectedHandler(
                 (session, args) =>
                 {
                     Logger.Info($"PostConnectionHandler called for {session} with status {session.ConnectionStatus.ToString()}.");
@@ -38,27 +42,27 @@ namespace MultiClientConsole
                     if (MonitoringStarted) return;
                     MonitoringStarted = true;
                     
-                    Monitor(new Dictionary<string, Action<Variant>>
+                    RemoteCccBo.Monitor(new Dictionary<string, Action<Variant>>
                     {
                         {
                             "BoState", strValue =>
                             {
                                 CcBoState = strValue.ToString();
-                                Logger.Info($"Received value from {Name}.BoState ... '{CcBoState}'.");
+                                Logger.Info($"Received value from {RemoteCccBo.Name}.BoState ... '{CcBoState}'.");
                             }
                         },
                         {
                             "IntBoState", intValue =>
                             {
                                 CcIntBoState = intValue.ToInt32();
-                                Logger.Info($"Received value from {Name}.IntBoState ... {CcIntBoState}.");
+                                Logger.Info($"Received value from {RemoteCccBo.Name}.IntBoState ... {CcIntBoState}.");
                             }
                         },
                         {
                             "FloatBoState", floatValue =>
                             {
                                 CcFloatBoState = floatValue.ToFloat();
-                                Logger.Info($"Received value from {Name}.FloatBoState ... {CcFloatBoState}.");
+                                Logger.Info($"Received value from {RemoteCccBo.Name}.FloatBoState ... {CcFloatBoState}.");
                             }
                         }
                     });
@@ -83,5 +87,8 @@ namespace MultiClientConsole
         public float CcFloatBoState { get; set; }
 
         private bool MonitoringStarted { get; set; }
+        
+        [UaObjectList]
+        public List<object> Items { get; set; }
     }
 }

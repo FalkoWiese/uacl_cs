@@ -15,16 +15,18 @@ namespace MultiClientConsole
             try
             {
                 server = new MultiClientServer();
-
+                // The Multi Client Host ...
                 var parent = server.CreateClient<MultiClientHost>();
-
-                foreach (var remoteObject in new RemoteObject[]
-                    {new ServerConsoleClient("localhost", 48030), new ClientConsoleClient("localhost", 48040)})
-                {
-                    server.CreateClient(remoteObject, parent).SetDisconnectedHandler(
-                            (session, args) => { remoteObject.StartConnectionEstablishment(); });
-                }
-
+                // The Server Console Client ...
+                var scc = new ServerConsoleClient();
+                server.CreateClient(scc, parent).SetDisconnectedHandler(
+                    (session, args) => { scc.StartConnectionEstablishment(); });
+                // The Client Console Client ...
+                var ccc = new ClientConsoleClient();
+                server.CreateClient(ccc, parent);
+                var bo1 = new CccBo1();
+                server.CreateClient(bo1, ccc);
+                server.CreateClient(new CccBo2(), bo1);
 
                 if (!server.Start())
                 {

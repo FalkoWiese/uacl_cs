@@ -108,6 +108,11 @@ namespace UaclClient
             NotConnectedCallback = notConnected;
         }
 
+        public void SetConnectedHandler(Action<Session, ServerConnectionStatusUpdateEventArgs> handler)
+        {
+            AnnouncePostConnectionEstablishedHandler(handler);
+        }
+        
         protected void AnnouncePostConnectionEstablishedHandler(Action<Session, ServerConnectionStatusUpdateEventArgs> postConnectionEstablished)
         {
             PostConnectionEstablished = postConnectionEstablished;

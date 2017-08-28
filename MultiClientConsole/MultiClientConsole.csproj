@@ -49,6 +49,8 @@
     </Reference>
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="CccBo1.cs" />
+    <Compile Include="CccBo2.cs" />
     <Compile Include="ClientConsoleClient.cs" />
     <Compile Include="MultiClientHost.cs" />
     <Compile Include="MultiClientServer.cs" />
