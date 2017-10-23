@@ -9,6 +9,14 @@ using UnifiedAutomation.UaClient;
 
 namespace UaclClient
 {
+    /**
+     * Thats the 'main' class for a UA Client Connection.
+     *
+     * You've to use it to encapsulate a closed application context. For every such context we establish a session. It's
+     * BTW a good idea to have that in mind, if you design your server architecture.
+     *
+     * 
+     */
     public class RemoteObject
     {
         public RemoteObject(string ip, int port, string name)
