@@ -15,7 +15,11 @@ namespace UaclClient
      * You've to use it to encapsulate a closed application context. For every such context we establish a session. It's
      * BTW a good idea to have that in mind, if you design your server architecture.
      *
-     * 
+     * To get a working UA Client Connection you should instantiate *RemoteObject* with the connection information and
+     * the UA Node Address Path from the server side. The separator is the '.'!
+     *
+     * In a good .NET software design we would suggest to have an instance variable of a RemoteObject. The instance
+     * variable is the correct handle to do all the necessary capabilties on the server.
      */
     public class RemoteObject
     {

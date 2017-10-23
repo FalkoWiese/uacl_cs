@@ -2,6 +2,11 @@
 
 namespace UaclServer
 {
+    /**
+     * *UA Property Node* annotion.
+     * 
+     * This annotation you've to use, if you want to have an *UA Property Node* on server side.
+     */
     [AttributeUsage(AttributeTargets.Property)]
     public class UaVariable : Attribute
     {

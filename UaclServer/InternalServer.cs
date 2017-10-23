@@ -8,6 +8,13 @@ using ApplicationType = UnifiedAutomation.UaSchema.ApplicationType;
 
 namespace UaclServer
 {
+    /**
+     * If you want to create a UA Server, this class is a good starting point.
+     *
+     * You should extend from *InternalServer* and overwrite the given constructors.
+     * Here you've to define the server name and the connection information of the
+     * new UA Server (IP Address, Port - the Socket). That's it!
+     */
     public class InternalServer
     {
         private int Port { get; set; }

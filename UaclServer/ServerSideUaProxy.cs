@@ -3,6 +3,13 @@ using UnifiedAutomation.UaBase;
 
 namespace UaclServer
 {
+    /**
+     * THE helper class on Server Side. 
+     *
+     * It levels up UA Monitoring to standard .NET Eventing.
+     *
+     * One advice: Don't remove the *AddUaNode Method*. It's called via reflection!
+     */
     public class ServerSideUaProxy
     {
         protected ServerSideUaProxy()
