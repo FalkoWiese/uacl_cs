@@ -64,11 +64,10 @@ from their website for free: http://www.unified-automation.com.
 
 ##Documentation?
 The library consists of three modules
- * *UaclUtils*
- * *UaclServer*
- * *UaclClient*
 
-<img src="https://bitbucket.org/falko_wiese/concept_laser/src/06b8d0a653ebd2b7681d708026a3cdcdeabfa1e1/UaclUtils.png" />
+ - *UaclUtils*
+ - *UaclServer*
+ - *UaclClient*
 
 ![UaclUtils Class Diagram](https://bitbucket.org/falko_wiese/concept_laser/src/06b8d0a653ebd2b7681d708026a3cdcdeabfa1e1/UaclUtils.png)
 
