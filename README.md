@@ -65,10 +65,13 @@ from their website for free: http://www.unified-automation.com.
 ##Documentation?
 The library consists of three modules
  - *UaclUtils*
-![UaclUtils Class Diagram](https://bitbucket.org/falko_wiese/concept_laser/src/06b8d0a653ebd2b7681d708026a3cdcdeabfa1e1/UaclUtils.png)
  - *UaclServer*
-![UaclServer Class Diagram](https://bitbucket.org/falko_wiese/concept_laser/src/06b8d0a653ebd2b7681d708026a3cdcdeabfa1e1/UaclServer.png)
  - *UaclClient*
+
+![UaclUtils Class Diagram](https://bitbucket.org/falko_wiese/concept_laser/src/06b8d0a653ebd2b7681d708026a3cdcdeabfa1e1/UaclUtils.png)
+
+![UaclServer Class Diagram](https://bitbucket.org/falko_wiese/concept_laser/src/06b8d0a653ebd2b7681d708026a3cdcdeabfa1e1/UaclServer.png)
+
 ![UaclClient Class Diagram](https://bitbucket.org/falko_wiese/concept_laser/src/06b8d0a653ebd2b7681d708026a3cdcdeabfa1e1/UaclClient.png)
  
 
