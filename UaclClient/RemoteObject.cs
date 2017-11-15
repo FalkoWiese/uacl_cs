@@ -242,7 +242,7 @@ namespace UaclClient
 
         public OpcUaSessionHandle SessionHandle { get; private set; }
 
-        public ConnectionInfo Connection { get; }
+        private ConnectionInfo Connection { get; }
 
         public string Name { get; }
 

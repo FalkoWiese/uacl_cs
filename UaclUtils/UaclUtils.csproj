@@ -51,6 +51,7 @@
     <Compile Include="TypeMapping.cs" />
   </ItemGroup>
   <ItemGroup>
+    <None Include="UaclUtils.cd" />
     <None Include="packages.config" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />

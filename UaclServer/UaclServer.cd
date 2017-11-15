@@ -1,0 +1,193 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<ClassDiagram MajorVersion="1" MinorVersion="1">
+  <Comment CommentText="The 'User Data' types for the generated UA Nodes.">
+    <Position X="6.49" Y="8.438" Height="0.75" Width="1.7" />
+  </Comment>
+  <Comment CommentText="The most important 'Server Context' classes. Here you can see the relations between *NodeManager*, *ServerManager*, and *Server*.">
+    <Position X="2.969" Y="5" Height="1.365" Width="1.7" />
+  </Comment>
+  <Comment CommentText="Some helper classes.">
+    <Position X="8.927" Y="3.969" Height="0.552" Width="1.7" />
+  </Comment>
+  <Comment CommentText="The Annotation Classes.">
+    <Position X="3.208" Y="0.771" Height="0.406" Width="1.7" />
+  </Comment>
+  <Class Name="UaclServer.BoCapsule" Collapsed="true">
+    <Position X="9.25" Y="4.75" Width="1.5" />
+    <Compartments>
+      <Compartment Name="Nested Types" Collapsed="false" />
+    </Compartments>
+    <NestedTypes>
+      <Class Name="UaclServer.BoCapsule.BoIdEqualityComparer">
+        <TypeIdentifier>
+          <NewMemberFileName>BoCapsule.cs</NewMemberFileName>
+        </TypeIdentifier>
+        <Lollipop Position="0.2" />
+      </Class>
+    </NestedTypes>
+    <TypeIdentifier>
+      <HashCode>AAAAAAAEAAAAACABgAAAAAAAAAAAAIAAAAEAAAAAAAA=</HashCode>
+      <FileName>BoCapsule.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="UaclServer.GlobalNotifier" Collapsed="true">
+    <Position X="11" Y="4.75" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAACQAA=</HashCode>
+      <FileName>GlobalNotifier.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="UaclServer.InternalNodeManager" Collapsed="true">
+    <Position X="5" Y="4.75" Width="1.75" />
+    <Compartments>
+      <Compartment Name="Fields" Collapsed="true" />
+      <Compartment Name="Properties" Collapsed="true" />
+    </Compartments>
+    <TypeIdentifier>
+      <HashCode>ECAQBAAEAAAABoCBAIAgiQAgAAAAKBAAAAAAABEIECA=</HashCode>
+      <FileName>InternalNodeManager.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="UaclServer.InternalServer" Collapsed="true">
+    <Position X="1" Y="7" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>EAACAAAAICAMAAAEAQAAAAAACABABAAAJAgCAAAAIAA=</HashCode>
+      <FileName>InternalServer.cs</FileName>
+    </TypeIdentifier>
+    <ShowAsAssociation>
+      <Property Name="Manager" />
+    </ShowAsAssociation>
+  </Class>
+  <Class Name="UaclServer.InternalServerManager" Collapsed="true">
+    <Position X="0.5" Y="5" Width="2" />
+    <NestedTypes>
+      <Class Name="UaclServer.InternalServerManager.CallbackHandler" Collapsed="true">
+        <TypeIdentifier>
+          <NewMemberFileName>InternalServerManager.cs</NewMemberFileName>
+        </TypeIdentifier>
+      </Class>
+    </NestedTypes>
+    <TypeIdentifier>
+      <HashCode>AABCAAAQICCAAAAAQQAAAgAAAAgAAAAAAggAAAAAAAQ=</HashCode>
+      <FileName>InternalServerManager.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="UaclServer.MethodNodeData" Collapsed="true">
+    <Position X="5.5" Y="9.75" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAACAAAAAAAAAAAAAAgAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>MethodNodeData.cs</FileName>
+    </TypeIdentifier>
+    <ShowAsAssociation>
+      <Property Name="Method" />
+    </ShowAsAssociation>
+  </Class>
+  <Class Name="UaclServer.ServerSideUaProxy" Collapsed="true">
+    <Position X="9.25" Y="5.75" Width="1.75" />
+    <TypeIdentifier>
+      <HashCode>AAAAQAAABAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAQAA=</HashCode>
+      <FileName>ServerSideUaProxy.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="UaclServer.UaclInsertState" Collapsed="true">
+    <Position X="0.75" Y="1.75" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>UaclInsertState.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="UaclServer.UaFactory" Collapsed="true">
+    <Position X="0.75" Y="9" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>QAAAAAAAAAACAAAAEAAAAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>UaFactory.cs</FileName>
+    </TypeIdentifier>
+    <ShowAsAssociation>
+      <Property Name="UaServer" />
+    </ShowAsAssociation>
+  </Class>
+  <Class Name="UaclServer.UaMethod" Collapsed="true">
+    <Position X="5.25" Y="1.75" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAAAAAQAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>UaMethod.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="UaclServer.UaObject" Collapsed="true">
+    <Position X="7.5" Y="1.75" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAAAAAQAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>UaObject.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="UaclServer.UaObjectList" Collapsed="true">
+    <Position X="3" Y="1.75" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>UaObjectList.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="UaclServer.UaReflectionHelper" Collapsed="true">
+    <Position X="11.25" Y="5.75" Width="1.75" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAAAAAAAAAEAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>UaReflectionHelper.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="UaclServer.UaVariable" Collapsed="true">
+    <Position X="9.75" Y="1.75" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAIAAAAAAAAAQAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>UaVariable.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="UaclServer.VariableNodeData" Collapsed="true">
+    <Position X="7.75" Y="7.75" Width="1.5" />
+    <AssociationLine Name="Property" Type="System.Reflection.PropertyInfo">
+      <MemberNameLabel ManuallyPlaced="true">
+        <Position X="0.05" Y="0.318" />
+      </MemberNameLabel>
+    </AssociationLine>
+    <TypeIdentifier>
+      <HashCode>AAAACAAAAAAAAAAAAAAAAAAAAABAAAQAAAAAAQAAAAA=</HashCode>
+      <FileName>VariableNodeData.cs</FileName>
+    </TypeIdentifier>
+    <ShowAsAssociation>
+      <Property Name="Property" />
+    </ShowAsAssociation>
+  </Class>
+  <Class Name="System.Reflection.PropertyInfo" Collapsed="true">
+    <Position X="7.75" Y="10" Width="1.5" />
+    <TypeIdentifier />
+    <Lollipop Position="0.2" />
+  </Class>
+  <Class Name="System.Reflection.MethodInfo" Collapsed="true">
+    <Position X="5.5" Y="7.5" Width="1.5" />
+    <TypeIdentifier />
+    <Lollipop Position="0.2" />
+  </Class>
+  <Class Name="System.Attribute" Collapsed="true">
+    <Position X="5.25" Y="0.5" Width="1.5" />
+    <TypeIdentifier />
+    <Lollipop Position="0.2" />
+  </Class>
+  <Class Name="UnifiedAutomation.UaServer.BaseNodeManager" Collapsed="true">
+    <Position X="4.5" Y="3.5" Width="1.75" />
+    <NestedTypes>
+      <Class Name="UnifiedAutomation.UaServer.BaseNodeManager.BuiltInBrowseStage" Collapsed="true">
+        <TypeIdentifier />
+      </Class>
+    </NestedTypes>
+    <TypeIdentifier />
+    <ShowAsAssociation>
+      <Property Name="Server" />
+    </ShowAsAssociation>
+    <Lollipop Position="0.2" Collapsed="true" />
+  </Class>
+  <Class Name="UnifiedAutomation.UaServer.ServerManager" Collapsed="true">
+    <Position X="1" Y="3.5" Width="1.5" />
+    <TypeIdentifier />
+    <Lollipop Position="0.2" />
+  </Class>
+  <Font Name="Segoe UI" Size="9" />
+</ClassDiagram>

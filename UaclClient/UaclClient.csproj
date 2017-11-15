@@ -57,6 +57,7 @@
     <Compile Include="RemoteObject.cs" />
   </ItemGroup>
   <ItemGroup>
+    <None Include="UaclClient.cd" />
     <None Include="packages.config" />
   </ItemGroup>
   <ItemGroup>

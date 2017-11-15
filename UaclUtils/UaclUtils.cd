@@ -1,0 +1,59 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<ClassDiagram MajorVersion="1" MinorVersion="1">
+  <Comment CommentText="Module UaclUtils&#xD;&#xA;&#xD;&#xA;Contains some helper classes. The most important class in it is the ReflectionHelper.">
+    <Position X="2.865" Y="5.104" Height="1.125" Width="2.762" />
+  </Comment>
+  <Class Name="UaclUtils.ConnectionInfo">
+    <Position X="0.5" Y="0.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAABAAAAAAgAAAAAAACAAAAIAAAAAAAAAAIAA=</HashCode>
+      <FileName>ConnectionInfo.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="UaclUtils.DateTimeHelper">
+    <Position X="2.25" Y="0.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAEAA=</HashCode>
+      <FileName>DateTimeHelper.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="UaclUtils.ExceptionHandler">
+    <Position X="4.75" Y="0.5" Width="1.75" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAQAAAAIAAAAAAAgCAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>ExceptionHandler.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="UaclUtils.Logger">
+    <Position X="0.5" Y="3" Width="1.75" />
+    <Compartments>
+      <Compartment Name="Nested Types" Collapsed="false" />
+    </Compartments>
+    <NestedTypes>
+      <Enum Name="UaclUtils.Logger.LogType">
+        <TypeIdentifier>
+          <NewMemberFileName>Logger.cs</NewMemberFileName>
+        </TypeIdentifier>
+      </Enum>
+    </NestedTypes>
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAQAAAAAAAAAAAAAAABEAAIAAAEAEAAA=</HashCode>
+      <FileName>Logger.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="UaclUtils.ReflectionHelper">
+    <Position X="2.75" Y="2" Width="1.75" />
+    <TypeIdentifier>
+      <HashCode>AEAEAAAAAAAAAAAAAAAAAAAEAAAAAAAAAAAAAAAAAgA=</HashCode>
+      <FileName>ReflectionHelper.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="UaclUtils.TypeMapping">
+    <Position X="5" Y="3.25" Width="2" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAABAAAAAAQAAAAACAAAAAAAAAACA=</HashCode>
+      <FileName>TypeMapping.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Font Name="Segoe UI" Size="9" />
+</ClassDiagram>

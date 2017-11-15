@@ -1,0 +1,74 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<ClassDiagram MajorVersion="1" MinorVersion="1">
+  <Comment CommentText="The helper classes for a RemoteObject instance.">
+    <Position X="5.198" Y="6.76" Height="0.75" Width="1.7" />
+  </Comment>
+  <Comment CommentText="The most important class on 'Client Context' is RemoteObject. Every instance is related to an own 'Network Session'. It's recommended to have that in mind if you create an instance from it!">
+    <Position X="6.094" Y="0.5" Height="1.542" Width="1.7" />
+  </Comment>
+  <Class Name="UaclClient.OpcUaSession">
+    <Position X="0.5" Y="4.25" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAEAAAAEAAAAAAAAAGAAAAAAAAAAAAA=</HashCode>
+      <FileName>OpcUaSession.cs</FileName>
+    </TypeIdentifier>
+    <ShowAsAssociation>
+      <Property Name="Connection" />
+    </ShowAsAssociation>
+  </Class>
+  <Class Name="UaclClient.OpcUaSessionHandle" BaseTypeListCollapsed="true">
+    <Position X="3.25" Y="0.5" Width="2.25" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAACAAAQAgAAAAAAAAQAAAAMoAEACAAAAAAAI=</HashCode>
+      <FileName>OpcUaSessionHandle.cs</FileName>
+    </TypeIdentifier>
+    <ShowAsAssociation>
+      <Property Name="Session" />
+    </ShowAsAssociation>
+    <Lollipop Position="0.2" Collapsed="true" />
+  </Class>
+  <Class Name="UaclClient.RemoteDataMonitor" Collapsed="true">
+    <Position X="2.75" Y="7.75" Width="1.75" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAIAAAAAAASAAAAAAAAAAAAgAAAAQAA=</HashCode>
+      <FileName>RemoteDataMonitor.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="UaclClient.RemoteHelper" Collapsed="true">
+    <Position X="4.75" Y="7.75" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>CAAAAAAAAARkIAAAAgAAAAAAAAgCQAAgAAAIIAgAAIA=</HashCode>
+      <FileName>RemoteHelper.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="UaclClient.RemoteMethod" Collapsed="true">
+    <Position X="2.75" Y="8.75" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAIAAAAAAEAAAQAAgAAAAAAAAAAAAAAABA=</HashCode>
+      <FileName>RemoteMethod.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="UaclClient.RemoteObject">
+    <Position X="7.25" Y="2.25" Width="3.25" />
+    <TypeIdentifier>
+      <HashCode>AAQAAEAABBEIQAWAAACADIQgAAEAAAAAAAAMBAEQAIA=</HashCode>
+      <FileName>RemoteObject.cs</FileName>
+    </TypeIdentifier>
+    <ShowAsAssociation>
+      <Property Name="Connection" />
+      <Property Name="SessionHandle" />
+    </ShowAsAssociation>
+  </Class>
+  <Class Name="UaclClient.RemoteVariable" Collapsed="true">
+    <Position X="4.5" Y="8.75" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAACAAAQgAAAAAAAAAAAgAAEAAAA=</HashCode>
+      <FileName>RemoteVariable.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="UaclUtils.ConnectionInfo" Collapsed="true">
+    <Position X="3.5" Y="5" Width="1.5" />
+    <TypeIdentifier />
+  </Class>
+  <Font Name="Segoe UI" Size="9" />
+</ClassDiagram>
