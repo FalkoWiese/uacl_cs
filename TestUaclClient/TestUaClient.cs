@@ -29,7 +29,7 @@ namespace TestUaclClient
             RemoteObject obj = new RemoteObject("localhost", 48030, "BusinessLogic");
 
             Assert.That(() => obj.Connect(), "Is TRUE!");
-            string value = "Falko und Anke Wiese";
+            const string value = "Moin from *UA Client* ...";
             var bytes = obj.Invoke<byte[]>("GetBytes", value);
             Assert.NotNull(bytes);
 
