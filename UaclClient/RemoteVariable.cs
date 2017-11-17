@@ -2,6 +2,10 @@
 
 namespace UaclClient
 {
+    /**
+     * An instance of this class is the 'Client Side' representation - something like a stub - of a UA Property Node on
+     * Server Side.
+     */
     public class RemoteVariable
     {
         public string Name { get; set; }

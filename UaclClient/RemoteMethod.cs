@@ -3,6 +3,10 @@ using UnifiedAutomation.UaBase;
 
 namespace UaclClient
 {
+    /**
+     * An instance of this class is the 'Client Side' representation - something like a stub - of a UA Method Node on
+     * Server Side.
+     */
     public class RemoteMethod
     {
         public string Name { get; set; }

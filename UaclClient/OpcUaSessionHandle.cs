@@ -5,6 +5,9 @@ using UnifiedAutomation.UaClient;
 
 namespace UaclClient
 {
+    /**
+     * Helper class to handle something about an OpcUaSession instance.
+     */
     public sealed class OpcUaSessionHandle : IDisposable
     {
         public OpcUaSessionHandle(OpcUaSession session)

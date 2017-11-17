@@ -3,6 +3,10 @@ using UnifiedAutomation.UaBase;
 
 namespace UaclClient
 {
+    /**
+     * To announce a callback for a 'Data Change event' on Server Side, an instance of this class is created. This
+     * instance saves all necessary information for those events - BUT - on 'Client Side', for sure.
+     */
     public class RemoteDataMonitor
     {
         public string Name { get; set; }

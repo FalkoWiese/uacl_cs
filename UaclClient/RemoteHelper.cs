@@ -14,6 +14,12 @@ namespace UaclClient
     /// - to monitor Data Changes on a OPC UA Server.
     /// This class should be instanciated within a <see cref="RemoteObject"/> RemoteObject. The associated session is
     /// ment to be instantiated and connected to the desired Server.
+    /// 
+    /// The most important classes for a RemoteHelper instance are:
+    /// - RemoteObject (UA Object Node on Server Side)
+    /// - RemoteVariable (UA Property Node on Server Side)
+    /// - RemoteMethod (UA Method Node on Server Side)
+    /// - RemoteDataMonitor (UA Data Change Event on Server Side)
     /// </summary>
     public class RemoteHelper
     {

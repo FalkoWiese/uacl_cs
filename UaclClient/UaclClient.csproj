@@ -46,7 +46,6 @@
     </Reference>
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="CallObjectsContainer.cs" />
     <Compile Include="RemoteDataMonitor.cs" />
     <Compile Include="RemoteHelper.cs" />
     <Compile Include="OpcUaSession.cs" />
