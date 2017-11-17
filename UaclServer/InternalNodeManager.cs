@@ -9,6 +9,15 @@ using UnifiedAutomation.UaServer;
 
 namespace UaclServer
 {
+    /**
+     * The central class of the UA Server. You need to overwrite (or implement) some methods to have your own
+     * behavior while starting and stopping the UA Server.
+     *
+     * So, it is a good idea to create your 'Server OPC UA Frontend' while server start. Means, create the UA Nodes,
+     * relate your User Objects to it, and so on.
+     *
+     * While stopping the server you should cleanup your 'Server Side Objects'.
+     */
     internal class InternalNodeManager : BaseNodeManager
     {
         public InternalNodeManager(ServerManager server, params string[] namespaceUris)

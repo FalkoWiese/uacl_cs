@@ -5,6 +5,9 @@ using UnifiedAutomation.UaBase;
 
 namespace UaclServer
 {
+    /**
+     * Enables a relation between an Object and a Property from it.
+     */
     internal class VariableNodeData
     {
         public object BusinessObject { get; set; }

@@ -4,6 +4,9 @@ using System.Reflection;
 
 namespace UaclServer
 {
+    /**
+     * Reflection helper class for a specific server side class - BoCapsule.
+     */
     public static class UaReflectionHelper
     {
         public static bool ContainsUaNodes(BoCapsule bo, ref ICollection<object> uaNodeItems)

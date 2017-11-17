@@ -5,6 +5,9 @@ using UaclUtils;
 
 namespace UaclServer
 {
+    /**
+     * Helper class to create Business Objects and UA Objects.
+     */
     internal class UaFactory
     {
         public UaFactory(InternalServer server)

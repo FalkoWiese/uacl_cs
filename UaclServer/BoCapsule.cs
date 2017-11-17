@@ -3,6 +3,9 @@ using UnifiedAutomation.UaBase;
 
 namespace UaclServer
 {
+    /**
+     * The intention is to have a class what combines a BoModel and it's NodeId.
+     */
     public class BoCapsule
     {
         protected bool Equals(BoCapsule other)

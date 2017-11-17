@@ -8,6 +8,11 @@ using UnifiedAutomation.UaServer;
 
 namespace UaclServer
 {
+    /**
+     * The InternalServerManager is a helper class for our InternalServer and InternalNodeManager instances.
+     *
+     * The instance of this manager is used to register and to unregister UA Nodes Objects.
+     */
     public class InternalServerManager : ServerManager
     {
         public InternalServerManager(params string[] uris)
