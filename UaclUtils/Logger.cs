@@ -2,6 +2,11 @@
 
 namespace UaclUtils
 {
+    /**
+     * A pretty simple Logger.
+     *
+     * Maybe it's worth to include 'Log4Net', maybe.
+     */
     public class Logger
     {
         private enum LogType

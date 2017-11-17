@@ -3,6 +3,9 @@ using UnifiedAutomation.UaBase;
 
 namespace UaclUtils
 {
+    /**
+     * Class to hold all necessary conversion methods from .NET (base) Data Types to OPC UA Types and vice versa.
+     */
     public sealed class TypeMapping
     {
         public static Variant MapType<T>()

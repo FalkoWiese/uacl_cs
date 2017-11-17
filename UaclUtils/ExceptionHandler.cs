@@ -2,7 +2,9 @@
 
 namespace UaclUtils
 {
-
+    /**
+     * Class what contains some helper methods about Errors and Exceptions.
+     */
     public class ExceptionHandler
     {
         private Exception Error { get; set; }

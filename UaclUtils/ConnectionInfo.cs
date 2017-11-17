@@ -1,5 +1,8 @@
 ﻿namespace UaclUtils
 {
+    /**
+     * Saves the Connection Information.
+     */
     public class ConnectionInfo
     {
         public ConnectionInfo(string ip, int port, string application)

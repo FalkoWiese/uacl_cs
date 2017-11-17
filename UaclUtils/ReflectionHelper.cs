@@ -2,6 +2,9 @@
 
 namespace UaclUtils
 {
+    /**
+     * Class what encapsulates some stuff about 'Introspection of the .NET Common Language Runtime (CLR'.
+     */
     public class ReflectionHelper
     {
         public ReflectionHelper(object item)
