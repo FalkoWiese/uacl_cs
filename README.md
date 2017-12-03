@@ -173,7 +173,7 @@ That's an *UA Client* to the above created *UA Server Object Node*.
 ```
 Now we have a connection to the *UA Object Node* created.
 
-#### How to read/write a *UA Property*?
+#### How to read/write an *UA Property*?
 ```c#
     var s0 = obj.Read<string>("BoState");
 ```
@@ -188,7 +188,7 @@ I think, that's easy. I would recommend to deal with your *UA Server* in an obje
 manipulate your *Server Objects* while execution of *Remoted Methods* and give the internal state of your
 *Remote Objects* with changed *Properties* to outside. So, we should *monitor* these properties. 
 
-#### How to monitor a *UA Property*?
+#### How to monitor an *UA Property*?
 ```c#
     obj.Monitor(
         "BoState",
@@ -197,7 +197,7 @@ manipulate your *Server Objects* while execution of *Remoted Methods* and give t
 Yup, it's as easy as the stuff above. The given (really simple) logging *Client Side Callback* will executed,
 if we notice an *Value Change* on *Server Side*.
 
-#### How to call a *UA Method*?
+#### How to call an *UA Method*?
 ```c#
     const string value = "Moin from *UA Client* ...";
     var bytes = obj.Invoke<byte[]>("GetBytes", value);
