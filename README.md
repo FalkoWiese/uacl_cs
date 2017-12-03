@@ -74,9 +74,9 @@ The library consists of three modules *UaclUtils*, *UaclServer*, and
 There exist some class diagrams. One for every library. Please have look to the 
 source tree. My intention was, to show them right here...
 
- - ![UaclUtils Class Diagram](https://gitlab.com/falko.wiese/uacl_cs/blob/master/UaclUtils.png)
- - ![UaclServer Class Diagram](https://gitlab.com/falko.wiese/uacl_cs/blob/master/UaclServer.png)
- - ![UaclClient Class Diagram](https://gitlab.com/falko.wiese/uacl_cs/blob/master/UaclClient.png)
+ - ![UaclUtils Class Diagram](img/UaclUtils.jpg)
+ - ![UaclServer Class Diagram](img/UaclServer.jpg)
+ - ![UaclClient Class Diagram](img/UaclClient.jpg)
  
 
 ## Examples?
