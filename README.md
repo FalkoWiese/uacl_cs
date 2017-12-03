@@ -71,12 +71,10 @@ http://www.unified-automation.com.
 The library consists of three modules *UaclUtils*, *UaclServer*, and 
 *UaclClient*.
 
-There exist some class diagrams. One for every library. Please have look to the 
-source tree. My intention was, to show them right here...
-
- - ![UaclUtils Class Diagram](img/UaclUtils.jpg)
- - ![UaclServer Class Diagram](img/UaclServer.jpg)
- - ![UaclClient Class Diagram](img/UaclClient.jpg)
+Every class contains a brief description. If you need more help, it is
+recommended to have a look into the given example projects! There are
+also class diagrams available, one for every assembly. If needed, have
+a look into it.
  
 
 ## Examples?
