@@ -84,7 +84,7 @@ You will find full featured client and server application examples at:
 - [OfficeConsole](https://gitlab.com/falko.wiese/uacl_cs/tree/master/OfficeConsole) 
 - [ServerConsole](https://gitlab.com/falko.wiese/uacl_cs/tree/master/ServerConsole)
 
-There you can find best practices and idioms for the usage of **UACL**.
+They depend on each other. There you can find best practices and idioms for the usage of **UACL**.
 
 ## Tests!
 You will find some unit tests at:
