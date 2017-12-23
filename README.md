@@ -1,8 +1,7 @@
 # Unified Architecture Convenience Layer (UACL)
 
 ## Project websites?
- - **Code repository:** 
-    - **.NET**: [*THIS*](https://gitlab.com/falko.wiese/uacl_cs)
+ - **Code repository:** [*THIS*](https://gitlab.com/falko.wiese/uacl_cs)
 
  - Git Branches:
      - `master`: tested and production-ready, has the latest API and the latest 
