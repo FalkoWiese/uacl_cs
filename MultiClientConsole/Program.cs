@@ -7,6 +7,8 @@ using UaclUtils;
 
 namespace MultiClientConsole
 {
+    delegate ModuleDescription DescFactory(AppDescription app, string suffix);
+
     class Program
     {
         static void Main()
@@ -14,47 +16,75 @@ namespace MultiClientConsole
             InternalServer server = null;
             try
             {
+                var weberScannerDesc = new AppDescription
+                {
+                    BaseUrl = "https://weber.adamos-dev.com",
+                    DeviceId = "206293"
+                };
+                var weberSlicerDesc = new AppDescription
+                {
+                    BaseUrl = "https://weber.adamos-dev.com",
+                    DeviceId = "206292"
+                };
+
+                var weber2ScannerDesc = new AppDescription
+                {
+                    BaseUrl = "https://weber2.adamos-dev.com",
+                    DeviceId = "198123",
+                };
+                var weber2SlicerDesc = new AppDescription
+                {
+                    BaseUrl = "https://weber2.adamos-dev.com",
+                    DeviceId = "198084",
+                };
+
+
+                DescFactory descFactory = delegate(AppDescription app, string suffix)
+                {
+                    var desc = new ModuleDescription
+                    {
+                        UrlPrefix = app.BaseUrl,
+                        Suffix = suffix,
+                        AdamosId = app.DeviceId,
+                        Username = "<username>",
+                        Password = "<password>"
+                    };
+                    return desc;
+                };
+
                 server = new MultiClientServer();
-                // The Multi Client Host ...
-                var parent = server.CreateClient<MultiClientHost>();
-                // The Server Console Client ...
-                var scc = new ServerConsoleClient();
-                server.CreateClient(scc, parent).SetDisconnectedHandler(
-                    (session, args) => { scc.StartConnectionEstablishment(); });
-                // The Client Console Client ...
-                var ccc = new ClientConsoleClient();
-                server.CreateClient(ccc, parent);
-                var bo1 = new CccBo1();
-                server.CreateClient(bo1, ccc);
-                server.CreateClient(new CccBo2(), bo1);
+
+                var slicer = new WpcModuleClient("172.20.30.231", 4841, "M01_SLICER")
+                {
+                    Desc = descFactory(weber2SlicerDesc, "event/events")
+                };
+                server.CreateClient(slicer)
+                    .SetDisconnectedHandler((session, args) => { slicer.StartConnectionEstablishment(); });
+
+                var weights = new WpcTrackClient("172.20.30.231", 4841, "M01_SLICER")
+                {
+                    Desc = descFactory(weber2SlicerDesc, "measurement/measurements")
+                };
+                server.CreateClient(weights)
+                    .SetDisconnectedHandler((session, args) => { weights.StartConnectionEstablishment(); });
+
+                var scanner = new WpcModuleClient("172.20.30.231", 4841, "M00_CLASSIC_PDM_SYSTEM")
+                {
+                    Desc = descFactory(weber2ScannerDesc, "event/events")
+                };
+
+                server.CreateClient(scanner)
+                    .SetDisconnectedHandler((session, args) => { scanner.StartConnectionEstablishment(); });
 
                 if (!server.Start())
                 {
                     throw new Exception("Cannot start UA Server without errors!");
                 }
 
-                var startTs = DateTimeHelper.currentTimeMillis();
                 while (true)
                 {
                     Thread.Sleep(1000);
-/*
-                    var runtime = DateTimeHelper.currentTimeMillis() - startTs;
-                    if (15000 < runtime && runtime < 17000)
-                    {
-                        var cl = server.AddClient<ClientConsoleClient>();
-                        Logger.Info($"{cl} added.");
-                    }
-                    else if (runtime > 17000)
-                    {
-                        var registeredClients = server.RegisteredClients();
-                        if (registeredClients.Count <= 1) continue;
-                        Console.Out.WriteLine($"Registered Business Object count == {registeredClients.Count}");
-                        var lbo = registeredClients.Last();
-                        server.RemoveClient(lbo.BoId);
-                    }
-*/
                 }
-
             }
             catch (Exception e)
             {
