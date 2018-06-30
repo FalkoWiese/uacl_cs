@@ -91,7 +91,7 @@ namespace UaclClient
             NodeId resultNode = null;
             if (parentNode == null)
             {
-                parentNode = new NodeId(OpcUaIdRootFolder);
+                parentNode = new NodeId(OpcUaIdObjectsFolder);
             }
 
             byte[] continuationPoint;
@@ -222,7 +222,7 @@ namespace UaclClient
 
         public static char[] PathSeparators()
         {
-            return new[] {'.', ':'};
+            return new[] {'.', ':', '/'};
         }
 
         public static string RestOfPath(string path, out string firstElement)
