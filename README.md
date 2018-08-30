@@ -1,7 +1,7 @@
 # Unified Architecture Convenience Layer (UACL)
 
 ## Project websites?
- - **Code repository:** [*THIS*](https://gitlab.com/falko.wiese/uacl_cs)
+ - **Code repository:** [*THIS*](https://github.com/FalkoWiese/uacl_cs)
 
  - Git Branches:
      - `master`: tested and production-ready, has the latest API and the latest 
@@ -79,20 +79,20 @@ a look into it.
 ## Examples?
 You will find full featured client and server application examples at:
 
-- [MultiClientConsole](https://gitlab.com/falko.wiese/uacl_cs/tree/master/MultiClientConsole) 
-- [OfficeConsole](https://gitlab.com/falko.wiese/uacl_cs/tree/master/OfficeConsole) 
-- [ServerConsole](https://gitlab.com/falko.wiese/uacl_cs/tree/master/ServerConsole)
+- [MultiClientConsole](https://github.com/FalkoWiese/uacl_cs/tree/master/MultiClientConsole) 
+- [OfficeConsole](https://github.com/FalkoWiese/uacl_cs/tree/master/OfficeConsole) 
+- [ServerConsole](https://github.com/FalkoWiese/uacl_cs/tree/master/ServerConsole)
 
 They depend on each other. There you can find best practices and idioms for the usage of **UACL**.
 
 ## Tests!
 You will find some unit tests at:
 
-- [TestOfficeConsole](https://gitlab.com/falko.wiese/uacl_cs/tree/master/TestOfficeConsole) 
-- [TestServerConsole](https://gitlab.com/falko.wiese/uacl_cs/tree/master/TestServerConsole) 
-- [TestUaclClient](https://gitlab.com/falko.wiese/uacl_cs/tree/master/TestUaclClient) 
-- [TestUaclServer](https://gitlab.com/falko.wiese/uacl_cs/tree/master/TestUaclServer) 
-- [TestUaclUtils](https://gitlab.com/falko.wiese/uacl_cs/tree/master/TestUaclUtils)
+- [TestOfficeConsole](https://github.com/FalkoWiese/uacl_cs/tree/master/TestOfficeConsole) 
+- [TestServerConsole](https://github.com/FalkoWiese/uacl_cs/tree/master/TestServerConsole) 
+- [TestUaclClient](https://github.com/FalkoWiese/uacl_cs/tree/master/TestUaclClient) 
+- [TestUaclServer](https://github.com/FalkoWiese/uacl_cs/tree/master/TestUaclServer) 
+- [TestUaclUtils](https://github.com/FalkoWiese/uacl_cs/tree/master/TestUaclUtils)
 
 ### How to create an *UA Server*?
 ```c#
@@ -157,7 +157,7 @@ have to implement some of the code from *ServerSideUaProxy* in your class.
     }
 ```
 That's the only thing, you have to do. I suggest some decoration with a bit convenience or security code,
-but yep, that's it. You will find the whole example at the [ServerConsole](https://bitbucket.org/falko_wiese/concept_laser/src/ecb7966318dccd989711185ac0e9900381776ee6/ServerConsole/?at=master)
+but yep, that's it. You will find the whole example at the [ServerConsole](https://github.com/FalkoWiese/uacl_cs/tree/master/ServerConsole)
 example.
 
 ### How to create an *UA Client*?
