@@ -19,7 +19,7 @@ enum34==1.0.4
 # python -m easy_install --always-unzip http://downloads.sourceforge.net/project/pywin32/pywin32/Build%20218/pywin32-218.win32-py2.7.exe
 # pywin32==218
 Fabric==1.10.2 # requires paramiko pycrypto
-paramiko==1.17.6
+paramiko==2.0.9
 quik==0.2.2
 
 # python -m easy_install PySide # ProxyBase Syntax Error kann ignoriert werden
